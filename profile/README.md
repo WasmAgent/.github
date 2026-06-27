@@ -1,8 +1,6 @@
 # WasmAgent
 
-Evidence-first stack for governed AI agents and MCP-based tool use.
-
-> **Training is optional and gated. Evidence is mandatory.**
+Protect agent runs. Record evidence. Audit claims. Train only from trusted traces.
 
 ## Projects
 
