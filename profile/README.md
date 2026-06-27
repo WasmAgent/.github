@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/WasmAgent/wasmagent/main/assets/logo.png" width="120" alt="WasmAgent logo"/>
-</p>
-
 # WasmAgent
 
 Evidence-first stack for governed AI agents and MCP-based tool use.
