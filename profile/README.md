@@ -6,8 +6,8 @@ Protect agent runs. Record evidence. Audit claims. Train only from trusted trace
 
 | Repository | Role |
 | --- | --- |
-| [wasmagent-js](https://github.com/WasmAgent/wasmagent-js) | Embedded agent runtime — WASM sandbox, MCP firewall, capability manifests, AEP emitter |
-| [bscode](https://github.com/WasmAgent/bscode) | Reference coding-agent workload on Cloudflare Workers; AEP evidence export |
+| [wasmagent-js](https://github.com/WasmAgent/wasmagent-js) | **Runtime** · Embedded agent runtime — WASM sandbox, MCP firewall, capability manifests, AEP emitter |
+| [bscode](https://github.com/WasmAgent/bscode) | **Workload** · Reference coding-agent workload on Cloudflare Workers; AEP evidence export |
 | [trace-pipeline](https://github.com/WasmAgent/trace-pipeline) | Measurement trust · evidence admission gate · training-audit backend |
 | [agent-trust-infra](https://github.com/WasmAgent/agent-trust-infra) | Agent Trust Infrastructure — AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI |
 | [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | Enterprise audit product — evidence reports, regulatory mappings, benchmark claim audit |
@@ -26,8 +26,9 @@ verifiers, mirroring the role `bscode` plays for coding tasks.
 
 ![WasmAgent product matrix](../assets/product-matrix.svg)
 
-`wasmagent-js` protects agent execution and emits signed AEP events. Real
-workloads (`bscode`, future `erp-agent`) produce verifiable runtime traces.
+The **runtime** layer — `wasmagent-js` — protects agent execution and emits
+signed AEP events. Real **workloads** (`bscode`, future `erp-agent`) produce
+verifiable runtime traces.
 `trace-pipeline` audits benchmark claims with paired statistics, gates training
 data admission, and records every training run as auditable evidence.
 `agent-trust-infra` layers on trust artifacts — AgentBOM, MCP Posture, and
