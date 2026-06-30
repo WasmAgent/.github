@@ -5,11 +5,13 @@ Protect agent runs. Record evidence. Audit claims. Train only from trusted trace
 ## Projects
 
 | Repository | Role |
-|---|---|
+| --- | --- |
 | [wasmagent-js](https://github.com/WasmAgent/wasmagent-js) | Embedded agent runtime — WASM sandbox, MCP firewall, capability manifests, AEP emitter |
 | [bscode](https://github.com/WasmAgent/bscode) | Reference coding-agent workload on Cloudflare Workers; AEP evidence export |
 | [trace-pipeline](https://github.com/WasmAgent/trace-pipeline) | Measurement trust · evidence admission gate · training-audit backend |
+| [agent-trust-infra](https://github.com/WasmAgent/agent-trust-infra) | Agent Trust Infrastructure — AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI |
 | [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | Enterprise audit product — evidence reports, regulatory mappings, benchmark claim audit |
+| [fresharena](https://github.com/WasmAgent/fresharena) | Dynamic, verifiable, adversarial evaluation protocol for coding agents |
 | [wasmagent](https://github.com/WasmAgent/wasmagent) | Project home — roadmap, claim registry, release ledger |
 
 Planned: `erp-agent` — an ERP-domain workload with order-state and ledger
@@ -23,8 +25,14 @@ verifiers, mirroring the role `bscode` plays for coding tasks.
 workloads (`bscode`, future `erp-agent`) produce verifiable runtime traces.
 `trace-pipeline` audits benchmark claims with paired statistics, gates training
 data admission, and records every training run as auditable evidence.
+`agent-trust-infra` layers on trust artifacts — AgentBOM, MCP Posture, and
+Trust Passport — giving every agent run a machine-readable identity and
+policy posture that feeds downstream audit.
 `open-agent-audit` turns the full evidence chain into enterprise-readable
 audit reports — deployed at **[trustavo.com](https://trustavo.com)**.
+`fresharena` closes the loop with dynamic, verifiable, adversarial evaluation
+of coding agents, ensuring the runtime, evidence, and audit story is grounded
+in real benchmark performance.
 
 ## What is Trustavo?
 
@@ -43,9 +51,13 @@ sustained track record.
 - **Runtime** — `wasmagent-js`, AEP, MCP firewall, capability manifests
 - **Workloads** — `bscode`, the planned `erp-agent`, future domain workloads
 - **Pipelines** — `trace-pipeline` (measurement trust, admission, training audit)
-- **Audit product** — `open-agent-audit` / Trustavo (evidence reports, Cloudflare Workers)
+- **Trust artifacts** — `agent-trust-infra` (AgentBOM, MCP Posture, Trust Passport)
+- **Audit product** — `open-agent-audit` / Trustavo
+  (evidence reports, Cloudflare Workers)
+- **Evaluation** — `fresharena` (adversarial evaluation protocol for coding agents)
 - **Adapters** — OpenTelemetry GenAI, Langfuse, LangSmith ingestion
-- **Regulatory profiles** — OWASP Agentic Top 10, NIST AI RMF, ISO/IEC 42001, EU AI Act Annex IV mappings
+- **Regulatory profiles** — OWASP Agentic Top 10, NIST AI RMF,
+  ISO/IEC 42001, EU AI Act Annex IV mappings
 - **DevRel & docs** — quickstart guides, integration walkthroughs, sample reports
 
 Interested? Open an issue titled `maintainer: <area>` in the relevant
