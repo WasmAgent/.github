@@ -13,7 +13,7 @@ Protect agent runs. Record evidence. Audit claims. Train only from trusted trace
 | [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | Enterprise audit product — evidence reports, regulatory mappings, benchmark claim audit |
 | [fresharena](https://github.com/WasmAgent/fresharena) | Dynamic, verifiable, adversarial evaluation protocol for coding agents |
 | ⚙️ [claude-bot](https://github.com/WasmAgent/claude-bot) | Internal automation — issue triage, PR review, and cross-repo coherence patrol (not a public product) |
-| ⚙️ [wasmagent-ops](https://github.com/WasmAgent/wasmagent-ops) | Private operations hub — generators and ops tooling for the org (not a public product) |
+| ⚙️ [wasmagent-ops](https://github.com/WasmAgent/wasmagent-ops) | Private operations hub — generators and ops tooling for the org (not a public product; listed for inventory completeness) |
 
 > ⚙️ marks **internal** repositories that support org operations
 > (automation, patrols, tooling) but ship no public product. They are listed
