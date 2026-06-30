@@ -13,6 +13,7 @@ Protect agent runs. Record evidence. Audit claims. Train only from trusted trace
 | [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | Enterprise audit product — evidence reports, regulatory mappings, benchmark claim audit |
 | [fresharena](https://github.com/WasmAgent/fresharena) | Dynamic, verifiable, adversarial evaluation protocol for coding agents |
 | ⚙️ [claude-bot](https://github.com/WasmAgent/claude-bot) | Internal automation — issue triage, PR review, and cross-repo coherence patrol (not a public product) |
+| ⚙️ [telleroutlook/claude-bot](https://github.com/telleroutlook/claude-bot) | Automation bot — org-coherence patrol, issue triage, and PR review across repos (not a public product) |
 
 Planned: `erp-agent` — an ERP-domain workload with order-state and ledger
 verifiers, mirroring the role `bscode` plays for coding tasks.
