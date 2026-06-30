@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title>WasmAgent logo</title>
+  <desc>Hexagon mark enclosing a trust shield with a check, the WasmAgent brand.</desc>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4f46e5"/>
+      <stop offset="1" stop-color="#0ea5e9"/>
+    </linearGradient>
+  </defs>
+  <polygon points="238,128 183,33 73,33 18,128 73,223 183,223" fill="url(#g)"/>
+  <polygon points="238,128 183,33 73,33 18,128 73,223 183,223" fill="none" stroke="#312e81" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M128,66 L172,86 L172,140 C172,178 152,202 128,212 C104,202 84,178 84,140 L84,86 Z" fill="#ffffff"/>
+  <path d="M128,66 L172,86 L172,140 C172,178 152,202 128,212 C104,202 84,178 84,140 L84,86 Z" fill="none" stroke="#312e81" stroke-width="3" stroke-linejoin="round"/>
+  <polyline points="106,140 122,156 154,118" fill="none" stroke="#4f46e5" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

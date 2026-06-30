@@ -1,0 +1,71 @@
+# WasmAgent public claims registry.
+# Each entry maps an org-made claim to its supporting evidence and review
+# status. This is a public ledger: edit in place only with merged evidence.
+schema_version: 1
+org: WasmAgent
+last_reviewed: 2026-06-30
+claims:
+  - id: WA-C-0001
+    domain: runtime
+    claim: >-
+      wasmagent-js sandboxes agent tools in WebAssembly and enforces an MCP
+      firewall gated by per-agent capability manifests, emitting signed Agent
+      Evidence Protocol (AEP) events.
+    evidence:
+      repo: wasmagent-js
+      artifacts:
+        - capability manifest format
+        - AEP event emitter
+    status: supported
+    recorded: 2026-06-30
+  - id: WA-C-0002
+    domain: evidence
+    claim: >-
+      trace-pipeline admits training data only from runs whose traces pass
+      paired-statistics evidence checks, and records every training run as
+      auditable evidence.
+    evidence:
+      repo: trace-pipeline
+      artifacts:
+        - evidence admission gate
+        - training-run audit log
+    status: supported
+    recorded: 2026-06-30
+  - id: WA-C-0003
+    domain: trust
+    claim: >-
+      agent-trust-infra gives every agent run a machine-readable identity and
+      policy posture through AgentBOM, MCP Posture, and Trust Passport artifacts.
+    evidence:
+      repo: agent-trust-infra
+      artifacts:
+        - AgentBOM spec
+        - MCP Posture spec
+        - Trust Passport spec
+    status: in-progress
+    recorded: 2026-06-30
+  - id: WA-C-0004
+    domain: audit
+    claim: >-
+      open-agent-audit renders the full evidence chain into enterprise-readable
+      audit reports with mappings to OWASP Agentic Top 10, NIST AI RMF,
+      ISO/IEC 42001, and EU AI Act Annex IV.
+    evidence:
+      repo: open-agent-audit
+      artifacts:
+        - report renderer
+        - regulatory mapping profiles
+    status: in-progress
+    recorded: 2026-06-30
+  - id: WA-C-0005
+    domain: evaluation
+    claim: >-
+      fresharena evaluates coding agents with dynamic, verifiable, adversarial
+      tasks whose results feed back into the evidence chain.
+    evidence:
+      repo: fresharena
+      artifacts:
+        - evaluation protocol
+        - verifiable task harness
+    status: in-progress
+    recorded: 2026-06-30
