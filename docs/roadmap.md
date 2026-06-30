@@ -54,6 +54,11 @@ unticked items are planned or in progress. This document mirrors
 
 - ✅ `.github` — org profile, public ledgers, and shared org docs.
 
+### Ops ✅
+
+- ✅ `wasmagent-ops` — internal operations hub: generators and ops tooling for
+  the org. Ships no public product; listed for inventory completeness.
+
 ## Cross-cutting (planned)
 
 - 📋 Ingestion adapters: OpenTelemetry GenAI, Langfuse, LangSmith.
