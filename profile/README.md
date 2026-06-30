@@ -15,9 +15,6 @@ Protect agent runs. Record evidence. Audit claims. Train only from trusted trace
 | ⚙️ [claude-bot](https://github.com/WasmAgent/claude-bot) | Internal automation — issue triage, PR review, and cross-repo coherence patrol (not a public product) |
 | ⚙️ [wasmagent-ops](https://github.com/WasmAgent/wasmagent-ops) | Private operations hub — generators and ops tooling for the org (not a public product) |
 
-Planned: `erp-agent` — an ERP-domain workload with order-state and ledger
-verifiers, mirroring the role `bscode` plays for coding tasks.
-
 > ⚙️ marks **internal** repositories that support org operations
 > (automation, patrols, tooling) but ship no public product. They are listed
 > here to keep the public inventory complete and accurate.
@@ -27,7 +24,7 @@ verifiers, mirroring the role `bscode` plays for coding tasks.
 ![WasmAgent product matrix](../assets/product-matrix.svg)
 
 The **runtime** layer — `wasmagent-js` — protects agent execution and emits
-signed AEP events. Real **workloads** (`bscode`, future `erp-agent`) produce
+signed AEP events. Real **workloads** (`bscode`) produce
 verifiable runtime traces.
 `trace-pipeline` audits benchmark claims with paired statistics, gates training
 data admission, and records every training run as auditable evidence.
@@ -55,7 +52,7 @@ part-time and async contribution; commit access is granted after a
 sustained track record.
 
 - **Runtime** — `wasmagent-js`, AEP, MCP firewall, capability manifests
-- **Workloads** — `bscode`, the planned `erp-agent`, future domain workloads
+- **Workloads** — `bscode`, future domain workloads
 - **Pipelines** — `trace-pipeline` (measurement trust, admission, training audit)
 - **Trust artifacts** — `agent-trust-infra` (AgentBOM, MCP Posture, Trust Passport)
 - **Audit product** — `open-agent-audit` / Trustavo
