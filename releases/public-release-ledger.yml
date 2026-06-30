@@ -1,0 +1,41 @@
+# WasmAgent public release ledger.
+# Tracks public releases across org repositories. Entries are landmark
+# summaries; each repo's git tags remain the canonical source of truth.
+schema_version: 1
+org: WasmAgent
+releases:
+  - repo: wasmagent-js
+    version: "0.1.0"
+    kind: initial-public
+    summary: Embedded agent runtime — WASM sandbox, MCP firewall, AEP emitter.
+    released: 2026-06-30
+  - repo: bscode
+    version: "0.1.0"
+    kind: initial-public
+    summary: Reference coding-agent workload on Cloudflare Workers with AEP export.
+    released: 2026-06-30
+  - repo: trace-pipeline
+    version: "0.1.0"
+    kind: initial-public
+    summary: Measurement trust, evidence admission gate, training-audit backend.
+    released: 2026-06-30
+  - repo: agent-trust-infra
+    version: "0.1.0"
+    kind: initial-public
+    summary: AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI.
+    released: 2026-06-30
+  - repo: open-agent-audit
+    version: "0.1.0"
+    kind: initial-public
+    summary: Enterprise audit product; deployed at trustavo.com.
+    released: 2026-06-30
+  - repo: fresharena
+    version: "0.1.0"
+    kind: initial-public
+    summary: Dynamic, verifiable, adversarial evaluation protocol for coding agents.
+    released: 2026-06-30
+  - repo: .github
+    version: "2026.06"
+    kind: profile-refresh
+    summary: Org profile, public ledgers, shared docs, redrawn product matrix.
+    released: 2026-06-30

@@ -12,14 +12,13 @@ Protect agent runs. Record evidence. Audit claims. Train only from trusted trace
 | [agent-trust-infra](https://github.com/WasmAgent/agent-trust-infra) | Agent Trust Infrastructure — AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI |
 | [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | Enterprise audit product — evidence reports, regulatory mappings, benchmark claim audit |
 | [fresharena](https://github.com/WasmAgent/fresharena) | Dynamic, verifiable, adversarial evaluation protocol for coding agents |
-| [wasmagent](https://github.com/WasmAgent/wasmagent) | Project home — roadmap, claim registry, release ledger |
 
 Planned: `erp-agent` — an ERP-domain workload with order-state and ledger
 verifiers, mirroring the role `bscode` plays for coding tasks.
 
 ## Product matrix
 
-![WasmAgent product matrix](https://raw.githubusercontent.com/WasmAgent/wasmagent/main/assets/product-matrix.webp)
+![WasmAgent product matrix](../assets/product-matrix.svg)
 
 `wasmagent-js` protects agent execution and emits signed AEP events. Real
 workloads (`bscode`, future `erp-agent`) produce verifiable runtime traces.
@@ -62,6 +61,16 @@ sustained track record.
 
 Interested? Open an issue titled `maintainer: <area>` in the relevant
 repository, or start a GitHub Discussion in the project home repository.
+
+## Ledgers & registries
+
+Public ledgers and shared docs live in this repository so they belong to the
+org, not any single product.
+
+- [Claims registry](../claims/public-claims.yml) — org claims mapped to evidence and review status
+- [Release ledger](../releases/public-release-ledger.yml) — public releases across repositories
+- [Media & posts](../media/posts.yml) — talks, posts, and appearances
+- [Roadmap](../docs/roadmap.md) — living roadmap mirroring the public repo list
 
 ## Disclaimer
 

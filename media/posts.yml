@@ -1,0 +1,32 @@
+# WasmAgent public media & posts registry.
+# Talks, posts, and appearances by the org and its maintainers. Entries are
+# topical pointers, not exhaustive citations.
+schema_version: 1
+org: WasmAgent
+posts:
+  - id: WA-M-0001
+    kind: overview
+    title: "WasmAgent: protect agent runs, record evidence, audit claims"
+    venue: Organization profile
+    summary: >-
+      Evidence-first positioning for the org across runtime, workloads,
+      evidence pipelines, trust artifacts, audit, and adversarial evaluation.
+    topics: [runtime, evidence, trust, audit, evaluation]
+    recorded: 2026-06-30
+  - id: WA-M-0002
+    kind: concept
+    title: "Why evidence-first agent evaluation"
+    venue: Project home discussion
+    summary: >-
+      Benchmark numbers are claims; paired statistics and admission gates make
+      them auditable.
+    topics: [evaluation, evidence, fresharena]
+    recorded: 2026-06-30
+  - id: WA-M-0003
+    kind: concept
+    title: "AgentBOM, MCP Posture, and Trust Passport"
+    venue: agent-trust-infra
+    summary: >-
+      A machine-readable identity and policy posture for every agent run.
+    topics: [trust, agent-trust-infra]
+    recorded: 2026-06-30
