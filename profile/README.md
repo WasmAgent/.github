@@ -12,7 +12,7 @@ Protect agent runs. Record evidence. Audit claims. Train only from trusted trace
 | [trace-pipeline](https://github.com/WasmAgent/trace-pipeline) | trace-to-training backend / data factory |
 | [agent-trust-infra](https://github.com/WasmAgent/agent-trust-infra) | **Trust artifacts** · AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI |
 | [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | Enterprise audit product — evidence reports, regulatory mappings, benchmark claim audit |
-| [fresharena](https://github.com/WasmAgent/fresharena) | **Evaluation** · Dynamic, verifiable, adversarial evaluation protocol for coding agents |
+| [fresharena](https://github.com/WasmAgent/fresharena) | **Evaluation protocol** · Dynamic, verifiable, adversarial evaluation protocol for coding agents |
 | ⚙️ [claude-bot](https://github.com/WasmAgent/claude-bot) | Internal automation — issue triage, PR review, and cross-repo coherence patrol (not a public product) |
 | ⚙️ [wasmagent-ops](https://github.com/WasmAgent/wasmagent-ops) | Private operations hub — generators and ops tooling for the org (not a public product) |
 
@@ -61,7 +61,7 @@ sustained track record.
 - **Trust artifacts** — `agent-trust-infra` (AgentBOM, MCP Posture, Trust Passport)
 - **Audit product** — `open-agent-audit` / Trustavo
   (evidence reports, Cloudflare Workers)
-- **Evaluation** — `fresharena` (adversarial evaluation protocol for coding agents)
+- **Evaluation** — `fresharena` (dynamic, verifiable, adversarial evaluation protocol for coding agents)
 - **Adapters** — OpenTelemetry GenAI, Langfuse, LangSmith ingestion
 - **Regulatory profiles** — OWASP Agentic Top 10, NIST AI RMF,
   ISO/IEC 42001, EU AI Act Annex IV mappings
