@@ -8,7 +8,6 @@ Protect agent runs. Record evidence. Audit claims. Train only from trusted trace
 | --- | --- |
 | [wasmagent](https://github.com/WasmAgent/wasmagent) | **Project home** · Public landing page that directs readers to [`.github`](https://github.com/WasmAgent/.github) for the full roadmap and project list |
 | [wasmagent-js](https://github.com/WasmAgent/wasmagent-js) | **Runtime** · Embedded agent runtime — WASM sandbox, MCP firewall, capability manifests, signed AEP event emitter |
-| [bscode](https://github.com/WasmAgent/bscode) | **Workload** · Reference coding-agent workload on Cloudflare Workers; AEP evidence export |
 | [trace-pipeline](https://github.com/WasmAgent/trace-pipeline) | trace-to-training backend / data factory |
 | [agent-trust-infra](https://github.com/WasmAgent/agent-trust-infra) | **Trust artifacts** · AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI |
 | [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | Enterprise audit product — evidence reports, regulatory mappings, benchmark claim audit |
@@ -28,8 +27,7 @@ inventory complete and accurate.
 ![WasmAgent product matrix](../assets/product-matrix.svg)
 
 The **runtime** layer — `wasmagent-js` — protects agent execution and emits
-signed AEP events. Real **workloads** (`bscode`) produce
-verifiable runtime traces.
+signed AEP events that flow into verifiable runtime traces.
 `trace-pipeline` audits benchmark claims with paired statistics, gates training
 data admission, and records every training run as auditable evidence.
 `agent-trust-infra` layers on trust artifacts — AgentBOM, MCP Posture, and
@@ -56,7 +54,6 @@ part-time and async contribution; commit access is granted after a
 sustained track record.
 
 - **Runtime** — `wasmagent-js`, AEP, MCP firewall, capability manifests
-- **Workloads** — `bscode`, future domain workloads
 - **Pipelines** — `trace-pipeline` (measurement trust, admission, training audit)
 - **Trust artifacts** — `agent-trust-infra` (AgentBOM, MCP Posture, Trust Passport)
 - **Audit product** — `open-agent-audit` / Trustavo
