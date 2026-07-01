@@ -20,9 +20,9 @@ Protect agent runs. Record evidence. Audit claims. Train only from trusted trace
 ### Internal tools
 
 The ⚙️ entries in the table above — `claude-bot` and `wasmagent-ops` — are the
-org's **internal tools**. They support org operations (automation, patrols,
-tooling) but ship no public product, and are listed here to keep the public
-inventory complete and accurate.
+org's **internal tools**. They support org operations (automation, patrols, and
+tooling) but ship no public product, and are listed here only to keep
+the public inventory complete and accurate.
 
 ## Product matrix
 
