@@ -15,9 +15,12 @@ Protect agent runs. Record evidence. Audit claims. Train only from trusted trace
 | ⚙️ [claude-bot](https://github.com/WasmAgent/claude-bot) | Internal automation — issue triage, PR review, and cross-repo coherence patrol (not a public product) |
 | ⚙️ [wasmagent-ops](https://github.com/WasmAgent/wasmagent-ops) | Private operations hub — generators and ops tooling for the org (not a public product) |
 
-> ⚙️ marks **internal** repositories that support org operations
-> (automation, patrols, tooling) but ship no public product. They are listed
-> here to keep the public inventory complete and accurate.
+### Internal tools
+
+The ⚙️ entries in the table above — `claude-bot` and `wasmagent-ops` — are the
+org's **internal tools**. They support org operations (automation, patrols,
+tooling) but ship no public product, and are listed here to keep the public
+inventory complete and accurate.
 
 ## Product matrix
 
