@@ -6,7 +6,7 @@ Protect agent runs. Record evidence. Audit claims. Train only from trusted trace
 
 | Repository | Role |
 | --- | --- |
-| [wasmagent](https://github.com/WasmAgent/wasmagent) | **Project home** · Public project home and roadmap for the WasmAgent organization |
+| [wasmagent](https://github.com/WasmAgent/wasmagent) | **Project home** · Public landing page that directs readers to [`.github`](https://github.com/WasmAgent/.github) for the full roadmap and project list |
 | [wasmagent-js](https://github.com/WasmAgent/wasmagent-js) | **Runtime** · Embedded agent runtime — WASM sandbox, MCP firewall, capability manifests, signed AEP event emitter |
 | [bscode](https://github.com/WasmAgent/bscode) | **Workload** · Reference coding-agent workload on Cloudflare Workers; AEP evidence export |
 | [trace-pipeline](https://github.com/WasmAgent/trace-pipeline) | trace-to-training backend / data factory |

@@ -52,7 +52,10 @@ unticked items are planned or in progress. This document mirrors
 
 ### Project home ✅
 
-- ✅ `.github` — org profile, public ledgers, and shared org docs.
+- ✅ `.github` — org profile, public ledgers, shared org docs, and the
+  source of truth for the full roadmap and project list.
+- ✅ `wasmagent` — public landing page that directs readers to `.github` for
+  the full roadmap and project list.
 
 ### Ops ✅
 
