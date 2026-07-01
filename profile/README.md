@@ -61,7 +61,7 @@ sustained track record.
 - **Trust artifacts** — `agent-trust-infra` (AgentBOM, MCP Posture, Trust Passport)
 - **Audit product** — `open-agent-audit` / Trustavo
   (evidence reports, Cloudflare Workers)
-- **Evaluation** — `fresharena` (adversarial evaluation protocol for coding agents)
+- **Evaluation** — `fresharena` (dynamic, verifiable, adversarial evaluation protocol for coding agents)
 - **Adapters** — OpenTelemetry GenAI, Langfuse, LangSmith ingestion
 - **Regulatory profiles** — OWASP Agentic Top 10, NIST AI RMF,
   ISO/IEC 42001, EU AI Act Annex IV mappings
