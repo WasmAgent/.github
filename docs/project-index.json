@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "org": "WasmAgent",
+  "description": "Machine-readable source of truth for the WasmAgent project index. Lists every repository in the organization with its category, role, status, and visibility. Consumed by the org profile (profile/README.md project table) and the living roadmap (docs/roadmap.md) so the public project matrix is rendered from a single registry instead of maintained by hand, preventing omissions.",
+  "source_url": "https://github.com/WasmAgent/.github/blob/main/docs/project-index.json",
+  "last_reviewed": "2026-07-02",
+  "consumers": [
+    "profile/README.md — Projects table",
+    "docs/roadmap.md — project layers"
+  ],
+  "status_legend": {
+    "shipped": "Public repository exists and is the source of truth for its layer.",
+    "in_progress": "Spec or reference implementation landing.",
+    "planned": "Not yet public."
+  },
+  "categories": {
+    "project-home": "Public landing page that directs readers to the org hub.",
+    "org-hub": "Org-wide documentation, ledgers, and source of truth for the project list.",
+    "runtime": "Embedded agent runtime.",
+    "workload": "Reference agent workload.",
+    "evidence-pipeline": "Trace ingestion, evidence admission, and training audit.",
+    "trust-artifacts": "Machine-readable identity and policy posture artifacts.",
+    "audit": "Enterprise audit product.",
+    "evaluation": "Adversarial evaluation protocol.",
+    "internal-tool": "Internal automation or operations; ships no public product."
+  },
+  "repos": [
+    {
+      "name": "wasmagent",
+      "category": "project-home",
+      "role": "Project home",
+      "status": "shipped",
+      "visibility": "public",
+      "in_profile": true,
+      "summary": "Public landing page that directs readers to .github for the full roadmap and project list.",
+      "url": "https://github.com/WasmAgent/wasmagent"
+    },
+    {
+      "name": ".github",
+      "category": "org-hub",
+      "role": "Org hub",
+      "status": "shipped",
+      "visibility": "public",
+      "in_profile": true,
+      "summary": "Org-wide documentation and ledger hub; public home for the roadmap, claims registry, release ledger, and cross-repo coordination.",
+      "url": "https://github.com/WasmAgent/.github"
+    },
+    {
+      "name": "wasmagent-js",
+      "category": "runtime",
+      "role": "Runtime",
+      "status": "shipped",
+      "visibility": "public",
+      "in_profile": true,
+      "summary": "Embedded agent runtime: WASM sandbox, MCP firewall, capability manifests, signed AEP event emitter.",
+      "url": "https://github.com/WasmAgent/wasmagent-js"
+    },
+    {
+      "name": "bscode",
+      "category": "workload",
+      "role": "Workload",
+      "status": "shipped",
+      "visibility": "public",
+      "in_profile": true,
+      "summary": "Reference coding-agent workload on Cloudflare Workers with AEP evidence export.",
+      "url": "https://github.com/WasmAgent/bscode"
+    },
+    {
+      "name": "trace-pipeline",
+      "category": "evidence-pipeline",
+      "role": "Evidence pipeline",
+      "status": "shipped",
+      "visibility": "public",
+      "in_profile": true,
+      "summary": "Trace-to-training backend and data factory; ingests AEP traces, gates training-data admission, and records every training run as auditable evidence.",
+      "url": "https://github.com/WasmAgent/trace-pipeline"
+    },
+    {
+      "name": "agent-trust-infra",
+      "category": "trust-artifacts",
+      "role": "Trust artifacts",
+      "status": "shipped",
+      "visibility": "public",
+      "in_profile": true,
+      "summary": "AgentBOM, MCP Posture, and Trust Passport spec, reference implementation, and CLI.",
+      "url": "https://github.com/WasmAgent/agent-trust-infra"
+    },
+    {
+      "name": "open-agent-audit",
+      "category": "audit",
+      "role": "Audit",
+      "status": "shipped",
+      "visibility": "public",
+      "in_profile": true,
+      "summary": "Enterprise audit product; deployed at trustavo.com.",
+      "url": "https://github.com/WasmAgent/open-agent-audit"
+    },
+    {
+      "name": "fresharena",
+      "category": "evaluation",
+      "role": "Evaluation",
+      "status": "shipped",
+      "visibility": "public",
+      "in_profile": true,
+      "summary": "Dynamic, verifiable, adversarial evaluation protocol for coding agents.",
+      "url": "https://github.com/WasmAgent/fresharena"
+    },
+    {
+      "name": "claude-bot",
+      "category": "internal-tool",
+      "role": "Internal automation",
+      "status": "shipped",
+      "visibility": "internal",
+      "in_profile": true,
+      "summary": "Internal automation: issue triage, PR review, and cross-repo coherence patrol. Not a public product.",
+      "url": "https://github.com/WasmAgent/claude-bot"
+    },
+    {
+      "name": "wasmagent-ops",
+      "category": "internal-tool",
+      "role": "Internal operations",
+      "status": "shipped",
+      "visibility": "internal",
+      "in_profile": true,
+      "summary": "Private operations hub: media, release, research, and security operations for the org. Not a public product.",
+      "url": "https://github.com/WasmAgent/wasmagent-ops"
+    },
+    {
+      "name": "erp-agent",
+      "category": "workload",
+      "role": "Workload (planned)",
+      "status": "planned",
+      "visibility": "public",
+      "in_profile": false,
+      "summary": "Planned ERP-domain workload with order-state and ledger verifiers, mirroring the role bscode plays for coding tasks.",
+      "url": "https://github.com/WasmAgent/erp-agent"
+    }
+  ]
+}

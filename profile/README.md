@@ -4,6 +4,11 @@ Protect agent runs. Record evidence. Audit claims. Train only from trusted trace
 
 ## Projects
 
+The table below is the human-readable view of
+[`docs/project-index.json`](../docs/project-index.json), the machine-readable
+source of truth for the project list. Profile generation consumes that index so
+the public matrix stays complete and in sync across repos.
+
 | Repository | Role |
 | --- | --- |
 | [wasmagent](https://github.com/WasmAgent/wasmagent) | **Project home** · Public landing page that directs readers to [`.github`](https://github.com/WasmAgent/.github) for the full roadmap and project list |
@@ -77,6 +82,7 @@ org, not any single product.
 - [Claims registry](../claims/public-claims.yml) — org claims mapped to evidence and review status
 - [Release ledger](../releases/public-release-ledger.yml) — public releases across repositories
 - [Media & posts](../media/posts.yml) — talks, posts, and appearances
+- [Project index](../docs/project-index.json) — machine-readable source of truth for the project list
 - [Roadmap](../docs/roadmap.md) — living roadmap mirroring the public repo list
 
 ## Disclaimer
