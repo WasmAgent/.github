@@ -6,9 +6,10 @@ Protect agent runs. Record evidence. Audit claims. Train only from trusted trace
 
 | Repository | Role |
 | --- | --- |
+| [wasmagent](https://github.com/WasmAgent/wasmagent) | **Project home** · Public project home and roadmap for the WasmAgent organization |
 | [wasmagent-js](https://github.com/WasmAgent/wasmagent-js) | **Runtime** · Embedded agent runtime — WASM sandbox, MCP firewall, capability manifests, AEP emitter |
 | [bscode](https://github.com/WasmAgent/bscode) | **Workload** · Reference coding-agent workload on Cloudflare Workers; AEP evidence export |
-| [trace-pipeline](https://github.com/WasmAgent/trace-pipeline) | Measurement trust · evidence admission gate · training-audit backend |
+| [trace-pipeline](https://github.com/WasmAgent/trace-pipeline) | trace-to-training backend / data factory |
 | [agent-trust-infra](https://github.com/WasmAgent/agent-trust-infra) | **Trust artifacts** · AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI |
 | [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | Enterprise audit product — evidence reports, regulatory mappings, benchmark claim audit |
 | [fresharena](https://github.com/WasmAgent/fresharena) | Dynamic, verifiable, adversarial evaluation protocol for coding agents |
