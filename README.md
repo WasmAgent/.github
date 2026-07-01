@@ -16,3 +16,21 @@ Generators and ops tooling live in
 - [`docs/`](docs/) — roadmap, architecture, evaluation summary
 - [`claims/`](claims/), [`releases/`](releases/), [`media/`](media/) — public ledgers
 - [`assets/`](assets/) — logo and product matrix
+
+## Canonical paths
+
+The assets and ledgers above are the org-wide source of truth. Product
+repositories (`wasmagent`, `wasmagent-js`, and the rest) should link to these
+centralized paths instead of keeping local copies, so media and ledger
+references are never orphaned when content moves between repos. Prefer the
+`.svg` product matrix hosted here over repo-local raster copies (e.g.
+`product-matrix.webp`).
+
+- Product matrix image (raw URL for embedding):
+  `https://raw.githubusercontent.com/WasmAgent/.github/main/assets/product-matrix.svg`
+- Claims registry:
+  `https://github.com/WasmAgent/.github/blob/main/claims/public-claims.yml`
+- Release ledger:
+  `https://github.com/WasmAgent/.github/blob/main/releases/public-release-ledger.yml`
+- Media & posts:
+  `https://github.com/WasmAgent/.github/blob/main/media/posts.yml`
