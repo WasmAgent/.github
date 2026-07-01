@@ -17,7 +17,7 @@ the public matrix stays complete and in sync across repos.
 | [bscode](https://github.com/WasmAgent/bscode) | **Workload** · Real coding-agent workload and evidence collection surface on Cloudflare Workers with AEP evidence export |
 | [trace-pipeline](https://github.com/WasmAgent/trace-pipeline) | **Evidence pipeline** · Trace-to-training backend and data factory — ingests AEP traces, gates training-data admission, and records every training run as auditable evidence |
 | [agent-trust-infra](https://github.com/WasmAgent/agent-trust-infra) | **Trust artifacts** · AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI |
-| [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | Enterprise audit product |
+| [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | **Audit** · Enterprise audit product; deployed at [trustavo.com](https://trustavo.com) |
 | [fresharena](https://github.com/WasmAgent/fresharena) | **Evaluation protocol** · Dynamic, verifiable, adversarial evaluation protocol for coding agents |
 | ⚙️ [claude-bot](https://github.com/WasmAgent/claude-bot) | Internal automation — issue triage, PR review, and cross-repo coherence patrol (not a public product) |
 | ⚙️ [wasmagent-ops](https://github.com/WasmAgent/wasmagent-ops) | Private operations hub — media, release, research, and security operations for the org (not a public product) |
