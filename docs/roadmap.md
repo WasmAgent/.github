@@ -3,7 +3,8 @@
 Living roadmap for the WasmAgent organization. Ticked items ship as public
 repositories under [github.com/WasmAgent](https://github.com/WasmAgent);
 unticked items are planned or in progress. This document mirrors
-`gh repo list WasmAgent --visibility public`.
+`gh repo list WasmAgent --visibility public`, and its machine-readable
+counterpart is [`project-index.json`](project-index.json).
 
 ## Status legend
 

@@ -14,6 +14,7 @@ Generators and ops tooling live in
 
 - [`profile/README.md`](profile/README.md) — organization profile
 - [`docs/`](docs/) — roadmap, architecture, evaluation summary
+- [`docs/project-index.json`](docs/project-index.json) — machine-readable project index (source of truth for the project list)
 - [`claims/`](claims/), [`releases/`](releases/), [`media/`](media/) — public ledgers
 - [`assets/`](assets/) — logo and product matrix
 
@@ -28,6 +29,8 @@ references are never orphaned when content moves between repos. Prefer the
 
 - Product matrix image (raw URL for embedding):
   `https://raw.githubusercontent.com/WasmAgent/.github/main/assets/product-matrix.svg`
+- Project index (machine-readable repo, role, and status registry):
+  `https://github.com/WasmAgent/.github/blob/main/docs/project-index.json`
 - Claims registry:
   `https://github.com/WasmAgent/.github/blob/main/claims/public-claims.yml`
 - Release ledger:
