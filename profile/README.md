@@ -19,15 +19,6 @@ the public matrix stays complete and in sync across repos.
 | [agent-trust-infra](https://github.com/WasmAgent/agent-trust-infra) | **Trust artifacts** · AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI |
 | [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | **Audit** · Enterprise audit product; deployed at [trustavo.com](https://trustavo.com) |
 | [fresharena](https://github.com/WasmAgent/fresharena) | **Evaluation protocol** · Dynamic, verifiable, adversarial evaluation protocol for coding agents |
-| ⚙️ [claude-bot](https://github.com/WasmAgent/claude-bot) | Internal automation — issue triage, PR review, and cross-repo coherence patrol (not a public product) |
-| ⚙️ [wasmagent-ops](https://github.com/WasmAgent/wasmagent-ops) | Private operations hub — media, release, research, and security operations for the org (not a public product) |
-
-### Internal tools
-
-The ⚙️ entries in the table above — `claude-bot` and `wasmagent-ops` — are the
-org's **internal tools**. They support org operations (automation, patrols, and
-tooling) but ship no public product, and are listed here only to keep
-the public inventory complete and accurate.
 
 ## Product matrix
 
