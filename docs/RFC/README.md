@@ -46,3 +46,4 @@ status is tracked in the file header, not in a GitHub issue.
 | RFC | Title | Status |
 |-----|-------|--------|
 | [RFC-0001](RFC-0001-erp-agent.md) | erp-agent — bscode sibling for ERP/business-API agents | Draft |
+| [RFC-0002](RFC-0002-cfep.md) | Causal Fabric Evidence Protocol (CFEP) — cross-island causal evidence above hardware telemetry | Draft |
