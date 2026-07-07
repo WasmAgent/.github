@@ -5,6 +5,9 @@ on:
     branches: [main]
   push:
     branches: [main]
+  release:
+    types: [created, published]
+  workflow_dispatch:
 
 jobs:
   lint-markdown:
@@ -23,3 +26,12 @@ jobs:
               "MD033": false,
               "MD041": false
             }
+
+  generate-trust-artifacts-on-release:
+    name: Generate trust artifacts on release
+    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+    needs: lint-markdown
+    uses: ./.github/workflows/generate-trust-artifacts.yml
+    secrets: inherit
+    with:
+      release_tag: ${{ github.event.release.tag_name }}

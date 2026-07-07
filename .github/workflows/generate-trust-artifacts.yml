@@ -1,0 +1,226 @@
+name: Generate Trust Artifacts
+
+on:
+  release:
+    types: [created, published]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag to generate artifacts for'
+        required: true
+        type: string
+      trace_file:
+        description: 'Path to trace file (for AgentBOM generation)'
+        required: false
+        type: string
+      aep_file:
+        description: 'Path to AEP events file (for Trust Passport generation)'
+        required: false
+        type: string
+
+jobs:
+  generate-trust-artifacts:
+    name: Generate Trust Artifacts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get release information
+        id: release_info
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            TAG_NAME="${{ github.event.release.tag_name }}"
+            RELEASE_ID="${{ github.event.release.id }}"
+            REPO_NAME="${{ github.repository }}"
+          else
+            TAG_NAME="${{ github.event.inputs.release_tag }}"
+            # Get release ID from tag
+            RELEASE_DATA=$(gh release view "$TAG_NAME" --json id --jq '.id')
+            RELEASE_ID="$RELEASE_DATA"
+            REPO_NAME="${{ github.repository }}"
+          fi
+
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "release_id=$RELEASE_ID" >> $GITHUB_OUTPUT
+          echo "repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
+
+      - name: Set up trust artifact generators
+        run: |
+          echo "Setting up trust artifact generation environment..."
+          # TODO: Install wasmagent-ops generators when they become available
+          # For now, this is a placeholder that will eventually:
+          # 1. Clone or install the generators from wasmagent-ops/generators/
+          # 2. Set up any required dependencies (Python, Node.js, etc.)
+          # 3. Configure the generators with repository-specific settings
+
+      - name: Generate AgentBOM
+        id: agentbom
+        env:
+          TAG_NAME: ${{ steps.release_info.outputs.tag_name }}
+          REPO_NAME: ${{ steps.release_info.outputs.repo_name }}
+        run: |
+          echo "Generating AgentBOM for release $TAG_NAME..."
+
+          # TODO: Call the AgentBOM generator from wasmagent-ops/generators/
+          # Command will be similar to:
+          # generate-agentbom --trace-file trace.jsonl --output agentbom-$TAG_NAME.json
+
+          # Placeholder: Create a minimal AgentBOM structure
+          cat > agentbom-${TAG_NAME}.json << 'EOF'
+          {
+            "$schema": "https://wasmagent.github.io/agent-trust-infra/schemas/agentbom-1.json",
+            "bomFormat": "AgentBOM",
+            "specVersion": "1.0",
+            "metadata": {
+              "generated": "${{ github.event.release.published_at || github.event.head_commit.timestamp }}",
+              "repository": "${{ github.repository }}",
+              "release": "$TAG_NAME",
+              "generator": "wasmagent-ops/generators (pending implementation)"
+            },
+            "components": []
+          }
+          EOF
+
+          echo "agentbom_file=agentbom-${TAG_NAME}.json" >> $GITHUB_OUTPUT
+
+          # Verify the file was created
+          if [ -f "agentbom-${TAG_NAME}.json" ]; then
+            echo "AgentBOM file created successfully"
+            cat agentbom-${TAG_NAME}.json
+          else
+            echo "ERROR: Failed to create AgentBOM file"
+            exit 1
+          fi
+
+      - name: Generate MCP Posture
+        id: mcp_posture
+        env:
+          TAG_NAME: ${{ steps.release_info.outputs.tag_name }}
+          REPO_NAME: ${{ steps.release_info.outputs.repo_name }}
+        run: |
+          echo "Generating MCP Posture for release $TAG_NAME..."
+
+          # TODO: Call the MCP Posture analyzer/generator
+          # This will analyze the repository's MCP configuration and generate a posture document
+
+          # Placeholder: Create a minimal MCP Posture structure
+          cat > mcp-posture-${TAG_NAME}.json << 'EOF'
+          {
+            "$schema": "https://wasmagent.github.io/agent-trust-infra/schemas/mcp-posture-1.json",
+            "postureFormat": "MCPPosture",
+            "specVersion": "1.0",
+            "metadata": {
+              "generated": "${{ github.event.release.published_at || github.event.head_commit.timestamp }}",
+              "repository": "${{ github.repository }}",
+              "release": "$TAG_NAME",
+              "generator": "wasmagent-ops/generators (pending implementation)"
+            },
+            "declaredServers": [],
+            "declaredTools": [],
+            "capabilities": {}
+          }
+          EOF
+
+          echo "mcp_posture_file=mcp-posture-${TAG_NAME}.json" >> $GITHUB_OUTPUT
+
+          # Verify the file was created
+          if [ -f "mcp-posture-${TAG_NAME}.json" ]; then
+            echo "MCP Posture file created successfully"
+            cat mcp-posture-${TAG_NAME}.json
+          else
+            echo "ERROR: Failed to create MCP Posture file"
+            exit 1
+          fi
+
+      - name: Generate Trust Passport
+        id: trust_passport
+        env:
+          TAG_NAME: ${{ steps.release_info.outputs.tag_name }}
+          REPO_NAME: ${{ steps.release_info.outputs.repo_name }}
+        run: |
+          echo "Generating Trust Passport for release $TAG_NAME..."
+
+          # TODO: Call the Trust Passport generator from wasmagent-ops/generators/
+          # Command will be similar to:
+          # generate-passport --aep-file events.jsonl --output passport-$TAG_NAME.json
+
+          # Placeholder: Create a minimal Trust Passport structure
+          cat > trust-passport-${TAG_NAME}.json << 'EOF'
+          {
+            "$schema": "https://wasmagent.github.io/agent-trust-infra/schemas/trust-passport-1.json",
+            "passportFormat": "TrustPassport",
+            "specVersion": "1.0",
+            "metadata": {
+              "generated": "${{ github.event.release.published_at || github.event.head_commit.timestamp }}",
+              "repository": "${{ github.repository }}",
+              "release": "$TAG_NAME",
+              "generator": "wasmagent-ops/generators (pending implementation)"
+            },
+            "identity": {},
+            "posture": {},
+            "evidence": []
+          }
+          EOF
+
+          echo "trust_passport_file=trust-passport-${TAG_NAME}.json" >> $GITHUB_OUTPUT
+
+          # Verify the file was created
+          if [ -f "trust-passport-${TAG_NAME}.json" ]; then
+            echo "Trust Passport file created successfully"
+            cat trust-passport-${TAG_NAME}.json
+          else
+            echo "ERROR: Failed to create Trust Passport file"
+            exit 1
+          fi
+
+      - name: Upload trust artifacts to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ steps.release_info.outputs.tag_name }}
+          RELEASE_ID: ${{ steps.release_info.outputs.release_id }}
+        run: |
+          echo "Uploading trust artifacts to release $TAG_NAME..."
+
+          # Upload AgentBOM
+          gh release upload "$TAG_NAME" \
+            agentbom-${TAG_NAME}.json \
+            --clobber \
+            --repo "${{ github.repository }}"
+
+          # Upload MCP Posture
+          gh release upload "$TAG_NAME" \
+            mcp-posture-${TAG_NAME}.json \
+            --clobber \
+            --repo "${{ github.repository }}"
+
+          # Upload Trust Passport
+          gh release upload "$TAG_NAME" \
+            trust-passport-${TAG_NAME}.json \
+            --clobber \
+            --repo "${{ github.repository }}"
+
+          echo "All trust artifacts uploaded successfully"
+
+      - name: Generate artifact summary
+        env:
+          TAG_NAME: ${{ steps.release_info.outputs.tag_name }}
+        run: |
+          echo "## Trust Artifacts Generated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Release: $TAG_NAME" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Artifact | File | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| AgentBOM | \`agentbom-${TAG_NAME}.json\` | ✅ Generated |" >> $GITHUB_STEP_SUMMARY
+          echo "| MCP Posture | \`mcp-posture-${TAG_NAME}.json\` | ✅ Generated |" >> $GITHUB_STEP_SUMMARY
+          echo "| Trust Passport | \`trust-passport-${TAG_NAME}.json\` | ✅ Generated |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Note:** This workflow currently generates placeholder trust artifacts. " >> $GITHUB_STEP_SUMMARY
+          echo "Full implementation will integrate with \`wasmagent-ops/generators/\` " >> $GITHUB_STEP_SUMMARY
+          echo "once the AgentBOM and Trust Passport generators are implemented (Milestone 3, bullets 23-24)." >> $GITHUB_STEP_SUMMARY
