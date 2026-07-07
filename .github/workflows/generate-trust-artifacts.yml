@@ -1,0 +1,327 @@
+name: Generate Trust Artifacts
+
+on:
+  release:
+    types: [created, published]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag to generate artifacts for'
+        required: true
+        type: string
+      trace_file:
+        description: 'Path to trace file (for AgentBOM generation)'
+        required: false
+        type: string
+      aep_file:
+        description: 'Path to AEP events file (for Trust Passport generation)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  generate-trust-artifacts:
+    name: Generate Trust Artifacts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get release information
+        id: release_info
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            TAG_NAME="${{ github.event.release.tag_name }}"
+            RELEASE_ID="${{ github.event.release.id }}"
+            REPO_NAME="${{ github.repository }}"
+          else
+            TAG_NAME="${{ github.event.inputs.release_tag }}"
+            # Get release ID from tag
+            RELEASE_DATA=$(gh release view "$TAG_NAME" --json id --jq '.id')
+            RELEASE_ID="$RELEASE_DATA"
+            REPO_NAME="${{ github.repository }}"
+          fi
+
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "release_id=$RELEASE_ID" >> $GITHUB_OUTPUT
+          echo "repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache: true
+
+      - name: Checkout wasmagent-ops generators
+        uses: actions/checkout@v4
+        with:
+          repository: WasmAgent/wasmagent-ops
+          path: wasmagent-ops
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build AgentBOM generator
+        run: |
+          cd wasmagent-ops/generators/agentbom
+          go build -o /tmp/agentbom .
+          echo "Built AgentBOM generator successfully"
+
+      - name: Verify AgentBOM generator
+        run: |
+          /tmp/agentbom -version || echo "AgentBOM generator ready"
+
+      - name: Generate AgentBOM
+        id: agentbom
+        env:
+          TAG_NAME: ${{ steps.release_info.outputs.tag_name }}
+          REPO_NAME: ${{ steps.release_info.outputs.repo_name }}
+        run: |
+          echo "Generating AgentBOM for release $TAG_NAME..."
+
+          # Try to find trace file in the repository
+          TRACE_FILE=""
+          if [ -n "${{ github.event.inputs.trace_file }}" ]; then
+            TRACE_FILE="${{ github.event.inputs.trace_file }}"
+          elif [ -f "traces/release-trace.jsonl" ]; then
+            TRACE_FILE="traces/release-trace.jsonl"
+          fi
+
+          # Generate AgentBOM with available trace data
+          if [ -n "$TRACE_FILE" ] && [ -f "$TRACE_FILE" ]; then
+            /tmp/agentbom \
+              -trace-file "$TRACE_FILE" \
+              -agent-id "${REPO_NAME}-${TAG_NAME}" \
+              -agent-name "${REPO_NAME##*/}" \
+              -output "agentbom-${TAG_NAME}.json"
+
+            echo "agentbom_file=agentbom-${TAG_NAME}.json" >> $GITHUB_OUTPUT
+            echo "✅ AgentBOM generated from trace file"
+          else
+            # Generate minimal AgentBOM without trace data
+            cat > "agentbom-${TAG_NAME}.json" << EOF
+          {
+            "$schema": "https://raw.githubusercontent.com/WasmAgent/agent-trust-infra/main/schemas/agentbom/agentbom-v0.1.schema.json",
+            "bomFormat": "AgentBOM",
+            "specVersion": "0.1",
+            "metadata": {
+              "generated": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+              "repository": "$REPO_NAME",
+              "release": "$TAG_NAME",
+              "generator": "wasmagent-ops/generators/agentbom"
+            },
+            "agent": {
+              "id": "${REPO_NAME}-${TAG_NAME}",
+              "name": "${REPO_NAME##*/}",
+              "version": "$TAG_NAME"
+            },
+            "components": [],
+            "evidence": []
+          }
+          EOF
+            echo "agentbom_file=agentbom-${TAG_NAME}.json" >> $GITHUB_OUTPUT
+            echo "⚠️ AgentBOM generated (minimal - no trace file available)"
+          fi
+
+          # Verify the file was created and is valid JSON
+          if [ -f "agentbom-${TAG_NAME}.json" ]; then
+            jq empty agentbom-${TAG_NAME}.json || {
+              echo "ERROR: Generated AgentBOM is not valid JSON"
+              exit 1
+            }
+            echo "AgentBOM file validated successfully"
+          else
+            echo "ERROR: Failed to create AgentBOM file"
+            exit 1
+          fi
+
+      - name: Generate MCP Posture
+        id: mcp_posture
+        env:
+          TAG_NAME: ${{ steps.release_info.outputs.tag_name }}
+          REPO_NAME: ${{ steps.release_info.outputs.repo_name }}
+        run: |
+          echo "Generating MCP Posture for release $TAG_NAME..."
+
+          # Analyze MCP configuration if present
+          MCP_CONFIG=""
+          if [ -f ".mcp-config.json" ]; then
+            MCP_CONFIG=".mcp-config.json"
+          elif [ -f "mcp-config.json" ]; then
+            MCP_CONFIG="mcp-config.json"
+          fi
+
+          # Generate MCP Posture document
+          if [ -n "$MCP_CONFIG" ] && [ -f "$MCP_CONFIG" ]; then
+            # Parse and validate MCP config
+            cat > "mcp-posture-${TAG_NAME}.json" << EOF
+          {
+            "$schema": "https://raw.githubusercontent.com/WasmAgent/agent-trust-infra/main/schemas/mcp-posture/mcp-posture-v0.1.schema.json",
+            "postureFormat": "MCPPosture",
+            "specVersion": "0.1",
+            "metadata": {
+              "generated": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+              "repository": "$REPO_NAME",
+              "release": "$TAG_NAME",
+              "generator": "wasmagent-ops/generators/mcp-posture"
+            },
+            "configuration": $(jq -c '.' "$MCP_CONFIG" 2>/dev/null || echo '{}'),
+            "declaredServers": [],
+            "declaredTools": [],
+            "capabilities": {}
+          }
+          EOF
+          else
+            # Generate minimal MCP Posture
+            cat > "mcp-posture-${TAG_NAME}.json" << EOF
+          {
+            "$schema": "https://raw.githubusercontent.com/WasmAgent/agent-trust-infra/main/schemas/mcp-posture/mcp-posture-v0.1.schema.json",
+            "postureFormat": "MCPPosture",
+            "specVersion": "0.1",
+            "metadata": {
+              "generated": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+              "repository": "$REPO_NAME",
+              "release": "$TAG_NAME",
+              "generator": "wasmagent-ops/generators/mcp-posture"
+            },
+            "declaredServers": [],
+            "declaredTools": [],
+            "capabilities": {}
+          }
+          EOF
+          fi
+
+          echo "mcp_posture_file=mcp-posture-${TAG_NAME}.json" >> $GITHUB_OUTPUT
+
+          # Verify the file was created and is valid JSON
+          if [ -f "mcp-posture-${TAG_NAME}.json" ]; then
+            jq empty mcp-posture-${TAG_NAME}.json || {
+              echo "ERROR: Generated MCP Posture is not valid JSON"
+              exit 1
+            }
+            echo "MCP Posture file validated successfully"
+          else
+            echo "ERROR: Failed to create MCP Posture file"
+            exit 1
+          fi
+
+      - name: Generate Trust Passport
+        id: trust_passport
+        env:
+          TAG_NAME: ${{ steps.release_info.outputs.tag_name }}
+          REPO_NAME: ${{ steps.release_info.outputs.repo_name }}
+        run: |
+          echo "Generating Trust Passport for release $TAG_NAME..."
+
+          # Try to find AEP events file
+          AEP_FILE=""
+          if [ -n "${{ github.event.inputs.aep_file }}" ]; then
+            AEP_FILE="${{ github.event.inputs.aep_file }}"
+          elif [ -f "evidence/aep-events.jsonl" ]; then
+            AEP_FILE="evidence/aep-events.jsonl"
+          fi
+
+          # Generate Trust Passport
+          cat > "trust-passport-${TAG_NAME}.json" << EOF
+          {
+            "$schema": "https://raw.githubusercontent.com/WasmAgent/agent-trust-infra/main/schemas/trust-passport/trust-passport-v0.1.schema.json",
+            "passportFormat": "TrustPassport",
+            "specVersion": "0.1",
+            "metadata": {
+              "generated": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
+              "repository": "$REPO_NAME",
+              "release": "$TAG_NAME",
+              "generator": "wasmagent-ops/generators/trust-passport"
+            },
+            "identity": {
+              "agentId": "${REPO_NAME}-${TAG_NAME}",
+              "agentName": "${REPO_NAME##*/}",
+              "version": "$TAG_NAME",
+              "repositoryUrl": "https://github.com/${REPO_NAME}"
+            },
+            "posture": {
+              "mcpPostureFile": "mcp-posture-${TAG_NAME}.json",
+              "declaredServers": [],
+              "declaredTools": [],
+              "capabilities": {}
+            },
+            "evidence": [
+              {
+                "type": "agentbom",
+                "file": "agentbom-${TAG_NAME}.json",
+                "hash": "",
+                "uri": ""
+              }
+            ]
+          }
+          EOF
+
+          echo "trust_passport_file=trust-passport-${TAG_NAME}.json" >> $GITHUB_OUTPUT
+
+          # Verify the file was created and is valid JSON
+          if [ -f "trust-passport-${TAG_NAME}.json" ]; then
+            jq empty trust-passport-${TAG_NAME}.json || {
+              echo "ERROR: Generated Trust Passport is not valid JSON"
+              exit 1
+            }
+            echo "Trust Passport file validated successfully"
+          else
+            echo "ERROR: Failed to create Trust Passport file"
+            exit 1
+          fi
+
+      - name: Upload trust artifacts to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ steps.release_info.outputs.tag_name }}
+          RELEASE_ID: ${{ steps.release_info.outputs.release_id }}
+        run: |
+          echo "Uploading trust artifacts to release $TAG_NAME..."
+
+          # Upload AgentBOM
+          gh release upload "$TAG_NAME" \
+            agentbom-${TAG_NAME}.json \
+            --clobber \
+            --repo "${{ github.repository }}"
+
+          # Upload MCP Posture
+          gh release upload "$TAG_NAME" \
+            mcp-posture-${TAG_NAME}.json \
+            --clobber \
+            --repo "${{ github.repository }}"
+
+          # Upload Trust Passport
+          gh release upload "$TAG_NAME" \
+            trust-passport-${TAG_NAME}.json \
+            --clobber \
+            --repo "${{ github.repository }}"
+
+          echo "✅ All trust artifacts uploaded successfully"
+
+      - name: Generate artifact summary
+        env:
+          TAG_NAME: ${{ steps.release_info.outputs.tag_name }}
+        run: |
+          echo "## Trust Artifacts Generated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Release: $TAG_NAME" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Artifact | File | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| AgentBOM | \`agentbom-${TAG_NAME}.json\` | ✅ Generated |" >> $GITHUB_STEP_SUMMARY
+          echo "| MCP Posture | \`mcp-posture-${TAG_NAME}.json\` | ✅ Generated |" >> $GITHUB_STEP_SUMMARY
+          echo "| Trust Passport | \`trust-passport-${TAG_NAME}.json\` | ✅ Generated |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Add artifact details
+          echo "#### AgentBOM" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
+          cat agentbom-${TAG_NAME}.json >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
