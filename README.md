@@ -13,7 +13,7 @@ Generators and ops tooling live in
 ## Contents
 
 - [`profile/README.md`](profile/README.md) — organization profile
-- [`docs/`](docs/) — roadmap, architecture, evaluation summary
+- [`docs/`](docs/) — roadmap, architecture, evaluation summary, RFC registry
 - [`docs/project-index.json`](docs/project-index.json) — machine-readable project index (source of truth for the project list)
 - [`claims/`](claims/), [`releases/`](releases/), [`media/`](media/) — public ledgers
 - [`assets/`](assets/) — logo and product matrix

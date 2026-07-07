@@ -70,6 +70,7 @@ repository, or start a GitHub Discussion in the project home repository.
 Public ledgers and shared docs live in this repository so they belong to the
 org, not any single product.
 
+- [RFC registry](../docs/RFC/README.md) — org-level design decisions that span multiple repositories
 - [Claims registry](../claims/public-claims.yml) — org claims mapped to evidence and review status
 - [Release ledger](../releases/public-release-ledger.yml) — public releases across repositories
 - [Media & posts](../media/posts.yml) — talks, posts, and appearances

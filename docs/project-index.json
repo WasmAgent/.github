@@ -3,7 +3,7 @@
   "org": "WasmAgent",
   "description": "Machine-readable source of truth for the WasmAgent project index. Lists every repository in the organization with its category, role, status, and visibility. Consumed by the org profile (profile/README.md project table) and the living roadmap (docs/roadmap.md) so the public project matrix is rendered from a single registry instead of maintained by hand, preventing omissions.",
   "source_url": "https://github.com/WasmAgent/.github/blob/main/docs/project-index.json",
-  "last_reviewed": "2026-07-02",
+  "last_reviewed": "2026-07-07",
   "consumers": [
     "profile/README.md — Projects table",
     "docs/roadmap.md — project layers"

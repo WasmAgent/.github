@@ -53,8 +53,8 @@ counterpart is [`project-index.json`](project-index.json).
 
 ### Project home ✅
 
-- ✅ `.github` — org profile, public ledgers, shared org docs, and the
-  source of truth for the full roadmap and project list.
+- ✅ `.github` — org profile, public ledgers, shared org docs, RFC registry,
+  and the source of truth for the full roadmap and project list.
 - ✅ `wasmagent` — public landing page that directs readers to `.github` for
   the full roadmap and project list.
 
