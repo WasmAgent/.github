@@ -62,7 +62,7 @@
       "status": "shipped",
       "visibility": "public",
       "in_profile": true,
-      "summary": "Reference coding-agent workload on Cloudflare Workers with AEP evidence export.",
+      "summary": "Reference coding-agent workload and evidence collection surface on Cloudflare Workers with AEP evidence export.",
       "url": "https://github.com/WasmAgent/bscode"
     },
     {
@@ -72,7 +72,7 @@
       "status": "shipped",
       "visibility": "public",
       "in_profile": true,
-      "summary": "Trace-to-training backend and data factory; ingests AEP traces, gates training-data admission, and records every training run as auditable evidence.",
+      "summary": "Trace-to-training backend and data factory — ingests AEP traces, gates training-data admission, and records every training run as auditable evidence.",
       "url": "https://github.com/WasmAgent/trace-pipeline"
     },
     {
@@ -82,7 +82,7 @@
       "status": "shipped",
       "visibility": "public",
       "in_profile": true,
-      "summary": "AgentBOM, MCP Posture, and Trust Passport spec, reference implementation, and CLI.",
+      "summary": "AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI.",
       "url": "https://github.com/WasmAgent/agent-trust-infra"
     },
     {
@@ -98,7 +98,7 @@
     {
       "name": "fresharena",
       "category": "evaluation",
-      "role": "Evaluation",
+      "role": "Evaluation protocol",
       "status": "shipped",
       "visibility": "public",
       "in_profile": true,
@@ -111,7 +111,7 @@
       "role": "Internal automation",
       "status": "shipped",
       "visibility": "internal",
-      "in_profile": true,
+      "in_profile": false,
       "summary": "Internal automation: issue triage, PR review, and cross-repo coherence patrol. Not a public product.",
       "url": "https://github.com/WasmAgent/claude-bot"
     },
@@ -121,8 +121,8 @@
       "role": "Internal operations",
       "status": "shipped",
       "visibility": "internal",
-      "in_profile": true,
-      "summary": "Private operations hub: media, release, research, and security operations for the org. Not a public product.",
+      "in_profile": false,
+      "summary": "Private operations hub: media publishing, release ops, eval, research, outreach, security ops. Not a public product.",
       "url": "https://github.com/WasmAgent/wasmagent-ops"
     },
     {
