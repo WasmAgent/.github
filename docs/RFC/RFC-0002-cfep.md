@@ -6,7 +6,7 @@
 | Author | @telleroutlook |
 | Created | 2026-07 |
 | Classification | Direction 3 — low-probability, high-prestige research bet |
-| Discussion | [.github#95](https://github.com/WasmAgent/.github/issues/95) |
+| Discussion | [.github#95](https://github.com/WasmAgent/.github/issues/95) — Phase 0 go/no-go and four open questions |
 | Affects | wasmagent-js (`@wasmagent/aep`, `@wasmagent/otel-exporter`, `@wasmagent/mcp-policy`) |
 | Not a dependency of | any current sprint, roadmap item, or semver commitment |
 
