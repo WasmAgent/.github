@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
   <title>WasmAgent product matrix</title>
-  <desc>Core public repositories spanning runtime, evidence pipelines, trust artifacts, audit, evaluation, and the org project home.</desc>
+  <desc>Core public repositories spanning runtime, workload, evidence pipelines, trust artifacts, audit, evaluation, and the org project home.</desc>
 
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
@@ -11,38 +11,53 @@
   <rect width="960" height="540" fill="#ffffff"/>
 
   <text x="480" y="40" text-anchor="middle" font-size="24" font-weight="700" fill="#0f172a">WasmAgent product matrix</text>
-  <text x="480" y="64" text-anchor="middle" font-size="13" fill="#64748b">Core public repositories &#183; runtime &#8594; evidence &#8594; trust &#8594; audit &#8594; evaluation</text>
+  <text x="480" y="64" text-anchor="middle" font-size="13" fill="#64748b">Core public repositories &#183; runtime &#8594; workload &#8594; evidence &#8594; trust &#8594; audit &#8594; evaluation</text>
 
-  <line x1="308" y1="165" x2="342" y2="165" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="618" y1="165" x2="652" y2="165" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="455" y1="335" x2="505" y2="335" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <!-- Row 1 horizontal flow arrows -->
+  <line x1="253" y1="165" x2="261" y2="165" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="476" y1="165" x2="484" y2="165" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="699" y1="165" x2="707" y2="165" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
 
+  <!-- fresharena → trace-pipeline feedback arrow (results re-enter pipeline) -->
+  <path d="M 765,335 L 820,335 Q 840,335 840,315 L 840,185 Q 840,165 820,165 L 699,165" stroke="#94a3b8" stroke-width="2" fill="none" stroke-dasharray="6,3" marker-end="url(#arrow)"/>
+
+  <!-- wasmagent-js (RUNTIME) -->
   <g>
-    <rect x="40" y="90" width="260" height="150" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
+    <rect x="40" y="90" width="211" height="150" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
     <text x="58" y="120" font-size="11" font-weight="700" fill="#2563eb" letter-spacing="1">RUNTIME</text>
-    <text x="58" y="148" font-size="18" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">wasmagent-js</text>
-    <text x="58" y="178" font-size="12" fill="#475569">WASM sandbox &#183; MCP firewall</text>
-    <text x="58" y="196" font-size="12" fill="#475569">Capability manifests &#183; AEP emitter</text>
+    <text x="58" y="148" font-size="17" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">wasmagent-js</text>
+    <text x="58" y="176" font-size="12" fill="#475569">WASM sandbox &#183; MCP firewall</text>
+    <text x="58" y="196" font-size="12" fill="#475569">Capability manifests &#183; AEP</text>
   </g>
 
+  <!-- bscode (WORKLOAD) -->
   <g>
-    <rect x="350" y="90" width="260" height="150" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
-    <text x="368" y="120" font-size="11" font-weight="700" fill="#2563eb" letter-spacing="1">EVIDENCE PIPELINES</text>
-    <text x="368" y="148" font-size="18" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">trace-pipeline</text>
-    <text x="368" y="178" font-size="12" fill="#475569">Measurement trust &#183; admission gate</text>
-    <text x="368" y="196" font-size="12" fill="#475569">Training-audit backend</text>
+    <rect x="263" y="90" width="211" height="150" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="281" y="120" font-size="11" font-weight="700" fill="#2563eb" letter-spacing="1">WORKLOAD</text>
+    <text x="281" y="148" font-size="17" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">bscode</text>
+    <text x="281" y="176" font-size="12" fill="#475569">Cloudflare Workers agent</text>
+    <text x="281" y="196" font-size="12" fill="#475569">AEP evidence export</text>
   </g>
 
+  <!-- trace-pipeline (EVIDENCE PIPELINES) -->
   <g>
-    <rect x="660" y="90" width="260" height="150" rx="12" fill="#f8fafc" stroke="#16a34a"/>
-    <rect x="858" y="104" width="50" height="20" rx="10" fill="#16a34a"/>
-    <text x="883" y="119" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">NEW</text>
-    <text x="678" y="120" font-size="11" font-weight="700" fill="#16a34a" letter-spacing="1">TRUST ARTIFACTS</text>
-    <text x="678" y="148" font-size="18" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">agent-trust-infra</text>
-    <text x="678" y="178" font-size="12" fill="#475569">AgentBOM &#183; MCP Posture</text>
-    <text x="678" y="196" font-size="12" fill="#475569">Trust Passport spec + CLI</text>
+    <rect x="486" y="90" width="211" height="150" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="504" y="120" font-size="11" font-weight="700" fill="#2563eb" letter-spacing="1">EVIDENCE PIPELINES</text>
+    <text x="504" y="148" font-size="17" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">trace-pipeline</text>
+    <text x="504" y="176" font-size="12" fill="#475569">Measurement trust &#183; gate</text>
+    <text x="504" y="196" font-size="12" fill="#475569">Training-audit backend</text>
   </g>
 
+  <!-- agent-trust-infra (TRUST ARTIFACTS) — no NEW badge -->
+  <g>
+    <rect x="709" y="90" width="211" height="150" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="727" y="120" font-size="11" font-weight="700" fill="#2563eb" letter-spacing="1">TRUST ARTIFACTS</text>
+    <text x="727" y="148" font-size="17" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">agent-trust-infra</text>
+    <text x="727" y="176" font-size="12" fill="#475569">AgentBOM &#183; MCP Posture</text>
+    <text x="727" y="196" font-size="12" fill="#475569">Trust Passport spec + CLI</text>
+  </g>
+
+  <!-- open-agent-audit (AUDIT) -->
   <g>
     <rect x="195" y="260" width="260" height="150" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
     <text x="213" y="290" font-size="11" font-weight="700" fill="#2563eb" letter-spacing="1">AUDIT</text>
@@ -51,16 +66,16 @@
     <text x="213" y="366" font-size="12" fill="#475569">Evidence reports &#8594; Trustavo</text>
   </g>
 
+  <!-- fresharena (EVALUATION) — no NEW badge -->
   <g>
-    <rect x="505" y="260" width="260" height="150" rx="12" fill="#f8fafc" stroke="#16a34a"/>
-    <rect x="703" y="274" width="50" height="20" rx="10" fill="#16a34a"/>
-    <text x="728" y="289" text-anchor="middle" font-size="11" font-weight="700" fill="#ffffff">NEW</text>
-    <text x="523" y="290" font-size="11" font-weight="700" fill="#16a34a" letter-spacing="1">EVALUATION</text>
+    <rect x="505" y="260" width="260" height="150" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="523" y="290" font-size="11" font-weight="700" fill="#2563eb" letter-spacing="1">EVALUATION</text>
     <text x="523" y="318" font-size="18" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">fresharena</text>
     <text x="523" y="348" font-size="12" fill="#475569">Adversarial eval protocol</text>
     <text x="523" y="366" font-size="12" fill="#475569">Verifiable coding benchmarks</text>
   </g>
 
+  <!-- .github (PROJECT HOME) -->
   <g>
     <rect x="40" y="448" width="880" height="68" rx="12" fill="#0f172a"/>
     <text x="58" y="478" font-size="11" font-weight="700" fill="#93c5fd" letter-spacing="1">PROJECT HOME</text>
