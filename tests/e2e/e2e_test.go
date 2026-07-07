@@ -220,3 +220,90 @@ func TestTrustArtifactsChain(t *testing.T) {
 
 	t.Log("Trust artifacts chain validated successfully")
 }
+
+// TestRuntimeWorkloadIntegration validates that the wasmagent-js runtime
+// is properly configured to integrate with workload repositories.
+func TestRuntimeWorkloadIntegration(t *testing.T) {
+	projectIndex, err := docs.LoadProjectIndex()
+	if err != nil {
+		t.Fatalf("Failed to load project index: %v", err)
+	}
+
+	// Find the runtime repository
+	runtime, found := projectIndex.GetRepoByName("wasmagent-js")
+	if !found {
+		t.Fatal("wasmagent-js runtime repository not found in project index")
+	}
+
+	// Validate runtime is properly categorized
+	if runtime.Category != "runtime" {
+		t.Errorf("wasmagent-js has incorrect category: %s (expected: runtime)", runtime.Category)
+	}
+
+	// Validate runtime is shipped (required for workload integration)
+	if runtime.Status != "shipped" {
+		t.Errorf("wasmagent-js runtime is not shipped (status: %s)", runtime.Status)
+	}
+
+	// Validate runtime is public and in profile
+	if !runtime.InProfile {
+		t.Error("wasmagent-js runtime should be in public profile")
+	}
+
+	if runtime.Visibility != "public" {
+		t.Errorf("wasmagent-js runtime has incorrect visibility: %s (expected: public)", runtime.Visibility)
+	}
+
+	t.Logf("Runtime repository validated: %s (%s, %s)", runtime.Name, runtime.Status, runtime.URL)
+
+	// Validate workload repositories that integrate with the runtime
+	workloads := []struct {
+		name     string
+		required bool // whether the workload must be shipped
+	}{
+		{"bscode", true},     // bscode is a required shipped workload
+		{"erp-agent", false}, // erp-agent is planned, not required yet
+	}
+
+	for _, wl := range workloads {
+		t.Run(wl.name, func(t *testing.T) {
+			workload, found := projectIndex.GetRepoByName(wl.name)
+			if !found {
+				if wl.required {
+					t.Errorf("Required workload %s not found in project index", wl.name)
+				} else {
+					t.Logf("Optional workload %s not found (may be planned)", wl.name)
+				}
+				return
+			}
+
+			// Validate workload is properly categorized
+			if workload.Category != "workload" {
+				t.Errorf("Workload %s has incorrect category: %s (expected: workload)",
+					wl.name, workload.Category)
+			}
+
+			// For required workloads, check shipped status
+			if wl.required && workload.Status != "shipped" {
+				t.Errorf("Required workload %s is not shipped (status: %s)", wl.name, workload.Status)
+			}
+
+			// Log the status of this workload
+			t.Logf("Workload %s: status=%s, url=%s", workload.Name, workload.Status, workload.URL)
+		})
+	}
+
+	// Count shipped workloads to validate integration pipeline
+	shippedWorkloads := 0
+	for _, repo := range projectIndex.Repos {
+		if repo.Category == "workload" && repo.Status == "shipped" {
+			shippedWorkloads++
+		}
+	}
+
+	if shippedWorkloads == 0 {
+		t.Error("No shipped workloads found - runtime integration cannot be validated")
+	}
+
+	t.Logf("Runtime integration validated with %d shipped workload(s)", shippedWorkloads)
+}
