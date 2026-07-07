@@ -1,0 +1,35 @@
+{
+  "$schema": "https://wasmagent.github.io/agent-trust-infra/schemas/mcp-posture-1.json",
+  "postureFormat": "MCPPosture",
+  "specVersion": "1.0",
+  "metadata": {
+    "generated": "2026-07-07T00:00:00Z",
+    "repository": "WasmAgent/.github",
+    "release": "v1.0.0",
+    "generator": "wasmagent-ops/generators (test fixture)"
+  },
+  "declaredServers": [
+    {
+      "name": "filesystem-server",
+      "endpoint": "stdio",
+      "capabilities": ["read", "write"]
+    }
+  ],
+  "declaredTools": [
+    {
+      "name": "read_file",
+      "category": "file-system",
+      "riskLevel": "low"
+    },
+    {
+      "name": "write_file",
+      "category": "file-system",
+      "riskLevel": "medium"
+    }
+  ],
+  "capabilities": {
+    "allowedOperations": ["read", "write", "execute"],
+    "restrictedPaths": ["/etc", "/usr/bin"],
+    "auditLevel": "full"
+  }
+}

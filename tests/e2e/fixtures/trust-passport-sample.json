@@ -1,0 +1,29 @@
+{
+  "$schema": "https://wasmagent.github.io/agent-trust-infra/schemas/trust-passport-1.json",
+  "passportFormat": "TrustPassport",
+  "specVersion": "1.0",
+  "metadata": {
+    "generated": "2026-07-07T00:00:00Z",
+    "repository": "WasmAgent/.github",
+    "release": "v1.0.0",
+    "generator": "wasmagent-ops/generators (test fixture)"
+  },
+  "identity": {
+    "agentId": "github.com/WasmAgent/test-agent",
+    "version": "1.0.0",
+    "timestamp": "2026-07-07T00:00:00Z"
+  },
+  "posture": {
+    "declaredTools": ["read_file", "write_file"],
+    "observedCapabilities": ["file-system", "network"],
+    "complianceStatus": "compliant"
+  },
+  "evidence": [
+    {
+      "type": "AEP",
+      "location": "evidence/events.jsonl",
+      "signature": "placeholder-signature"
+    }
+  ],
+  "trustScore": 0.95
+}
