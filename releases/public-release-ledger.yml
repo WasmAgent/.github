@@ -4,38 +4,43 @@
 schema_version: 1
 org: WasmAgent
 releases:
-  - repo: wasmagent-js
-    version: "0.1.0"
-    kind: initial-public
-    summary: Embedded agent runtime — WASM sandbox, MCP firewall, AEP emitter.
-    released: 2026-06-30
-  - repo: bscode
-    version: "0.1.0"
-    kind: initial-public
-    summary: Reference coding-agent workload on Cloudflare Workers with AEP export.
-    released: 2026-06-30
-  - repo: trace-pipeline
-    version: "0.1.0"
-    kind: initial-public
-    summary: Measurement trust, evidence admission gate, training-audit backend.
-    released: 2026-06-30
-  - repo: agent-trust-infra
-    version: "0.1.0"
-    kind: initial-public
-    summary: AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI.
-    released: 2026-06-30
-  - repo: open-agent-audit
-    version: "0.1.0"
-    kind: initial-public
-    summary: Enterprise audit product; deployed at trustavo.com.
-    released: 2026-06-30
-  - repo: fresharena
-    version: "0.1.0"
-    kind: initial-public
-    summary: Dynamic, verifiable, adversarial evaluation protocol for coding agents.
-    released: 2026-06-30
+  - repo: wasmagent
+    version: "1.0.0"
+    kind: major
+    summary: Project home page — public landing directing to org hub and roadmap.
+    released: 2026-07-07
   - repo: .github
-    version: "2026.06"
-    kind: profile-refresh
-    summary: Org profile, public ledgers, shared docs, redrawn product matrix.
-    released: 2026-06-30
+    version: "1.0.0"
+    kind: major
+    summary: Org hub — profile, public ledgers, shared docs, project matrix, and roadmap.
+    released: 2026-07-07
+  - repo: wasmagent-js
+    version: "1.0.0"
+    kind: major
+    summary: Embedded agent runtime — WASM sandbox, MCP firewall, AEP emitter.
+    released: 2026-07-07
+  - repo: bscode
+    version: "1.0.0"
+    kind: major
+    summary: Reference coding-agent workload on Cloudflare Workers with AEP export.
+    released: 2026-07-07
+  - repo: trace-pipeline
+    version: "1.0.0"
+    kind: major
+    summary: Evidence pipeline — trace ingestion, admission gate, training-audit backend.
+    released: 2026-07-07
+  - repo: agent-trust-infra
+    version: "1.0.0"
+    kind: major
+    summary: Trust artifacts — AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI.
+    released: 2026-07-07
+  - repo: open-agent-audit
+    version: "1.0.0"
+    kind: major
+    summary: Enterprise audit product; deployed at trustavo.com.
+    released: 2026-07-07
+  - repo: fresharena
+    version: "1.0.0"
+    kind: major
+    summary: Dynamic, verifiable, adversarial evaluation protocol for coding agents.
+    released: 2026-07-07
