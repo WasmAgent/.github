@@ -22,7 +22,7 @@ the public matrix stays complete and in sync across repos.
 
 ## Product matrix
 
-![WasmAgent product matrix](../assets/product-matrix.svg)
+![WasmAgent product matrix](https://raw.githubusercontent.com/WasmAgent/.github/main/assets/product-matrix.svg)
 
 The **runtime** layer — `wasmagent-js` — protects agent execution and emits
 signed AEP events that flow into verifiable runtime traces.
