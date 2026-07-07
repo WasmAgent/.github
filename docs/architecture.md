@@ -265,6 +265,7 @@ graph TB
 - **Org Profile** — Landing page at github.com/WasmAgent
 - **Public Ledgers** — Claims, releases, media registries
 - **Shared Documentation** — Roadmap, architecture, evaluation summary
+- **RFC Registry** — Org-level design decisions and accepted proposals (`docs/RFC/`)
 - **Project Index** — Machine-readable repo, role, status registry
 
 ## Data flow
