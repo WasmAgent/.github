@@ -27,10 +27,29 @@ jobs:
               "MD041": false
             }
 
+  check-links:
+    name: Check Documentation Links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lychee link checker
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: |
+            --verbose
+            --no-progress
+            --exclude-mail
+            docs/
+            README.md
+            **/*.md
+          fail: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   generate-trust-artifacts-on-release:
     name: Generate trust artifacts on release
     if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
-    needs: lint-markdown
+    needs: [lint-markdown, check-links]
     uses: ./.github/workflows/generate-trust-artifacts.yml
     secrets: inherit
     with:
