@@ -1,0 +1,25 @@
+{
+  "$schema": "https://wasmagent.github.io/agent-trust-infra/schemas/agentbom-1.json",
+  "bomFormat": "AgentBOM",
+  "specVersion": "1.0",
+  "metadata": {
+    "generated": "2026-07-07T00:00:00Z",
+    "repository": "WasmAgent/.github",
+    "release": "v1.0.0",
+    "generator": "wasmagent-ops/generators (test fixture)"
+  },
+  "components": [
+    {
+      "type": "runtime",
+      "name": "wasmagent-js",
+      "version": "1.0.0",
+      "description": "WASM sandbox and MCP firewall"
+    },
+    {
+      "type": "tool",
+      "name": "file-system",
+      "version": "1.0.0",
+      "description": "File system access tool"
+    }
+  ]
+}
