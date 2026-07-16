@@ -16,47 +16,50 @@ counterpart is [`project-index.json`](project-index.json).
 
 ### Runtime ✅
 
-- ✅ `wasmagent-js` — embedded agent runtime: WASM sandbox, MCP firewall,
-  capability manifests, signed AEP event emitter.
+- ✅ `wasmagent-js` v1.x — embedded agent runtime: WASM kernels (QuickJS,
+  Pyodide, Wasmtime, Remote), MCP gateway, MCP attestation, AEP emitter,
+  capability manifests; adapters for A2A, AG-UI, AI SDK, Claude Agent SDK.
 
 ### Workloads ✅
 
-- ✅ `bscode` — reference coding-agent workload on Cloudflare Workers with
-  AEP evidence export.
+- ✅ `bscode` — coding-agent workload on Cloudflare Workers with AEP evidence
+  export, deny capabilities, output taint labels, and RolloutProvenance.
 - 📋 `erp-agent` — ERP-domain workload with order-state and ledger verifiers,
   mirroring the role `bscode` plays for coding tasks.
 
 ### Evidence pipelines ✅
 
-- ✅ `trace-pipeline` — measurement trust, evidence admission gate, and
-  training-audit backend; records every training run as auditable evidence.
+- ✅ `trace-pipeline` (`evomerge` on PyPI) — eval_trust paired statistics,
+  AgentTrustScore stable JSON schema, training-data admission gate; schema
+  compatible with `wasmagent-js` v1.x AEP.
 
 ### Trust artifacts ✅
 
 - ✅ `agent-trust-infra` — AgentBOM, MCP Posture, and Trust Passport: spec,
-  reference implementation, and CLI giving every agent run a machine-readable
-  identity and policy posture.
-- 🚧 Reference-implementation coverage across all three artifact types.
+  reference implementation, and CLI.
+- 🚧 EU AI Act Annex IV compliance mapping — draft covers 20/29 Annex IV
+  sub-items; deadline 2026-08-02 (Article 11 effective for high-risk AI).
 
 ### Audit ✅
 
-- ✅ `open-agent-audit` — enterprise audit product; evidence reports and
-  regulatory mappings, deployed at [trustavo.com](https://trustavo.com).
+- ✅ `open-agent-audit` — enterprise audit product with AEP v0.3 adapter;
+  deployed at [trustavo.com](https://trustavo.com).
+  `@openagentaudit/core`, `adapters`, `schema` published on npm.
 - 🚧 Regulatory profiles: OWASP Agentic Top 10, NIST AI RMF,
   ISO/IEC 42001, EU AI Act Annex IV.
 
 ### Evaluation ✅
 
 - ✅ `fresharena` — dynamic, verifiable, adversarial evaluation protocol for
-  coding agents; results feed back into the evidence chain.
-- 🚧 Public benchmark task set and paired-statistics reporting.
+  coding agents; FAEP schema, submit-then-test adversarial testing, Public
+  Immunity Pool. Results feed back into the evidence chain.
+- 🚧 Technical paper (FreshArena: FAEP protocol + empirical results on
+  JSON Transform World) in preparation.
 
 ### Project home ✅
 
-- ✅ `.github` — org profile, public ledgers, shared org docs, RFC registry,
-  and the source of truth for the full roadmap and project list.
-- ✅ `wasmagent` — public landing page that directs readers to `.github` for
-  the full roadmap and project list.
+- ✅ `.github` — org portal; profile, public ledgers, shared org docs, RFC
+  registry, and the source of truth for the full roadmap and project list.
 
 ### Ops ✅
 
@@ -66,5 +69,7 @@ counterpart is [`project-index.json`](project-index.json).
 ## Cross-cutting (planned)
 
 - 📋 Ingestion adapters: OpenTelemetry GenAI, Langfuse, LangSmith.
+- 📋 `erp-agent` public repository.
 - 📋 Cross-repo coherence patrol: org repo list ↔ profile README ↔
   cross-repo URLs ↔ roadmap completion.
+- 📋 Trust Passport product module: issuance, verification, renewal (Trustavo).

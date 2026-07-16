@@ -4,38 +4,47 @@ Protect agent runs. Record evidence. Audit claims. Train only from trusted trace
 
 ## Projects
 
-The table below is the human-readable view of
+The **architecture** layer below is the human-readable view of
 [`docs/project-index.json`](../docs/project-index.json), the machine-readable
-source of truth for the project list. Profile generation consumes that index so
-the public matrix stays complete and in sync across repos.
+source of truth for the project list. This repository (`.github`) is the
+organization's sole public portal.
 
 | Repository | Role |
 | --- | --- |
-| [wasmagent](https://github.com/WasmAgent/wasmagent) | **Project home** · Public landing page that directs readers to [`.github`](https://github.com/WasmAgent/.github) for the full roadmap and project list |
-| [`.github`](https://github.com/WasmAgent/.github) | **Org hub** · Org-wide documentation and ledger hub — public home for the roadmap, claims registry, release ledger, and cross-repo coordination |
-| [wasmagent-js](https://github.com/WasmAgent/wasmagent-js) | **Runtime** · Embedded agent runtime — WASM sandbox, MCP firewall, capability manifests, signed AEP event emitter |
-| [bscode](https://github.com/WasmAgent/bscode) | **Workload** · Real coding-agent workload and evidence collection surface on Cloudflare Workers with AEP evidence export |
-| [trace-pipeline](https://github.com/WasmAgent/trace-pipeline) | **Evidence pipeline** · Trace-to-training backend and data factory — ingests AEP traces, gates training-data admission, and records every training run as auditable evidence |
-| [agent-trust-infra](https://github.com/WasmAgent/agent-trust-infra) | **Trust artifacts** · AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI |
-| [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | **Audit** · Enterprise audit product; deployed at [trustavo.com](https://trustavo.com) |
-| [fresharena](https://github.com/WasmAgent/fresharena) | **Evaluation protocol** · Dynamic, verifiable, adversarial evaluation protocol for coding agents |
+| [`.github`](https://github.com/WasmAgent/.github) | **Org hub** · Organization portal — roadmap, claims registry, release ledger, project index, and cross-repo documentation |
+| [wasmagent-js](https://github.com/WasmAgent/wasmagent-js) | **Runtime** · Embedded agent runtime v1.x — WASM kernels (QuickJS, Pyodide, Wasmtime, Remote), MCP gateway + attestation, AEP emitter, capability manifests; adapters for A2A, AG-UI, AI SDK, and Claude Agent SDK |
+| [bscode](https://github.com/WasmAgent/bscode) | **Workload** · Coding-agent workload on Cloudflare Workers — AEP evidence export, deny capabilities, output taint labels, RolloutProvenance |
+| [trace-pipeline](https://github.com/WasmAgent/trace-pipeline) | **Evidence pipeline** · `evomerge` — trace-to-training backend: eval_trust paired statistics, AgentTrustScore, training-data admission gate, wasmagent-js v1.x schema compat |
+| [agent-trust-infra](https://github.com/WasmAgent/agent-trust-infra) | **Trust artifacts** · AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI; EU AI Act Annex IV compliance mapping (draft) |
+| [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | **Audit** · Enterprise audit product with AEP v0.3 adapter; deployed at [trustavo.com](https://trustavo.com) |
+| [fresharena](https://github.com/WasmAgent/fresharena) | **Evaluation protocol** · Dynamic, verifiable, adversarial evaluation — FAEP schema, submit-then-test, Public Immunity Pool; paper in preparation |
 
-## Product matrix
+## Architecture
 
-![WasmAgent product matrix](../assets/product-matrix.svg)
+![WasmAgent architecture](../assets/product-matrix.svg)
 
-The **runtime** layer — `wasmagent-js` — protects agent execution and emits
-signed AEP events that flow into verifiable runtime traces.
-`trace-pipeline` audits benchmark claims with paired statistics, gates training
-data admission, and records every training run as auditable evidence.
-`agent-trust-infra` layers on trust artifacts — AgentBOM, MCP Posture, and
-Trust Passport — giving every agent run a machine-readable identity and
-policy posture that feeds downstream audit.
-`open-agent-audit` turns the full evidence chain into enterprise-readable
-audit reports — deployed at **[trustavo.com](https://trustavo.com)**.
-`fresharena` closes the loop with dynamic, verifiable, adversarial evaluation
-of coding agents, ensuring the runtime, evidence, and audit story is grounded
-in real benchmark performance.
+The **runtime** layer — `wasmagent-js` (v1.x) — protects agent execution across
+multiple WASM kernels, enforces MCP policy via `mcp-gateway` and `mcp-attestation`,
+and emits signed AEP events that flow into verifiable runtime traces.
+
+`bscode` and `fresharena` are the two live agent surfaces: coding workload and
+adversarial evaluation, both instrumented to produce AEP evidence.
+
+`trace-pipeline` (`evomerge` on PyPI) gates training-data admission with paired
+statistics and records every training run as auditable evidence. Compatible with
+`wasmagent-js` v1.x AEP schema.
+
+`agent-trust-infra` layers on trust artifacts — AgentBOM, MCP Posture, and Trust
+Passport — giving every agent run a machine-readable identity and policy posture.
+An EU AI Act Annex IV compliance mapping (Article 11 / Annex IV, effective 2026-08-02)
+is in draft, covering 20 of 29 Annex IV sub-items.
+
+`open-agent-audit` turns the full evidence chain into enterprise-readable audit
+reports with AEP v0.3 adapter support — deployed at **[trustavo.com](https://trustavo.com)**.
+
+`fresharena` closes the loop with dynamic, verifiable, adversarial evaluation,
+grounding the runtime, evidence, and audit story in measured benchmark performance.
+A technical paper (FAEP protocol + empirical results) is in preparation.
 
 ## What is Trustavo?
 
@@ -51,15 +60,13 @@ We are looking for maintainers across several focus areas. Open to
 part-time and async contribution; commit access is granted after a
 sustained track record.
 
-- **Runtime** — `wasmagent-js`, AEP, MCP firewall, capability manifests
-- **Pipelines** — `trace-pipeline` (measurement trust, admission, training audit)
-- **Trust artifacts** — `agent-trust-infra` (AgentBOM, MCP Posture, Trust Passport)
-- **Audit product** — `open-agent-audit` / Trustavo
-  (evidence reports, Cloudflare Workers)
-- **Evaluation** — `fresharena` (dynamic, verifiable, adversarial evaluation protocol for coding agents)
+- **Runtime** — `wasmagent-js`, AEP, MCP gateway/attestation, capability manifests
+- **Pipelines** — `trace-pipeline` / `evomerge` (measurement trust, admission, training audit)
+- **Trust artifacts** — `agent-trust-infra` (AgentBOM, MCP Posture, Trust Passport, EU AI Act mapping)
+- **Audit product** — `open-agent-audit` / Trustavo (evidence reports, Cloudflare Workers)
+- **Evaluation** — `fresharena` (dynamic, verifiable, adversarial evaluation; paper preparation)
 - **Adapters** — OpenTelemetry GenAI, Langfuse, LangSmith ingestion
-- **Regulatory profiles** — OWASP Agentic Top 10, NIST AI RMF,
-  ISO/IEC 42001, EU AI Act Annex IV mappings
+- **Regulatory profiles** — OWASP Agentic Top 10, NIST AI RMF, ISO/IEC 42001, EU AI Act Annex IV
 - **DevRel & docs** — quickstart guides, integration walkthroughs, sample reports
 
 Interested? Open an issue titled `maintainer: <area>` in the relevant

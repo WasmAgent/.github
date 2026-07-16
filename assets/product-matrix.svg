@@ -1,85 +1,84 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
-  <title>WasmAgent product matrix</title>
-  <desc>Core public repositories spanning runtime, workload, evidence pipelines, trust artifacts, audit, evaluation, and the org project home.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 555" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title>WasmAgent architecture</title>
+  <desc>Trustworthy agent architecture: Runtime (wasmagent-js) feeds Workload (bscode) and Evaluation (fresharena), both flow into Evidence Pipeline (trace-pipeline), which feeds Trust Artifacts (agent-trust-infra) and Audit (open-agent-audit), all anchored by the Org Hub (.github).</desc>
 
   <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
       <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
     </marker>
   </defs>
 
-  <rect width="960" height="540" fill="#ffffff"/>
+  <rect width="960" height="555" fill="#ffffff"/>
 
-  <text x="480" y="40" text-anchor="middle" font-size="24" font-weight="700" fill="#0f172a">WasmAgent product matrix</text>
-  <text x="480" y="64" text-anchor="middle" font-size="13" fill="#64748b">Core public repositories &#183; runtime &#8594; workload &#8594; evidence &#8594; trust &#8594; audit &#8594; evaluation</text>
+  <!-- Title -->
+  <text x="480" y="35" text-anchor="middle" font-size="22" font-weight="700" fill="#0f172a">WasmAgent — Trustworthy Agent Architecture</text>
+  <text x="480" y="54" text-anchor="middle" font-size="12" fill="#64748b">Runtime · Workloads · Evidence Pipeline · Trust Artifacts · Audit · Evaluation</text>
 
-  <!-- Row 1 horizontal flow arrows -->
-  <line x1="253" y1="165" x2="261" y2="165" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="476" y1="165" x2="484" y2="165" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="699" y1="165" x2="707" y2="165" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <!-- ===== wasmagent-js (RUNTIME) ===== -->
+  <rect x="40" y="66" width="880" height="94" rx="12" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+  <line x1="512" y1="76" x2="512" y2="150" stroke="#bfdbfe" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="58" y="88" font-size="10" font-weight="700" fill="#1d4ed8" letter-spacing="1.5">RUNTIME</text>
+  <text x="58" y="112" font-size="16" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">wasmagent-js</text>
+  <text x="58" y="131" font-size="11" fill="#475569">WASM kernels: QuickJS · Pyodide · Wasmtime · Remote</text>
+  <text x="58" y="149" font-size="11" fill="#475569">MCP gateway · MCP attestation · AEP emitter · capability manifests</text>
+  <text x="530" y="88" font-size="10" font-weight="600" fill="#64748b">Packages (v1.x)</text>
+  <text x="530" y="106" font-size="11" fill="#475569">@wasmagent/core · cli · aep · compliance · evals-runner</text>
+  <text x="530" y="124" font-size="11" fill="#475569">mcp-gateway · mcp-attestation · devtools · kernel-*</text>
+  <text x="530" y="142" font-size="11" fill="#475569">Adapters: A2A · AG-UI · AI SDK · Claude Agent SDK</text>
 
-  <!-- fresharena → trace-pipeline feedback arrow (results re-enter pipeline) -->
-  <path d="M 765,335 L 820,335 Q 840,335 840,315 L 840,185 Q 840,165 820,165 L 699,165" stroke="#94a3b8" stroke-width="2" fill="none" stroke-dasharray="6,3" marker-end="url(#arrow)"/>
+  <!-- Down arrows: wasmagent-js → bscode, fresharena -->
+  <line x1="247" y1="160" x2="247" y2="173" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="713" y1="160" x2="713" y2="173" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
 
-  <!-- wasmagent-js (RUNTIME) -->
-  <g>
-    <rect x="40" y="90" width="211" height="150" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
-    <text x="58" y="120" font-size="11" font-weight="700" fill="#2563eb" letter-spacing="1">RUNTIME</text>
-    <text x="58" y="148" font-size="17" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">wasmagent-js</text>
-    <text x="58" y="176" font-size="12" fill="#475569">WASM sandbox &#183; MCP firewall</text>
-    <text x="58" y="196" font-size="12" fill="#475569">Capability manifests &#183; AEP</text>
-  </g>
+  <!-- ===== bscode (WORKLOAD) ===== -->
+  <rect x="40" y="175" width="415" height="90" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="58" y="197" font-size="10" font-weight="700" fill="#2563eb" letter-spacing="1.5">WORKLOAD</text>
+  <text x="58" y="220" font-size="16" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">bscode</text>
+  <text x="58" y="240" font-size="11" fill="#475569">Cloudflare Workers coding agent · AEP evidence export</text>
+  <text x="58" y="257" font-size="11" fill="#475569">Deny capabilities · output_taint_labels · RolloutProvenance</text>
 
-  <!-- bscode (WORKLOAD) -->
-  <g>
-    <rect x="263" y="90" width="211" height="150" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
-    <text x="281" y="120" font-size="11" font-weight="700" fill="#2563eb" letter-spacing="1">WORKLOAD</text>
-    <text x="281" y="148" font-size="17" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">bscode</text>
-    <text x="281" y="176" font-size="12" fill="#475569">Cloudflare Workers agent</text>
-    <text x="281" y="196" font-size="12" fill="#475569">AEP evidence export</text>
-  </g>
+  <!-- ===== fresharena (EVALUATION) ===== -->
+  <rect x="505" y="175" width="415" height="90" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="523" y="197" font-size="10" font-weight="700" fill="#2563eb" letter-spacing="1.5">EVALUATION</text>
+  <text x="523" y="220" font-size="16" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">fresharena</text>
+  <text x="523" y="240" font-size="11" fill="#475569">Dynamic, verifiable, adversarial evaluation protocol</text>
+  <text x="523" y="257" font-size="11" fill="#475569">Verifiable tasks · paired statistics · FAEP schema</text>
 
-  <!-- trace-pipeline (EVIDENCE PIPELINES) -->
-  <g>
-    <rect x="486" y="90" width="211" height="150" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
-    <text x="504" y="120" font-size="11" font-weight="700" fill="#2563eb" letter-spacing="1">EVIDENCE PIPELINES</text>
-    <text x="504" y="148" font-size="17" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">trace-pipeline</text>
-    <text x="504" y="176" font-size="12" fill="#475569">Measurement trust &#183; gate</text>
-    <text x="504" y="196" font-size="12" fill="#475569">Training-audit backend</text>
-  </g>
+  <!-- Elbow arrows: bscode, fresharena → trace-pipeline -->
+  <path d="M 247,265 L 247,272 L 300,272 L 300,278" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 713,265 L 713,272 L 660,272 L 660,278" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
 
-  <!-- agent-trust-infra (TRUST ARTIFACTS) — no NEW badge -->
-  <g>
-    <rect x="709" y="90" width="211" height="150" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
-    <text x="727" y="120" font-size="11" font-weight="700" fill="#2563eb" letter-spacing="1">TRUST ARTIFACTS</text>
-    <text x="727" y="148" font-size="17" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">agent-trust-infra</text>
-    <text x="727" y="176" font-size="12" fill="#475569">AgentBOM &#183; MCP Posture</text>
-    <text x="727" y="196" font-size="12" fill="#475569">Trust Passport spec + CLI</text>
-  </g>
+  <!-- ===== trace-pipeline (EVIDENCE PIPELINE) ===== -->
+  <rect x="180" y="280" width="600" height="80" rx="12" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+  <text x="198" y="302" font-size="10" font-weight="700" fill="#15803d" letter-spacing="1.5">EVIDENCE PIPELINE</text>
+  <text x="198" y="327" font-size="16" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">trace-pipeline</text>
+  <text x="365" y="327" font-size="11" fill="#64748b" font-style="italic">· pip install evomerge</text>
+  <text x="198" y="347" font-size="11" fill="#475569">eval_trust · AgentTrustScore · paired statistics · training data admission gate</text>
 
-  <!-- open-agent-audit (AUDIT) -->
-  <g>
-    <rect x="195" y="260" width="260" height="150" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
-    <text x="213" y="290" font-size="11" font-weight="700" fill="#2563eb" letter-spacing="1">AUDIT</text>
-    <text x="213" y="318" font-size="18" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">open-agent-audit</text>
-    <text x="213" y="348" font-size="12" fill="#475569">Enterprise audit product</text>
-    <text x="213" y="366" font-size="12" fill="#475569">Evidence reports &#8594; Trustavo</text>
-  </g>
+  <!-- Elbow arrows: trace-pipeline → trust-infra, audit -->
+  <path d="M 310,360 L 310,367 L 247,367 L 247,373" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M 650,360 L 650,367 L 713,367 L 713,373" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
 
-  <!-- fresharena (EVALUATION) — no NEW badge -->
-  <g>
-    <rect x="505" y="260" width="260" height="150" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
-    <text x="523" y="290" font-size="11" font-weight="700" fill="#2563eb" letter-spacing="1">EVALUATION</text>
-    <text x="523" y="318" font-size="18" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">fresharena</text>
-    <text x="523" y="348" font-size="12" fill="#475569">Adversarial eval protocol</text>
-    <text x="523" y="366" font-size="12" fill="#475569">Verifiable coding benchmarks</text>
-  </g>
+  <!-- ===== agent-trust-infra (TRUST ARTIFACTS) ===== -->
+  <rect x="40" y="375" width="415" height="95" rx="12" fill="#faf5ff" stroke="#d8b4fe" stroke-width="1.5"/>
+  <text x="58" y="397" font-size="10" font-weight="700" fill="#7c3aed" letter-spacing="1.5">TRUST ARTIFACTS</text>
+  <text x="58" y="420" font-size="15" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">agent-trust-infra</text>
+  <text x="58" y="440" font-size="11" fill="#475569">AgentBOM · MCP Posture · Trust Passport</text>
+  <text x="58" y="458" font-size="11" fill="#475569">trust-cli · dashboard export · marketplace schema</text>
 
-  <!-- .github (PROJECT HOME) -->
-  <g>
-    <rect x="40" y="448" width="880" height="68" rx="12" fill="#0f172a"/>
-    <text x="58" y="478" font-size="11" font-weight="700" fill="#93c5fd" letter-spacing="1">PROJECT HOME</text>
-    <text x="58" y="503" font-size="16" font-weight="700" fill="#ffffff" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">.github</text>
-    <text x="902" y="490" text-anchor="end" font-size="12" fill="#cbd5e1">Org profile &#183; public ledgers &#183; shared docs &#183; github.com/WasmAgent</text>
-  </g>
+  <!-- ===== open-agent-audit (AUDIT) ===== -->
+  <rect x="505" y="375" width="415" height="95" rx="12" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/>
+  <text x="523" y="397" font-size="10" font-weight="700" fill="#c2410c" letter-spacing="1.5">AUDIT</text>
+  <text x="523" y="420" font-size="15" font-weight="700" fill="#0f172a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">open-agent-audit</text>
+  <text x="523" y="440" font-size="11" fill="#475569">Enterprise audit reports · trustavo.com · AEP v0.3</text>
+  <text x="523" y="458" font-size="11" fill="#475569">@openagentaudit/core · adapters · OWASP · NIST · EU AI Act</text>
+
+  <!-- Cross arrow: trust-infra → audit -->
+  <line x1="456" y1="422" x2="503" y2="422" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ===== .github (PROJECT HOME & ORG HUB) ===== -->
+  <rect x="40" y="484" width="880" height="58" rx="12" fill="#0f172a"/>
+  <text x="58" y="508" font-size="10" font-weight="700" fill="#93c5fd" letter-spacing="1.5">PROJECT HOME &amp; ORG HUB</text>
+  <text x="58" y="529" font-size="15" font-weight="700" fill="#ffffff" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">.github · wasmagent</text>
+  <text x="900" y="519" text-anchor="end" font-size="11" fill="#cbd5e1">Org profile · roadmap · claims registry · release ledger · github.com/WasmAgent</text>
 </svg>

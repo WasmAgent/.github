@@ -3,69 +3,85 @@
 # status. This is a public ledger: edit in place only with merged evidence.
 schema_version: 1
 org: WasmAgent
-last_reviewed: 2026-06-30
+last_reviewed: 2026-07-16
 claims:
   - id: WA-C-0001
     domain: runtime
     claim: >-
-      wasmagent-js sandboxes agent tools in WebAssembly and enforces an MCP
-      firewall gated by per-agent capability manifests, emitting signed Agent
-      Evidence Protocol (AEP) events.
+      wasmagent-js v1.x sandboxes agent tools across multiple WASM kernels
+      (QuickJS, Pyodide, Wasmtime, Remote) and enforces an MCP firewall via
+      mcp-gateway and mcp-attestation, emitting signed Agent Evidence Protocol
+      (AEP) events via @wasmagent/aep.
     evidence:
       repo: wasmagent-js
       artifacts:
-        - capability manifest format
-        - AEP event emitter
+        - packages/mcp-gateway
+        - packages/mcp-attestation
+        - packages/aep (v1.11.0)
+        - packages/capability-compiler
     status: supported
-    recorded: 2026-06-30
+    recorded: 2026-07-16
   - id: WA-C-0002
     domain: evidence
     claim: >-
-      trace-pipeline admits training data only from runs whose traces pass
-      paired-statistics evidence checks, and records every training run as
-      auditable evidence.
+      trace-pipeline (evomerge) admits training data only from runs whose
+      traces pass paired-statistics evidence checks via eval_trust, exposes
+      AgentTrustScore as a stable JSON schema, and records every training run
+      as auditable evidence. Schema compatible with wasmagent-js v1.x AEP.
     evidence:
       repo: trace-pipeline
       artifacts:
-        - evidence admission gate
-        - training-run audit log
+        - evomerge CLI (pip install evomerge)
+        - AgentTrustScore JSON schema (feat #2)
+        - wasmagent-js v1.11.0 schema compat fix (PR #11)
     status: supported
-    recorded: 2026-06-30
+    recorded: 2026-07-16
   - id: WA-C-0003
     domain: trust
     claim: >-
       agent-trust-infra gives every agent run a machine-readable identity and
-      policy posture through AgentBOM, MCP Posture, and Trust Passport artifacts.
+      policy posture through AgentBOM, MCP Posture, and Trust Passport artifacts
+      with reference implementation and CLI. An EU AI Act Annex IV compliance
+      mapping is in draft, covering 20 of 29 Annex IV sub-items.
     evidence:
       repo: agent-trust-infra
       artifacts:
-        - AgentBOM spec
-        - MCP Posture spec
-        - Trust Passport spec
-    status: in-progress
-    recorded: 2026-06-30
+        - AgentBOM spec + validator
+        - MCP Posture spec + MCP server decorator
+        - Trust Passport spec + sign/verify-signed CLI (Milestone 1)
+        - trust-cli export-dashboard (Milestone 4)
+        - docs/ai-act-annex-iv-mapping.md (draft, 2026-08-02 deadline)
+    status: supported
+    recorded: 2026-07-16
   - id: WA-C-0004
     domain: audit
     claim: >-
       open-agent-audit renders the full evidence chain into enterprise-readable
-      audit reports with mappings to OWASP Agentic Top 10, NIST AI RMF,
-      ISO/IEC 42001, and EU AI Act Annex IV.
+      audit reports with AEP v0.3 adapter support, deployed at trustavo.com on
+      Cloudflare Workers.
     evidence:
       repo: open-agent-audit
       artifacts:
-        - report renderer
-        - regulatory mapping profiles
-    status: in-progress
-    recorded: 2026-06-30
+        - "@openagentaudit/core v0.2.2"
+        - "@openagentaudit/adapters v0.2.4 (aep/v0.3 support)"
+        - "@openagentaudit/schema v0.2.0"
+        - trustavo.com production deployment
+    status: supported
+    recorded: 2026-07-16
   - id: WA-C-0005
     domain: evaluation
     claim: >-
       fresharena evaluates coding agents with dynamic, verifiable, adversarial
-      tasks whose results feed back into the evidence chain.
+      tasks using the FAEP protocol — versioned task families, submit-then-test
+      adversarial checks, and a Public Immunity Pool — whose results feed back
+      into the evidence chain. A technical paper is in preparation.
     evidence:
       repo: fresharena
       artifacts:
-        - evaluation protocol
-        - verifiable task harness
-    status: in-progress
-    recorded: 2026-06-30
+        - FAEP schema (packages/faep-schema)
+        - verifier-runtime (deterministic sandbox)
+        - submit-then-test adversarial harness
+        - Public Immunity Pool (records/samples/)
+        - docs/paper-strategy.md (paper in preparation)
+    status: supported
+    recorded: 2026-07-16

@@ -4,43 +4,48 @@
 schema_version: 1
 org: WasmAgent
 releases:
-  - repo: wasmagent
-    version: "1.0.0"
-    kind: major
-    summary: Project home page — public landing directing to org hub and roadmap.
-    released: 2026-07-07
   - repo: .github
     version: "1.0.0"
     kind: major
     summary: Org hub — profile, public ledgers, shared docs, project matrix, and roadmap.
     released: 2026-07-07
   - repo: wasmagent-js
-    version: "1.0.0"
+    version: "0.2.0"
+    kind: minor
+    summary: First public npm release. Four strategic axes established; all packages on shared version line.
+    released: 2026-06-12
+  - repo: wasmagent-js
+    version: "0.3.0"
+    kind: minor
+    summary: GoalDirectedAgent (Axis 8), adaptive execution with 3 recovery layers (Axis 9), npx init scaffold, Cloudflare Worker example, OWASP demo.
+    released: 2026-06-18
+  - repo: wasmagent-js
+    version: "1.11.0"
     kind: major
-    summary: Embedded agent runtime — WASM sandbox, MCP firewall, AEP emitter.
-    released: 2026-07-07
+    summary: "Runtime v1.x: mcp-gateway, mcp-attestation, A2A/AG-UI/AI SDK/Claude Agent SDK adapters, evals-runner, multi-kernel support (QuickJS, Pyodide, Wasmtime, Remote)."
+    released: 2026-07-16
   - repo: bscode
     version: "1.0.0"
     kind: major
-    summary: Reference coding-agent workload on Cloudflare Workers with AEP export.
+    summary: Coding-agent workload on Cloudflare Workers with AEP evidence export, deny capabilities, output_taint_labels, RolloutProvenance.
     released: 2026-07-07
   - repo: trace-pipeline
     version: "1.0.0"
     kind: major
-    summary: Evidence pipeline — trace ingestion, admission gate, training-audit backend.
-    released: 2026-07-07
+    summary: evomerge — eval_trust paired stats, AgentTrustScore stable JSON schema, training-data admission gate; wasmagent-js v1.x schema compatible.
+    released: 2026-07-16
   - repo: agent-trust-infra
     version: "1.0.0"
     kind: major
-    summary: Trust artifacts — AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI.
-    released: 2026-07-07
+    summary: AgentBOM, MCP Posture, Trust Passport spec + CLI. Milestones 1–4 landed. EU AI Act Annex IV mapping in draft.
+    released: 2026-07-16
   - repo: open-agent-audit
-    version: "1.0.0"
-    kind: major
-    summary: Enterprise audit product; deployed at trustavo.com.
-    released: 2026-07-07
+    version: "0.2.4"
+    kind: minor
+    summary: "@openagentaudit/adapters v0.2.4 — AEP v0.3 record support, side_effect_class preserved; @openagentaudit/core v0.2.2; dashboard DX batch."
+    released: 2026-07-16
   - repo: fresharena
     version: "1.0.0"
     kind: major
-    summary: Dynamic, verifiable, adversarial evaluation protocol for coding agents.
+    summary: Dynamic, verifiable, adversarial evaluation — FAEP schema, submit-then-test, Public Immunity Pool. Technical paper in preparation.
     released: 2026-07-07

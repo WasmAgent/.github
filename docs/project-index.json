@@ -3,7 +3,7 @@
   "org": "WasmAgent",
   "description": "Machine-readable source of truth for the WasmAgent project index. Lists every repository in the organization with its category, role, status, and visibility. Consumed by the org profile (profile/README.md project table) and the living roadmap (docs/roadmap.md) so the public project matrix is rendered from a single registry instead of maintained by hand, preventing omissions.",
   "source_url": "https://github.com/WasmAgent/.github/blob/main/docs/project-index.json",
-  "last_reviewed": "2026-07-07",
+  "last_reviewed": "2026-07-16",
   "consumers": [
     "profile/README.md — Projects table",
     "docs/roadmap.md — project layers"
@@ -26,23 +26,13 @@
   },
   "repos": [
     {
-      "name": "wasmagent",
-      "category": "project-home",
-      "role": "Project home",
-      "status": "shipped",
-      "visibility": "public",
-      "in_profile": true,
-      "summary": "Public landing page that directs readers to .github for the full roadmap and project list.",
-      "url": "https://github.com/WasmAgent/wasmagent"
-    },
-    {
       "name": ".github",
       "category": "org-hub",
-      "role": "Org hub",
+      "role": "Org portal",
       "status": "shipped",
       "visibility": "public",
       "in_profile": true,
-      "summary": "Org-wide documentation and ledger hub; public home for the roadmap, claims registry, release ledger, and cross-repo coordination.",
+      "summary": "Organization portal and sole public entry point: profile, roadmap, claims registry, release ledger, RFC registry, and cross-repo documentation.",
       "url": "https://github.com/WasmAgent/.github"
     },
     {
@@ -52,8 +42,9 @@
       "status": "shipped",
       "visibility": "public",
       "in_profile": true,
-      "summary": "Embedded agent runtime: WASM sandbox, MCP firewall, capability manifests, signed AEP event emitter.",
-      "url": "https://github.com/WasmAgent/wasmagent-js"
+      "summary": "Embedded agent runtime v1.x: WASM kernels (QuickJS, Pyodide, Wasmtime, Remote), MCP gateway + attestation, AEP emitter, capability manifests; adapters for A2A, AG-UI, AI SDK, Claude Agent SDK.",
+      "url": "https://github.com/WasmAgent/wasmagent-js",
+      "latest_version": "1.11.0"
     },
     {
       "name": "bscode",
@@ -62,7 +53,7 @@
       "status": "shipped",
       "visibility": "public",
       "in_profile": true,
-      "summary": "Reference coding-agent workload and evidence collection surface on Cloudflare Workers with AEP evidence export.",
+      "summary": "Coding-agent workload on Cloudflare Workers — AEP evidence export, deny capabilities, output taint labels, RolloutProvenance.",
       "url": "https://github.com/WasmAgent/bscode"
     },
     {
@@ -72,7 +63,7 @@
       "status": "shipped",
       "visibility": "public",
       "in_profile": true,
-      "summary": "Trace-to-training backend and data factory — ingests AEP traces, gates training-data admission, and records every training run as auditable evidence.",
+      "summary": "evomerge on PyPI — eval_trust paired statistics, AgentTrustScore stable JSON schema, training-data admission gate, wasmagent-js v1.x schema compatible.",
       "url": "https://github.com/WasmAgent/trace-pipeline"
     },
     {
@@ -82,7 +73,7 @@
       "status": "shipped",
       "visibility": "public",
       "in_profile": true,
-      "summary": "AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI.",
+      "summary": "AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI; EU AI Act Annex IV compliance mapping in draft (covers 20/29 sub-items, deadline 2026-08-02).",
       "url": "https://github.com/WasmAgent/agent-trust-infra"
     },
     {
@@ -92,8 +83,9 @@
       "status": "shipped",
       "visibility": "public",
       "in_profile": true,
-      "summary": "Enterprise audit product; deployed at trustavo.com.",
-      "url": "https://github.com/WasmAgent/open-agent-audit"
+      "summary": "Enterprise audit product with AEP v0.3 adapter; deployed at trustavo.com. Packages: @openagentaudit/core, adapters, schema.",
+      "url": "https://github.com/WasmAgent/open-agent-audit",
+      "latest_version": "0.2.4"
     },
     {
       "name": "fresharena",
@@ -102,7 +94,7 @@
       "status": "shipped",
       "visibility": "public",
       "in_profile": true,
-      "summary": "Dynamic, verifiable, adversarial evaluation protocol for coding agents.",
+      "summary": "Dynamic, verifiable, adversarial evaluation — FAEP schema, submit-then-test adversarial testing, Public Immunity Pool; technical paper in preparation.",
       "url": "https://github.com/WasmAgent/fresharena"
     },
     {
