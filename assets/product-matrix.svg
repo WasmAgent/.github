@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 860" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
-  <title>WasmAgent architecture</title>
-  <desc>Trustworthy agent architecture: Gateway (wasmagent-proxy) feeds Runtime (wasmagent-js, symkernel, wasmagent-py), backed by Verification (symkernel). Workloads (bscode, fresharena) and Runtime produce traces that flow into Evidence Pipelines (trace-pipeline, wasmagent-train-replay), which feed Trust Artifacts and Audit. All anchored by the Org Hub (.github).</desc>
+  <title>WasmAgent — The Trusted Agent OS</title>
+  <desc>The Trusted Agent OS: Gateway (wasmagent-proxy) feeds Runtime (wasmagent-js, symkernel, wasmagent-py). Workloads (bscode, fresharena) and Runtime produce traces that flow into Evidence Pipelines (trace-pipeline, wasmagent-train-replay), which feed Trust Artifacts and Audit. All anchored by the Org Hub (.github).</desc>
 
   <defs>
     <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
@@ -20,7 +20,7 @@
   <rect width="1040" height="860" fill="#f8fafc"/>
 
   <!-- Title -->
-  <text x="520" y="36" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">WasmAgent — Trustworthy Agent Architecture</text>
+  <text x="520" y="36" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">WasmAgent — The Trusted Agent OS</text>
   <text x="520" y="56" text-anchor="middle" font-size="11.5" fill="#64748b">Gateway · Runtime · Verification · Workloads · Evidence Pipelines · Trust Artifacts · Audit · Evaluation</text>
 
   <!-- ================================================================ -->
