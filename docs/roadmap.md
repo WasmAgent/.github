@@ -19,6 +19,22 @@ counterpart is [`project-index.json`](project-index.json).
 - ✅ `wasmagent-js` v1.x — embedded agent runtime: WASM kernels (QuickJS,
   Pyodide, Wasmtime, Remote), MCP gateway, MCP attestation, AEP emitter,
   capability manifests; adapters for A2A, AG-UI, AI SDK, Claude Agent SDK.
+- 📋 `wasmagent-py` — Python agent runtime sibling; shares AEP schema,
+  Criterion/ConstraintIR protocol, and symkernel HTTP adapter.
+
+### Gateway 🚧
+
+- 🚧 `wasmagent-proxy` — Proxy-Wasm (Rust) evidence engine for Envoy, Istio,
+  Kong, and Consul: intercepts Agent/MCP/A2A HTTP traffic, applies
+  `validation → delta → full` recording policy, emits Ed25519-signed AEP
+  records (DSSE envelope). Joins `mcp-firewall` via shared `trace_id`.
+
+### Verification 🚧
+
+- 🚧 `symkernel` — Go symbolic verification backend: cel-go lightweight rules,
+  wazero Wasm sandbox hard-isolation, Z3 SMT satisfiability proofs. OPA-style
+  HTTP service; consumed by wasmagent-js (CelGoVerifier / Z3Verifier) and
+  future wasmagent-py via a thin adapter. Deploys on Cloudflare Containers.
 
 ### Workloads ✅
 
@@ -32,6 +48,10 @@ counterpart is [`project-index.json`](project-index.json).
 - ✅ `trace-pipeline` (`evomerge` on PyPI) — eval_trust paired statistics,
   AgentTrustScore stable JSON schema, training-data admission gate; schema
   compatible with `wasmagent-js` v1.x AEP.
+- 🚧 `wasmagent-train-replay` — causal evidence layer for distributed GPU
+  training: reads PyTorch Flight Recorder dumps, builds cross-rank PROV-DM
+  provenance graphs, records Ed25519-signed `EpochEvidenceBundle`s, supports
+  tensor-origin tracing and deterministic replay.
 
 ### Trust artifacts ✅
 
@@ -70,6 +90,9 @@ counterpart is [`project-index.json`](project-index.json).
 
 - 📋 Ingestion adapters: OpenTelemetry GenAI, Langfuse, LangSmith.
 - 📋 `erp-agent` public repository.
+- 📋 `wasmagent-py` Python runtime and symkernel adapter.
 - 📋 Cross-repo coherence patrol: org repo list ↔ profile README ↔
   cross-repo URLs ↔ roadmap completion.
 - 📋 Trust Passport product module: issuance, verification, renewal (Trustavo).
+- 📋 symkernel Phase 1: wazero sandbox (`/v1/sandbox/run`), Z3 integration
+  (`/v1/verify/z3`), generate-error-repair loop.

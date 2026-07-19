@@ -3,7 +3,7 @@
   "org": "WasmAgent",
   "description": "Machine-readable source of truth for the WasmAgent project index. Lists every repository in the organization with its category, role, status, and visibility. Consumed by the org profile (profile/README.md project table) and the living roadmap (docs/roadmap.md) so the public project matrix is rendered from a single registry instead of maintained by hand, preventing omissions.",
   "source_url": "https://github.com/WasmAgent/.github/blob/main/docs/project-index.json",
-  "last_reviewed": "2026-07-16",
+  "last_reviewed": "2026-07-19",
   "consumers": [
     "profile/README.md — Projects table",
     "docs/roadmap.md — project layers"
@@ -22,7 +22,9 @@
     "trust-artifacts": "Machine-readable identity and policy posture artifacts.",
     "audit": "Enterprise audit product.",
     "evaluation": "Adversarial evaluation protocol.",
-    "internal-tool": "Internal automation or operations; ships no public product."
+    "internal-tool": "Internal automation or operations; ships no public product.",
+    "verification": "Symbolic verification and sandbox execution backend.",
+    "gateway": "Network-boundary evidence engine (Proxy-Wasm)."
   },
   "repos": [
     {
@@ -126,6 +128,46 @@
       "in_profile": false,
       "summary": "Planned ERP-domain workload with order-state and ledger verifiers, mirroring the role bscode plays for coding tasks.",
       "url": "https://github.com/WasmAgent/erp-agent"
+    },
+    {
+      "name": "symkernel",
+      "category": "verification",
+      "role": "Symbolic verification kernel",
+      "status": "in_progress",
+      "visibility": "public",
+      "in_profile": true,
+      "summary": "Go-based symbolic verification backend for the WasmAgent ecosystem: cel-go lightweight rules, wazero Wasm sandbox hard-isolation, Z3 SMT satisfiability proofs. HTTP service with OPA-style request/response envelope; language-agnostic — consumed by wasmagent-js and future wasmagent-py via a thin adapter.",
+      "url": "https://github.com/WasmAgent/symkernel"
+    },
+    {
+      "name": "wasmagent-proxy",
+      "category": "gateway",
+      "role": "Network-boundary evidence engine",
+      "status": "in_progress",
+      "visibility": "public",
+      "in_profile": true,
+      "summary": "Proxy-Wasm Rust module for Envoy, Istio, Kong, and Consul: intercepts Agent/MCP/A2A HTTP traffic, applies validation→delta→full recording policy, emits PROV-DM AEP records signed with Ed25519 (DSSE). Joins with wasmagent-js mcp-firewall via shared trace_id for full causal coverage from gateway to tool call.",
+      "url": "https://github.com/WasmAgent/wasmagent-proxy"
+    },
+    {
+      "name": "wasmagent-train-replay",
+      "category": "evidence-pipeline",
+      "role": "Training evidence & causal replay",
+      "status": "in_progress",
+      "visibility": "public",
+      "in_profile": true,
+      "summary": "Causal evidence layer for distributed GPU training: reads PyTorch Flight Recorder dumps, builds cross-rank PROV-DM provenance graphs, records Ed25519-signed EpochEvidenceBundles, and supports deterministic replay and tensor-origin tracing. Shares AEP schema and RecordingMode semantics with wasmagent-js.",
+      "url": "https://github.com/WasmAgent/wasmagent-train-replay"
+    },
+    {
+      "name": "wasmagent-py",
+      "category": "runtime",
+      "role": "Python runtime (planned)",
+      "status": "planned",
+      "visibility": "public",
+      "in_profile": true,
+      "summary": "Planned Python agent runtime — sibling to wasmagent-js. Will share AEP schema, Criterion/ConstraintIR protocol, and symkernel HTTP adapter so Python agents receive the same evidence recording, MCP policy enforcement, and symbolic verification as the JS runtime.",
+      "url": "https://github.com/WasmAgent/wasmagent-py"
     }
   ]
 }

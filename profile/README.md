@@ -13,26 +13,43 @@ organization's sole public portal.
 | --- | --- |
 | [`.github`](https://github.com/WasmAgent/.github) | **Org hub** · Organization portal — roadmap, claims registry, release ledger, project index, and cross-repo documentation |
 | [wasmagent-js](https://github.com/WasmAgent/wasmagent-js) | **Runtime** · Embedded agent runtime v1.x — WASM kernels (QuickJS, Pyodide, Wasmtime, Remote), MCP gateway + attestation, AEP emitter, capability manifests; adapters for A2A, AG-UI, AI SDK, and Claude Agent SDK |
+| [wasmagent-py](https://github.com/WasmAgent/wasmagent-py) | **Runtime (planned)** · Python agent runtime — sibling to wasmagent-js; shares AEP schema, Criterion/ConstraintIR protocol, and symkernel HTTP adapter |
+| [wasmagent-proxy](https://github.com/WasmAgent/wasmagent-proxy) | **Gateway** 🚧 · Proxy-Wasm (Rust) evidence engine for Envoy, Istio, Kong, Consul — intercepts Agent/MCP/A2A traffic, emits Ed25519-signed AEP records, joins mcp-firewall via shared trace_id |
+| [symkernel](https://github.com/WasmAgent/symkernel) | **Verification** 🚧 · Go symbolic verification backend — cel-go lightweight rules, wazero Wasm sandbox hard-isolation, Z3 SMT proofs; HTTP service consumed by wasmagent-js and wasmagent-py |
 | [bscode](https://github.com/WasmAgent/bscode) | **Workload** · Coding-agent workload on Cloudflare Workers — AEP evidence export, deny capabilities, output taint labels, RolloutProvenance |
+| [fresharena](https://github.com/WasmAgent/fresharena) | **Evaluation protocol** · Dynamic, verifiable, adversarial evaluation — FAEP schema, submit-then-test, Public Immunity Pool; paper in preparation |
 | [trace-pipeline](https://github.com/WasmAgent/trace-pipeline) | **Evidence pipeline** · `evomerge` — trace-to-training backend: eval_trust paired statistics, AgentTrustScore, training-data admission gate, wasmagent-js v1.x schema compat |
+| [wasmagent-train-replay](https://github.com/WasmAgent/wasmagent-train-replay) | **Evidence pipeline** 🚧 · Causal evidence for distributed GPU training — cross-rank PROV-DM provenance graph, Ed25519-signed EpochEvidenceBundles, tensor-origin tracing, deterministic replay CLI |
 | [agent-trust-infra](https://github.com/WasmAgent/agent-trust-infra) | **Trust artifacts** · AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI; EU AI Act Annex IV compliance mapping (draft) |
 | [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | **Audit** · Enterprise audit product with AEP v0.3 adapter; deployed at [trustavo.com](https://trustavo.com) |
-| [fresharena](https://github.com/WasmAgent/fresharena) | **Evaluation protocol** · Dynamic, verifiable, adversarial evaluation — FAEP schema, submit-then-test, Public Immunity Pool; paper in preparation |
 
 ## Architecture
 
 ![WasmAgent architecture](../assets/product-matrix.svg)
 
+The **gateway** layer — `wasmagent-proxy` — sits at the network boundary, intercepting
+Agent/MCP/A2A HTTP traffic across Envoy, Istio, Kong, and Consul, and emitting
+Ed25519-signed AEP records before requests reach the runtime.
+
 The **runtime** layer — `wasmagent-js` (v1.x) — protects agent execution across
 multiple WASM kernels, enforces MCP policy via `mcp-gateway` and `mcp-attestation`,
-and emits signed AEP events that flow into verifiable runtime traces.
+and emits signed AEP events that flow into verifiable runtime traces. A Python
+sibling, `wasmagent-py`, is planned and will share the same AEP schema, protocol,
+and symkernel adapter.
+
+`symkernel` backs both runtimes with symbolic verification: cel-go for lightweight
+high-frequency rule evaluation, wazero for hard-isolated Wasm sandbox execution of
+LLM-generated code, and Z3 SMT solving for combinatorial constraint proofs.
 
 `bscode` and `fresharena` are the two live agent surfaces: coding workload and
 adversarial evaluation, both instrumented to produce AEP evidence.
 
 `trace-pipeline` (`evomerge` on PyPI) gates training-data admission with paired
 statistics and records every training run as auditable evidence. Compatible with
-`wasmagent-js` v1.x AEP schema.
+`wasmagent-js` v1.x AEP schema. `wasmagent-train-replay` extends this to distributed
+GPU training jobs: it reads PyTorch Flight Recorder dumps, builds a cross-rank
+PROV-DM causal graph, and produces tamper-evident `EpochEvidenceBundle` records,
+enabling tensor-origin tracing and deterministic replay.
 
 `agent-trust-infra` layers on trust artifacts — AgentBOM, MCP Posture, and Trust
 Passport — giving every agent run a machine-readable identity and policy posture.
@@ -61,7 +78,11 @@ part-time and async contribution; commit access is granted after a
 sustained track record.
 
 - **Runtime** — `wasmagent-js`, AEP, MCP gateway/attestation, capability manifests
+- **Runtime (Python)** — `wasmagent-py`, Python agent runtime and symkernel adapter
+- **Gateway** — `wasmagent-proxy`, Proxy-Wasm evidence engine (Rust, Envoy/Istio/Kong)
+- **Verification** — `symkernel`, cel-go rules, wazero sandbox, Z3 SMT integration (Go)
 - **Pipelines** — `trace-pipeline` / `evomerge` (measurement trust, admission, training audit)
+- **Training evidence** — `wasmagent-train-replay`, PyTorch Flight Recorder, PROV-DM, GPU training causal graphs
 - **Trust artifacts** — `agent-trust-infra` (AgentBOM, MCP Posture, Trust Passport, EU AI Act mapping)
 - **Audit product** — `open-agent-audit` / Trustavo (evidence reports, Cloudflare Workers)
 - **Evaluation** — `fresharena` (dynamic, verifiable, adversarial evaluation; paper preparation)
