@@ -1,6 +1,10 @@
-# WasmAgent
+# WasmAgent — The Trusted Agent OS
 
-Protect agent runs. Record evidence. Audit claims. Train only from trusted traces.
+> The industry's focus is shifting from *"can the agent do the task?"* to *"can the agent run reliably, at scale, over time?"* We believe that is still not enough. The real question is: **"can you prove the agent ran correctly?"**
+>
+> WasmAgent is building the infrastructure layer for that — a Trusted Agent OS: runtime isolation, protocol-level interception, symbolic verification, tamper-evident evidence, and regulatory compliance, composable as open infrastructure rather than a single product.
+>
+> Parts of this vision are shipping today. Parts are in active development. The table below is honest about which is which.
 
 ## Projects
 
@@ -22,6 +26,22 @@ organization's sole public portal.
 | [wasmagent-train-replay](https://github.com/WasmAgent/wasmagent-train-replay) | **Evidence pipeline** 🚧 · Causal evidence for distributed GPU training — cross-rank PROV-DM provenance graph, Ed25519-signed EpochEvidenceBundles, tensor-origin tracing, deterministic replay CLI |
 | [agent-trust-infra](https://github.com/WasmAgent/agent-trust-infra) | **Trust artifacts** · AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI; EU AI Act Annex IV compliance mapping (draft) |
 | [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | **Audit** · Enterprise audit product with AEP v0.3 adapter; deployed at [trustavo.com](https://trustavo.com) |
+
+## Vision
+
+The broader industry is converging on *Agent Runtime / Agent OS* as the next infrastructure frontier — the layer that moves agents from stateless one-shot calls to long-running, stateful, recoverable systems. We agree with that framing, and we go one step further.
+
+**Reliability is necessary but not sufficient.** An agent that runs stably but whose behavior cannot be verified, audited, or proven correct is not ready for production systems, regulated industries, or multi-agent trust chains. The gap between "it finished" and "it did the right thing" is exactly where WasmAgent operates.
+
+The Trusted Agent OS adds three layers that a plain Agent Runtime omits:
+
+| Layer | What it solves | Status |
+| --- | --- | --- |
+| **Provable correctness** | `symkernel` — cel-go rules, wazero hard-isolation, Z3 SMT proofs | 🚧 in progress |
+| **Tamper-evident evidence** | AEP (Agent Evidence Protocol) — Ed25519-signed behavioral records at gateway and runtime | shipping in `wasmagent-js` v1.x |
+| **Regulatory compliance** | EU AI Act Annex IV mapping, OWASP Agentic Top 10, NIST AI RMF | draft in `agent-trust-infra` |
+
+The analogy: if Agent Runtime is Kubernetes (run things reliably at scale), the Trusted Agent OS is Kubernetes + audit logging + policy enforcement + compliance reporting — composable, open, and infrastructure-grade.
 
 ## Architecture
 
