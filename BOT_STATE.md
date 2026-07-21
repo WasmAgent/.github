@@ -1,12 +1,12 @@
 # Bot State
 
-_Last updated: 2026-07-21 11:45 UTC by patrol_
+_Last updated: 2026-07-21 11:47 UTC by patrol_
 
 ## Queue
 
 | State | Count |
 |---|---|
-| Pending | 4 |
+| Pending | 3 |
 | Active (running/reviewing) | 0 |
 | Blocked | 4 |
 | Completed/Merged (all time) | 97 |
@@ -23,6 +23,7 @@ _Last updated: 2026-07-21 11:45 UTC by patrol_
 
 ## Waiting for Human
 
+- #117: [milestone Milestone 5 ] `docs/project-index.json`: Updated with three new domain agents and trust-networ...
 - #116: [milestone Milestone 5 ] `trust-network/`: Public explorer renders live trust graph showing agent relatio...
 - #111: Fix WasmAgent/.github#109 ([milestone Milestone 5 ] `devops-agent/`: DevOps domain workload with deployment verification
 - #107: [milestone Milestone 5 ] `wasmagent-js/`: Multi-tenant verification runtime supports concurrent agent iso...
