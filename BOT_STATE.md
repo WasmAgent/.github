@@ -1,13 +1,13 @@
 # Bot State
 
-_Last updated: 2026-07-21 07:07 UTC by patrol_
+_Last updated: 2026-07-21 07:22 UTC by patrol_
 
 ## Queue
 
 | State | Count |
 |---|---|
-| Pending | 4 |
-| Active (running/reviewing) | 1 |
+| Pending | 6 |
+| Active (running/reviewing) | 0 |
 | Blocked | 0 |
 | Completed/Merged (all time) | 93 |
 
@@ -25,6 +25,7 @@ _Last updated: 2026-07-21 07:07 UTC by patrol_
 
 - #110: [milestone Milestone 5 ] `finance-agent/`: Finance domain workload with SOX compliance controls and trans...
 - #108: [milestone Milestone 5 ] `healthcare-agent/`: Healthcare domain workload lands with HIPAA-compliant evide...
+- #107: [milestone Milestone 5 ] `wasmagent-js/`: Multi-tenant verification runtime supports concurrent agent iso...
 - #105: Fix WasmAgent/.github#98 ([discussion] explore: Automate validation of YAML ledgers via GitHub Actions CI): implement ch
 
 ---
