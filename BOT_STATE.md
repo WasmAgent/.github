@@ -1,14 +1,14 @@
 # Bot State
 
-_Last updated: 2026-07-21 08:01 UTC by patrol_
+_Last updated: 2026-07-21 08:12 UTC by patrol_
 
 ## Queue
 
 | State | Count |
 |---|---|
-| Pending | 9 |
+| Pending | 10 |
 | Active (running/reviewing) | 1 |
-| Blocked | 1 |
+| Blocked | 2 |
 | Completed/Merged (all time) | 93 |
 
 ## Recent Activity (last 5)
@@ -23,6 +23,7 @@ _Last updated: 2026-07-21 08:01 UTC by patrol_
 
 ## Waiting for Human
 
+- #118: [milestone Milestone 5 ] `tests/`: Cross-domain integration tests validate trust artifact propagation and...
 - #116: [milestone Milestone 5 ] `trust-network/`: Public explorer renders live trust graph showing agent relatio...
 - #114: [milestone Milestone 5 ] `docs/`: Domain workload authoring guide with templates for new vertical-specifi...
 - #113: [milestone Milestone 5 ] `wasmagent-ops/`: Continuous verification daemon monitors running agents and ale...
