@@ -1,0 +1,124 @@
+{
+  "$schema": "https://wasmagent.github.io/agent-trust-infra/schemas/cross-domain-chain-1.json",
+  "chainFormat": "CrossDomainTrustChain",
+  "specVersion": "1.0",
+  "metadata": {
+    "generated": "2026-07-21T00:00:00Z",
+    "repository": "WasmAgent/.github",
+    "release": "v1.0.0",
+    "generator": "wasmagent-ops/generators (test fixture)"
+  },
+  "domains": [
+    {
+      "id": "healthcare",
+      "namespace": "WasmAgent/healthcare-agent",
+      "complianceFramework": "HIPAA",
+      "policyBoundaries": {
+        "allowedDataTypes": ["phi", "clinical-notes", "diagnostic-reports"],
+        "restrictedOperations": ["export", "share"],
+        "auditLevel": "full"
+      }
+    },
+    {
+      "id": "devops",
+      "namespace": "WasmAgent/devops-agent",
+      "complianceFramework": "SOC2",
+      "policyBoundaries": {
+        "allowedDataTypes": ["deployments", "infrastructure-config", "logs"],
+        "restrictedOperations": ["credential-access", "secret-read"],
+        "auditLevel": "full"
+      }
+    },
+    {
+      "id": "finance",
+      "namespace": "WasmAgent/finance-agent",
+      "complianceFramework": "SOX",
+      "policyBoundaries": {
+        "allowedDataTypes": ["transactions", "ledger-entries", "audit-records"],
+        "restrictedOperations": ["delete", "backdate"],
+        "auditLevel": "immutable"
+      }
+    }
+  ],
+  "propagationRules": [
+    {
+      "from": "healthcare",
+      "to": "trust-artifacts",
+      "artifactType": "AgentBOM",
+      "purpose": "domain identity registration"
+    },
+    {
+      "from": "devops",
+      "to": "trust-artifacts",
+      "artifactType": "AgentBOM",
+      "purpose": "domain identity registration"
+    },
+    {
+      "from": "finance",
+      "to": "trust-artifacts",
+      "artifactType": "AgentBOM",
+      "purpose": "domain identity registration"
+    }
+  ],
+  "enforcementBoundaries": [
+    {
+      "source": "healthcare",
+      "target": "devops",
+      "policyAction": "reject",
+      "reason": "PHI must not leak to infrastructure domain"
+    },
+    {
+      "source": "healthcare",
+      "target": "finance",
+      "policyAction": "reject",
+      "reason": "PHI must not leak to financial domain"
+    },
+    {
+      "source": "finance",
+      "target": "devops",
+      "policyAction": "reject",
+      "reason": "Financial transaction data must not leak to infrastructure domain"
+    },
+    {
+      "source": "devops",
+      "target": "finance",
+      "policyAction": "reject",
+      "reason": "Infrastructure credentials must not leak to financial domain"
+    },
+    {
+      "source": "devops",
+      "target": "healthcare",
+      "policyAction": "reject",
+      "reason": "Infrastructure secrets must not leak to healthcare domain"
+    }
+  ],
+  "chain": [
+    {
+      "domainId": "healthcare",
+      "artifact": {
+        "type": "AgentBOM",
+        "specVersion": "1.0",
+        "digest": "sha256:abc123healthcare"
+      },
+      "propagationStatus": "registered"
+    },
+    {
+      "domainId": "devops",
+      "artifact": {
+        "type": "AgentBOM",
+        "specVersion": "1.0",
+        "digest": "sha256:abc123devops"
+      },
+      "propagationStatus": "registered"
+    },
+    {
+      "domainId": "finance",
+      "artifact": {
+        "type": "AgentBOM",
+        "specVersion": "1.0",
+        "digest": "sha256:abc123finance"
+      },
+      "propagationStatus": "registered"
+    }
+  ]
+}
