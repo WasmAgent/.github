@@ -1,0 +1,50 @@
+name: Org Contract Compatibility
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"   # every Monday 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  contract-check:
+    name: Cross-repo schema compatibility
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install bun
+        uses: oven-sh/setup-bun@v2
+
+      # ── Placeholder checks ──
+      # Replace each TODO with a real cross-repo contract test once
+      # the Golden Path is runnable (track: WasmAgent/.github#103)
+
+      - name: TODO — verify wasmagent-js AEP fixture is accepted by open-agent-audit
+        run: |
+          echo "STUB: not yet implemented"
+          echo "Goal: @wasmagent/aep fixture → @openagentaudit/adapters → valid"
+
+      - name: TODO — verify AEP fixture is accepted by trace-pipeline
+        run: |
+          echo "STUB: not yet implemented"
+          echo "Goal: @wasmagent/aep fixture → evomerge validate-aep → pass"
+
+      - name: TODO — verify bscode rollout fixture accepted by open-agent-audit adapter
+        run: |
+          echo "STUB: not yet implemented"
+          echo "Goal: bscode rollout-wire/v1 → @openagentaudit/adapters bscode → valid"
+
+      - name: TODO — verify agent-trust-infra conformance fixtures pass validators
+        run: |
+          echo "STUB: not yet implemented"
+          echo "Goal: agent-trust-infra fixture → @wasmagent/agentbom-core validator → pass"
+
+      - name: TODO — verify versions.lock packages resolve
+        run: |
+          echo "STUB: checking versions.lock"
+          cat golden-path/versions.lock
