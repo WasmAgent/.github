@@ -5,8 +5,6 @@ on:
     branches: [main]
   push:
     branches: [main]
-  release:
-    types: [created, published]
   workflow_dispatch:
 
 jobs:
@@ -22,11 +20,3 @@ jobs:
       - name: Validate docs/project-index.json
         run: python scripts/validate_project_index.py
 
-  generate-trust-artifacts-on-release:
-    name: Generate trust artifacts on release
-    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
-    needs: validate-project-index
-    uses: ./.github/workflows/generate-trust-artifacts.yml
-    secrets: inherit
-    with:
-      release_tag: ${{ github.event.release.tag_name }}
