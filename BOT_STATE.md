@@ -1,6 +1,6 @@
 # Bot State
 
-_Last updated: 2026-07-21 12:02 UTC by patrol_
+_Last updated: 2026-07-21 12:29 UTC by patrol_
 
 ## Queue
 
@@ -9,17 +9,17 @@ _Last updated: 2026-07-21 12:02 UTC by patrol_
 | Pending | 5 |
 | Active (running/reviewing) | 0 |
 | Blocked | 4 |
-| Completed/Merged (all time) | 97 |
+| Completed/Merged (all time) | 99 |
 
 ## Recent Activity (last 5)
 
 | Issue | Title | Outcome | Date |
 |---|---|---|---|
+| #123 | [milestone Milestone 5 ] agent-trust-infra/: Trust propag... | completed/complexity_gate_split | 2026-07-21 |
+| #119 | stale-check #119 | completed/maintenance_done | 2026-07-21 |
 | #118 | [milestone Milestone 5 ] `tests/`: Cross-domain integrati... | merged/auto_closed_resolved | 2026-07-21 |
 | #114 | [milestone Milestone 5 ] `docs/`: Domain workload authori... | merged/auto_closed_resolved | 2026-07-21 |
 | #119 | stale-check #119 | completed/maintenance_done | 2026-07-21 |
-| #113 | [milestone Milestone 5 ] `wasmagent-ops/`: Continuous ver... | merged/merged | 2026-07-21 |
-| #109 | [milestone Milestone 5 ] `devops-agent/`: DevOps domain w... | completed/complexity_gate_split | 2026-07-21 |
 
 ## Waiting for Human
 
