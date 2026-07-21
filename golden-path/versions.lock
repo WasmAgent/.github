@@ -1,0 +1,12 @@
+# Golden Path — Compatible Version Lock
+# Update this file when bumping a cross-repo dependency in the demo.
+# All versions here must pass the org-contract-compatibility workflow.
+
+repositories:
+  wasmagent-js: latest        # pin to specific release once Golden Path is runnable
+  open-agent-audit: latest
+  trace-pipeline: latest
+  bscode: latest
+  agent-trust-infra: latest   # optional: conformance fixtures only
+
+# Last verified: not yet verified — scaffold only
