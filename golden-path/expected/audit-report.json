@@ -1,0 +1,10 @@
+{
+  "_comment": "Expected audit report structure \u2014 replace with real fixture from @openagentaudit/core",
+  "run_id": "<uuid>",
+  "risk_score": 0,
+  "findings": [],
+  "framework_coverage": {
+    "owasp_agentic_top10": [],
+    "eu_ai_act_annex_iv": []
+  }
+}
