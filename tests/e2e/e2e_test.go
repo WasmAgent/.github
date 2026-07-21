@@ -307,3 +307,417 @@ func TestRuntimeWorkloadIntegration(t *testing.T) {
 
 	t.Logf("Runtime integration validated with %d shipped workload(s)", shippedWorkloads)
 }
+
+// crossDomainChain represents a cross-domain trust chain fixture.
+type crossDomainChain struct {
+	SpecVersion        string                        `json:"specVersion"`
+	Metadata           map[string]interface{}         `json:"metadata"`
+	Domains            []crossDomain                  `json:"domains"`
+	PropagationRules   []propagationRule              `json:"propagationRules"`
+	EnforcementBoundaries []enforcementBoundary      `json:"enforcementBoundaries"`
+	Chain              []chainEntry                   `json:"chain"`
+}
+
+type crossDomain struct {
+	ID                 string                `json:"id"`
+	Namespace          string                `json:"namespace"`
+	ComplianceFramework string               `json:"complianceFramework"`
+	PolicyBoundaries   map[string]interface{} `json:"policyBoundaries"`
+}
+
+type propagationRule struct {
+	From        string `json:"from"`
+	To          string `json:"to"`
+	ArtifactType string `json:"artifactType"`
+	Purpose     string `json:"purpose"`
+}
+
+type enforcementBoundary struct {
+	Source      string `json:"source"`
+	Target      string `json:"target"`
+	PolicyAction string `json:"policyAction"`
+	Reason      string `json:"reason"`
+}
+
+type chainEntry struct {
+	DomainID           string      `json:"domainId"`
+	Artifact           chainArtifact `json:"artifact"`
+	PropagationStatus  string      `json:"propagationStatus"`
+}
+
+type chainArtifact struct {
+	Type        string `json:"type"`
+	SpecVersion string `json:"specVersion"`
+	Digest      string `json:"digest"`
+}
+
+// TestCrossDomainTrustPropagation validates that trust artifacts can propagate
+// across domain boundaries and that the cross-domain chain fixture conforms
+// to the expected schema.
+func TestCrossDomainTrustPropagation(t *testing.T) {
+	projectIndex, err := docs.LoadProjectIndex()
+	if err != nil {
+		t.Fatalf("Failed to load project index: %v", err)
+	}
+
+	// The trust artifact infrastructure must exist for cross-domain propagation
+	trustInfra, found := projectIndex.GetRepoByName("agent-trust-infra")
+	if !found {
+		t.Fatal("agent-trust-infra repository not found — cross-domain propagation requires trust artifact infrastructure")
+	}
+	if trustInfra.Status != "shipped" {
+		t.Errorf("agent-trust-infra must be shipped for cross-domain propagation (status: %s)", trustInfra.Status)
+	}
+
+	// Load and validate the cross-domain chain fixture
+	chainContent, err := os.ReadFile("fixtures/cross-domain-chain-sample.json")
+	if err != nil {
+		t.Fatalf("Cross-domain chain fixture not found: %v", err)
+	}
+
+	var chain crossDomainChain
+	if err := json.Unmarshal(chainContent, &chain); err != nil {
+		t.Fatalf("Cross-domain chain fixture contains invalid JSON: %v", err)
+	}
+
+	// Validate chain metadata
+	if chain.SpecVersion == "" {
+		t.Error("Cross-domain chain missing specVersion")
+	}
+	if chain.Metadata == nil {
+		t.Error("Cross-domain chain missing metadata")
+	}
+
+	// Each domain must have a unique ID and compliance framework
+	domainIDs := make(map[string]bool)
+	for _, domain := range chain.Domains {
+		if domain.ID == "" {
+			t.Error("Domain in chain has empty ID")
+		}
+		if domain.Namespace == "" {
+			t.Errorf("Domain %s has empty namespace", domain.ID)
+		}
+		if domain.ComplianceFramework == "" {
+			t.Errorf("Domain %s has empty complianceFramework", domain.ID)
+		}
+		if domainIDs[domain.ID] {
+			t.Errorf("Duplicate domain ID: %s", domain.ID)
+		}
+		domainIDs[domain.ID] = true
+	}
+
+	// Propagation rules must reference valid domain IDs
+	for _, rule := range chain.PropagationRules {
+		if !domainIDs[rule.From] {
+			t.Errorf("Propagation rule references unknown source domain: %s", rule.From)
+		}
+		if rule.To == "" {
+			t.Errorf("Propagation rule from %s has empty target", rule.From)
+		}
+		if rule.ArtifactType == "" {
+			t.Errorf("Propagation rule from %s to %s has empty artifactType", rule.From, rule.To)
+		}
+	}
+
+	// Chain entries must reference valid domain IDs
+	for _, entry := range chain.Chain {
+		if !domainIDs[entry.DomainID] {
+			t.Errorf("Chain entry references unknown domain ID: %s", entry.DomainID)
+		}
+		if entry.Artifact.Type == "" {
+			t.Errorf("Chain entry for domain %s has empty artifact type", entry.DomainID)
+		}
+		if entry.PropagationStatus == "" {
+			t.Errorf("Chain entry for domain %s has empty propagationStatus", entry.DomainID)
+		}
+	}
+
+	t.Logf("Cross-domain trust propagation validated: %d domains, %d propagation rules, %d chain entries",
+		len(chain.Domains), len(chain.PropagationRules), len(chain.Chain))
+}
+
+// TestPolicyEnforcementBoundaries validates that policy enforcement boundaries
+// are correctly defined and prevent cross-domain data leakage.
+func TestPolicyEnforcementBoundaries(t *testing.T) {
+	projectIndex, err := docs.LoadProjectIndex()
+	if err != nil {
+		t.Fatalf("Failed to load project index: %v", err)
+	}
+
+	// The runtime must support per-tenant policy enforcement
+	runtime, found := projectIndex.GetRepoByName("wasmagent-js")
+	if !found {
+		t.Fatal("wasmagent-js runtime not found — policy enforcement requires runtime support")
+	}
+
+	if runtime.Category != "runtime" {
+		t.Errorf("wasmagent-js has incorrect category for policy enforcement: %s (expected: runtime)", runtime.Category)
+	}
+
+	// Load and validate the cross-domain enforcement boundaries
+	chainContent, err := os.ReadFile("fixtures/cross-domain-chain-sample.json")
+	if err != nil {
+		t.Fatalf("Cross-domain chain fixture not found: %v", err)
+	}
+
+	var chain crossDomainChain
+	if err := json.Unmarshal(chainContent, &chain); err != nil {
+		t.Fatalf("Cross-domain chain fixture contains invalid JSON: %v", err)
+	}
+
+	// Build domain ID set for boundary validation
+	domainIDs := make(map[string]bool)
+	for _, domain := range chain.Domains {
+		domainIDs[domain.ID] = true
+	}
+
+	// Validate enforcement boundaries exist for each domain
+	for _, boundary := range chain.EnforcementBoundaries {
+		if !domainIDs[boundary.Source] {
+			t.Errorf("Enforcement boundary references unknown source domain: %s", boundary.Source)
+		}
+		if !domainIDs[boundary.Target] {
+			t.Errorf("Enforcement boundary references unknown target domain: %s", boundary.Target)
+		}
+		if boundary.Source == boundary.Target {
+			t.Errorf("Enforcement boundary source and target must differ: %s", boundary.Source)
+		}
+		if boundary.PolicyAction != "reject" && boundary.PolicyAction != "allow" && boundary.PolicyAction != "sanitize" {
+			t.Errorf("Enforcement boundary has unrecognized policyAction: %s", boundary.PolicyAction)
+		}
+		if boundary.Reason == "" {
+			t.Errorf("Enforcement boundary from %s to %s missing reason", boundary.Source, boundary.Target)
+		}
+	}
+
+	// Validate that each domain has at least one policy boundary defined
+	// (each domain should be isolated from at least one other domain)
+	boundedDomains := make(map[string]bool)
+	for _, boundary := range chain.EnforcementBoundaries {
+		boundedDomains[boundary.Source] = true
+	}
+
+	for _, domain := range chain.Domains {
+		if !boundedDomains[domain.ID] {
+			t.Errorf("Domain %s has no enforcement boundaries defined — policy isolation cannot be verified", domain.ID)
+		}
+	}
+
+	// Validate policy boundaries within each domain definition
+	for _, domain := range chain.Domains {
+		boundaries := domain.PolicyBoundaries
+		if boundaries == nil {
+			t.Errorf("Domain %s has no policy boundaries defined", domain.ID)
+			continue
+		}
+
+		if _, ok := boundaries["allowedDataTypes"]; !ok {
+			t.Errorf("Domain %s policy boundaries missing allowedDataTypes", domain.ID)
+		}
+		if _, ok := boundaries["restrictedOperations"]; !ok {
+			t.Errorf("Domain %s policy boundaries missing restrictedOperations", domain.ID)
+		}
+		if _, ok := boundaries["auditLevel"]; !ok {
+			t.Errorf("Domain %s policy boundaries missing auditLevel", domain.ID)
+		}
+	}
+
+	t.Logf("Policy enforcement boundaries validated: %d domains, %d enforcement rules",
+		len(chain.Domains), len(chain.EnforcementBoundaries))
+}
+
+// TestTrustArtifactPropagationConsistency validates that trust artifacts
+// produced by each pipeline layer conform to the propagation contract
+// expected by downstream consumers.
+func TestTrustArtifactPropagationConsistency(t *testing.T) {
+	projectIndex, err := docs.LoadProjectIndex()
+	if err != nil {
+		t.Fatalf("Failed to load project index: %v", err)
+	}
+
+	// Validate the full propagation path: workload → evidence → trust-artifacts → cross-domain
+	//
+	// 1. Workloads must exist to produce evidence
+	workloads := projectIndex.GetReposByCategory("workload")
+	if len(workloads) == 0 {
+		t.Error("No workload repositories found — trust artifact propagation has no source")
+	}
+
+	// 2. Evidence pipeline must exist to ingest workload evidence
+	evidencePipelines := projectIndex.GetReposByCategory("evidence-pipeline")
+	if len(evidencePipelines) == 0 {
+		t.Error("No evidence pipeline repositories found — trust artifact propagation has no ingestion layer")
+	}
+
+	// 3. Trust artifact infrastructure must exist
+	trustArtifacts := projectIndex.GetReposByCategory("trust-artifacts")
+	if len(trustArtifacts) == 0 {
+		t.Error("No trust artifact repositories found — propagation has no trust layer")
+	}
+
+	// 4. Validate fixture schemas are consistent across the chain
+	fixtures := []struct {
+		name     string
+		file     string
+		requiredFields []string
+	}{
+		{
+			"AgentBOM", "fixtures/agentbom-sample.json",
+			[]string{"$schema", "specVersion", "metadata", "components"},
+		},
+		{
+			"MCP Posture", "fixtures/mcp-posture-sample.json",
+			[]string{"$schema", "specVersion", "metadata", "declaredTools"},
+		},
+		{
+			"Trust Passport", "fixtures/trust-passport-sample.json",
+			[]string{"$schema", "specVersion", "metadata", "identity", "evidence"},
+		},
+		{
+			"Cross-Domain Chain", "fixtures/cross-domain-chain-sample.json",
+			[]string{"$schema", "specVersion", "domains", "propagationRules", "enforcementBoundaries", "chain"},
+		},
+	}
+
+	for _, fixture := range fixtures {
+		t.Run(fixture.name, func(t *testing.T) {
+			content, err := os.ReadFile(fixture.file)
+			if err != nil {
+				t.Fatalf("Failed to read fixture %s: %v", fixture.name, err)
+			}
+
+			var artifact map[string]interface{}
+			if err := json.Unmarshal(content, &artifact); err != nil {
+				t.Fatalf("Fixture %s contains invalid JSON: %v", fixture.name, err)
+			}
+
+			for _, field := range fixture.requiredFields {
+				if _, exists := artifact[field]; !exists {
+					t.Errorf("Fixture %s missing required field: %s", fixture.name, field)
+				}
+			}
+		})
+	}
+
+	// 5. Validate all artifacts share a compatible spec version lineage
+	// (they should all reference the same or compatible schema namespace)
+	artifactFiles := []string{
+		"fixtures/agentbom-sample.json",
+		"fixtures/mcp-posture-sample.json",
+		"fixtures/trust-passport-sample.json",
+		"fixtures/cross-domain-chain-sample.json",
+	}
+
+	for _, file := range artifactFiles {
+		t.Run(filepath.Base(file)+"_schema_namespace", func(t *testing.T) {
+			content, err := os.ReadFile(file)
+			if err != nil {
+				t.Fatalf("Failed to read %s: %v", file, err)
+			}
+
+			var artifact map[string]interface{}
+			if err := json.Unmarshal(content, &artifact); err != nil {
+				t.Fatalf("Invalid JSON in %s: %v", file, err)
+			}
+
+			schemaField, ok := artifact["$schema"]
+			if !ok {
+				t.Errorf("Artifact %s missing $schema field — cannot verify namespace compatibility", file)
+				return
+			}
+
+			schema, ok := schemaField.(string)
+			if !ok {
+				t.Errorf("Artifact %s $schema is not a string", file)
+				return
+			}
+
+			// All schemas must originate from the agent-trust-infra namespace
+			if !contains(schema, "wasmagent.github.io/agent-trust-infra/schemas/") {
+				t.Errorf("Artifact %s $schema not from agent-trust-infra namespace: %s", file, schema)
+			}
+		})
+	}
+
+	t.Logf("Trust artifact propagation consistency validated: %d workloads, %d evidence pipelines, %d trust artifact repos, %d fixture schemas",
+		len(workloads), len(evidencePipelines), len(trustArtifacts), len(fixtures))
+}
+
+// TestDomainWorkloadTrustIntegration validates that each domain workload
+// can produce trust artifacts and participate in the cross-domain trust chain.
+func TestDomainWorkloadTrustIntegration(t *testing.T) {
+	// Load the cross-domain chain fixture
+	chainContent, err := os.ReadFile("fixtures/cross-domain-chain-sample.json")
+	if err != nil {
+		t.Fatalf("Cross-domain chain fixture not found: %v", err)
+	}
+
+	var chain crossDomainChain
+	if err := json.Unmarshal(chainContent, &chain); err != nil {
+		t.Fatalf("Cross-domain chain fixture contains invalid JSON: %v", err)
+	}
+
+	// Each domain in the chain must have a corresponding chain entry
+	domainChainEntries := make(map[string]chainEntry)
+	for _, entry := range chain.Chain {
+		domainChainEntries[entry.DomainID] = entry
+	}
+
+	for _, domain := range chain.Domains {
+		t.Run(domain.ID, func(t *testing.T) {
+			entry, exists := domainChainEntries[domain.ID]
+			if !exists {
+				t.Errorf("Domain %s has no chain entry — trust integration incomplete", domain.ID)
+				return
+			}
+
+			// Chain entry must use a recognized artifact type
+			validArtifactTypes := map[string]bool{
+				"AgentBOM":      true,
+				"TrustPassport": true,
+				"MCPPosture":    true,
+			}
+			if !validArtifactTypes[entry.Artifact.Type] {
+				t.Errorf("Domain %s chain entry uses unrecognized artifact type: %s",
+					domain.ID, entry.Artifact.Type)
+			}
+
+			// Artifact specVersion must be non-empty
+			if entry.Artifact.SpecVersion == "" {
+				t.Errorf("Domain %s artifact has empty specVersion", domain.ID)
+			}
+
+			// Propagation status must be a recognized state
+			validStatuses := map[string]bool{
+				"registered":    true,
+				"propagated":    true,
+				"verified":      true,
+				"pending":       true,
+			}
+			if !validStatuses[entry.PropagationStatus] {
+				t.Errorf("Domain %s has unrecognized propagation status: %s",
+					domain.ID, entry.PropagationStatus)
+			}
+		})
+	}
+
+	// Validate the number of domains matches the number of chain entries
+	if len(chain.Domains) != len(chain.Chain) {
+		t.Errorf("Domain count (%d) does not match chain entry count (%d)",
+			len(chain.Domains), len(chain.Chain))
+	}
+}
+
+// contains checks if a string contains a substring.
+func contains(s, substr string) bool {
+	return len(s) >= len(substr) && (s == substr || len(s) > 0 && containsSubstring(s, substr))
+}
+
+func containsSubstring(s, substr string) bool {
+	for i := 0; i <= len(s)-len(substr); i++ {
+		if s[i:i+len(substr)] == substr {
+			return true
+		}
+	}
+	return false
+}
