@@ -20,7 +20,7 @@ cd .github/golden-path
 This runs `Protect → Record → Audit → Admit` across all core repos.
 See [`golden-path/README.md`](../golden-path/README.md) for details.
 
-> **Status:** scaffolded — not yet runnable. Track progress at [`.github#103`](https://github.com/WasmAgent/.github/issues/103).
+> **Status:** scaffolded — not yet runnable. Track progress via the [issue tracker](https://github.com/WasmAgent/.github/issues?q=is%3Aissue+golden-path).
 
 ## Projects
 
@@ -33,15 +33,15 @@ organization's sole public portal.
 | --- | --- |
 | [`.github`](https://github.com/WasmAgent/.github) | **Org hub** · Organization portal — roadmap, claims registry, release ledger, project index, and cross-repo documentation |
 | [wasmagent-js](https://github.com/WasmAgent/wasmagent-js) | **Runtime** · Embedded agent runtime v1.x — WASM kernels (QuickJS, Pyodide, Wasmtime, Remote), MCP gateway + attestation, AEP emitter, capability manifests; adapters for A2A, AG-UI, AI SDK, and Claude Agent SDK |
-| [wasmagent-py](https://github.com/WasmAgent/wasmagent-py) | **Runtime (planned)** · Python agent runtime — sibling to wasmagent-js; shares AEP schema, Criterion/ConstraintIR protocol, and symkernel HTTP adapter |
+| wasmagent-py *(planned — repo not yet created)* | **Runtime (planned)** · Python agent runtime — sibling to wasmagent-js; shares AEP schema, Criterion/ConstraintIR protocol, and symkernel HTTP adapter |
 | [wasmagent-proxy](https://github.com/WasmAgent/wasmagent-proxy) | **Gateway** 🚧 · Proxy-Wasm (Rust) evidence engine for Envoy, Istio, Kong, Consul — intercepts Agent/MCP/A2A traffic, emits Ed25519-signed AEP records, joins mcp-firewall via shared trace_id |
 | [symkernel](https://github.com/WasmAgent/symkernel) | **Verification** 🚧 · Go symbolic verification backend — cel-go lightweight rules, wazero Wasm sandbox hard-isolation, Z3 SMT proofs; HTTP service consumed by wasmagent-js and wasmagent-py |
 | [bscode](https://github.com/WasmAgent/bscode) | **Workload** · Coding-agent workload on Cloudflare Workers — AEP evidence export, deny capabilities, output taint labels, RolloutProvenance |
 | [fresharena](https://github.com/WasmAgent/fresharena) | **Evaluation protocol** · Dynamic, verifiable, adversarial evaluation — FAEP schema, submit-then-test, Public Immunity Pool; paper in preparation |
 | [trace-pipeline](https://github.com/WasmAgent/trace-pipeline) | **Evidence pipeline** · `evomerge` — trace-to-training backend: eval_trust paired statistics, AgentTrustScore, training-data admission gate, wasmagent-js v1.x schema compat |
 | [wasmagent-train-replay](https://github.com/WasmAgent/wasmagent-train-replay) | **Evidence pipeline** 🚧 · Causal evidence for distributed GPU training — cross-rank PROV-DM provenance graph, Ed25519-signed EpochEvidenceBundles, tensor-origin tracing, deterministic replay CLI |
-| [agent-trust-infra](https://github.com/WasmAgent/agent-trust-infra) | **Trust artifacts** · AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI; EU AI Act Annex IV compliance mapping (draft) |
-| [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | **Audit** · Enterprise audit product with AEP v0.3 adapter; deployed at [trustavo.com](https://trustavo.com) |
+| [agent-trust-infra](https://github.com/WasmAgent/agent-trust-infra) | **Trust artifacts** · AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI; EU AI Act Annex IV compliance mapping (draft, deadline **2026-08-02**) |
+| [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | **Audit** · Enterprise audit product with AEP v0.2 adapter; deployed at [trustavo.com](https://trustavo.com) |
 
 ## Vision
 
@@ -93,7 +93,7 @@ An EU AI Act Annex IV compliance mapping (Article 11 / Annex IV, effective 2026-
 is in draft, covering 20 of 29 Annex IV sub-items.
 
 `open-agent-audit` turns the full evidence chain into enterprise-readable audit
-reports with AEP v0.3 adapter support — deployed at **[trustavo.com](https://trustavo.com)**.
+reports with AEP v0.2 adapter support — deployed at **[trustavo.com](https://trustavo.com)**.
 
 `fresharena` closes the loop with dynamic, verifiable, adversarial evaluation,
 grounding the runtime, evidence, and audit story in measured benchmark performance.
