@@ -1,0 +1,6 @@
+{
+  "_comment": "Expected admission decision \u2014 replace with real fixture from trace-pipeline evomerge",
+  "admission_score": 0.0,
+  "decision": "admit|reject",
+  "dimensions": {}
+}
