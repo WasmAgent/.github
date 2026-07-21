@@ -1,0 +1,45 @@
+# Golden Path — docker-compose stub
+# Target: one-command local demo for Protect→Record→Audit→Admit
+# Status: NOT YET FUNCTIONAL — update versions.lock and service configs when ready
+
+version: "3.9"
+
+services:
+  # Step 1: wasmagent-js runtime + MCP firewall
+  wasmagent:
+    image: ghcr.io/wasmAgent/wasmagent-js:latest   # placeholder
+    environment:
+      - AEP_OUTPUT=/data/aep-record.json
+    volumes:
+      - ./fixtures:/fixtures:ro
+      - data:/data
+    profiles: [stub]
+
+  # Step 2: open-agent-audit
+  audit:
+    image: ghcr.io/wasmAgent/open-agent-audit:latest  # placeholder
+    environment:
+      - AEP_INPUT=/data/aep-record.json
+      - REPORT_OUTPUT=/data/audit-report.json
+    volumes:
+      - data:/data
+    depends_on: [wasmagent]
+    profiles: [stub]
+
+  # Step 3: trace-pipeline admission
+  admission:
+    image: ghcr.io/wasmAgent/trace-pipeline:latest  # placeholder
+    environment:
+      - AUDIT_INPUT=/data/audit-report.json
+      - DECISION_OUTPUT=/data/admission-decision.json
+    volumes:
+      - data:/data
+    depends_on: [audit]
+    profiles: [stub]
+
+volumes:
+  data:
+
+# Usage (once functional):
+#   docker compose up --build
+#   ./scripts/demo.sh
