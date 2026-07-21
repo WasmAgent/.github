@@ -1,6 +1,6 @@
 # Bot State
 
-_Last updated: 2026-07-21 13:04 UTC by patrol_
+_Last updated: 2026-07-21 13:25 UTC by patrol_
 
 ## Queue
 
@@ -8,25 +8,22 @@ _Last updated: 2026-07-21 13:04 UTC by patrol_
 |---|---|
 | Pending | 3 |
 | Active (running/reviewing) | 0 |
-| Blocked | 4 |
-| Completed/Merged (all time) | 100 |
+| Blocked | 0 |
+| Completed/Merged (all time) | 101 |
 
 ## Recent Activity (last 5)
 
 | Issue | Title | Outcome | Date |
 |---|---|---|---|
+| #119 | ci-health: main CI is red on WasmAgent/.github (workflow ... | merged/merged | 2026-07-21 |
 | #119 | stale-check #119 | completed/maintenance_done | 2026-07-21 |
 | #123 | [milestone Milestone 5 ] agent-trust-infra/: Trust propag... | completed/complexity_gate_split | 2026-07-21 |
 | #119 | stale-check #119 | completed/maintenance_done | 2026-07-21 |
 | #118 | [milestone Milestone 5 ] `tests/`: Cross-domain integrati... | merged/auto_closed_resolved | 2026-07-21 |
-| #114 | [milestone Milestone 5 ] `docs/`: Domain workload authori... | merged/auto_closed_resolved | 2026-07-21 |
 
 ## Waiting for Human
 
-- #116: [milestone Milestone 5 ] `trust-network/`: Public explorer renders live trust graph showing agent relatio...
-- #111: Fix WasmAgent/.github#109 ([milestone Milestone 5 ] `devops-agent/`: DevOps domain workload with deployment verification
 - #107: [milestone Milestone 5 ] `wasmagent-js/`: Multi-tenant verification runtime supports concurrent agent iso...
-- #105: Fix WasmAgent/.github#98 ([discussion] explore: Automate validation of YAML ledgers via GitHub Actions CI): implement ch
 
 ---
 _Maintained automatically by claude-bot-go patrol. Do not edit._
