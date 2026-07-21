@@ -1,0 +1,12 @@
+{
+  "_comment": "Expected AEP record structure \u2014 replace with real fixture from wasmagent-js @wasmagent/aep v0.2",
+  "schema": "aep-record/v0.2",
+  "action_id": "<uuid>",
+  "tool_name": "<tool>",
+  "decision": "allow|deny",
+  "signature": {
+    "alg": "Ed25519",
+    "sig": "<base64>"
+  },
+  "timestamp": "<ISO8601>"
+}
