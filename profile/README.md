@@ -6,6 +6,22 @@
 >
 > Parts of this vision are shipping today. Parts are in active development. The table below is honest about which is which.
 
+
+## Golden Path
+
+The fastest way to see WasmAgent's trust loop end-to-end:
+
+```bash
+git clone https://github.com/WasmAgent/.github
+cd .github/golden-path
+./scripts/demo.sh
+```
+
+This runs `Protect → Record → Audit → Admit` across all core repos.
+See [`golden-path/README.md`](../golden-path/README.md) for details.
+
+> **Status:** scaffolded — not yet runnable. Track progress at [`.github#103`](https://github.com/WasmAgent/.github/issues/103).
+
 ## Projects
 
 The **architecture** layer below is the human-readable view of
