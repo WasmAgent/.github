@@ -116,7 +116,7 @@
       "status": "shipped",
       "visibility": "internal",
       "in_profile": false,
-      "summary": "Private operations hub: media publishing, release ops, eval, research, outreach, security ops. Not a public product.",
+      "summary": "Internal operations hub: generators, release ops, eval, research, and continuous verification daemon that monitors running agents and alerts on trust-policy violations. Not a public product.",
       "url": "https://github.com/WasmAgent/wasmagent-ops"
     },
     {
