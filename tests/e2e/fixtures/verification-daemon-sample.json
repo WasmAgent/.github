@@ -1,0 +1,100 @@
+{
+  "$schema": "https://wasmagent.github.io/agent-trust-infra/schemas/verification-daemon-1.json",
+  "daemonFormat": "VerificationDaemon",
+  "specVersion": "1.0",
+  "metadata": {
+    "generated": "2026-07-21T00:00:00Z",
+    "repository": "WasmAgent/wasmagent-ops",
+    "release": "v1.0.0",
+    "generator": "wasmagent-ops/verification-daemon (test fixture)"
+  },
+  "daemonConfig": {
+    "pollIntervalSeconds": 30,
+    "alertBackoffSeconds": 300,
+    "maxConcurrentAgents": 50,
+    "healthCheckEndpoint": "/healthz"
+  },
+  "monitoredAgents": [
+    {
+      "agentId": "github.com/WasmAgent/bscode",
+      "namespace": "workload",
+      "endpoint": "http://localhost:8080",
+      "trustPolicyRef": "policies/bscode-trust.json"
+    },
+    {
+      "agentId": "github.com/WasmAgent/erp-agent",
+      "namespace": "workload",
+      "endpoint": "http://localhost:8081",
+      "trustPolicyRef": "policies/erp-trust.json"
+    }
+  ],
+  "trustPolicies": [
+    {
+      "id": "policy-aep-required",
+      "name": "Require AEP events for all data mutations",
+      "severity": "critical",
+      "scope": "all-agents",
+      "rules": [
+        {
+          "type": "aep-emission",
+          "description": "Every data mutation must produce a signed AEP event",
+          "action": "alert"
+        }
+      ]
+    },
+    {
+      "id": "policy-mcp-posture",
+      "name": "MCP posture must match declared manifest",
+      "severity": "warning",
+      "scope": "all-agents",
+      "rules": [
+        {
+          "type": "posture-drift",
+          "description": "Observed MCP tool usage must not exceed declared capabilities",
+          "action": "alert"
+        }
+      ]
+    },
+    {
+      "id": "policy-agentbom-freshness",
+      "name": "AgentBOM must be generated within 24 hours of agent deployment",
+      "severity": "info",
+      "scope": "all-agents",
+      "rules": [
+        {
+          "type": "artifact-freshness",
+          "description": "AgentBOM age must not exceed 86400 seconds",
+          "action": "alert"
+        }
+      ]
+    }
+  ],
+  "alertChannels": [
+    {
+      "type": "log",
+      "destination": "stdout"
+    },
+    {
+      "type": "webhook",
+      "destination": "https://hooks.example.com/alerts"
+    }
+  ],
+  "sampleViolations": [
+    {
+      "timestamp": "2026-07-21T12:34:56Z",
+      "agentId": "github.com/WasmAgent/bscode",
+      "policyId": "policy-aep-required",
+      "severity": "critical",
+      "description": "Agent performed 3 data mutations without emitting AEP events",
+      "evidenceRef": "evidence/bscode-violation-20260721.jsonl"
+    },
+    {
+      "timestamp": "2026-07-21T12:40:00Z",
+      "agentId": "github.com/WasmAgent/erp-agent",
+      "policyId": "policy-mcp-posture",
+      "severity": "warning",
+      "description": "Observed tool usage includes 'network-request' not declared in manifest",
+      "evidenceRef": "evidence/erp-violation-20260721.jsonl"
+    }
+  ]
+}
