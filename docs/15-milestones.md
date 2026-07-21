@@ -36,3 +36,18 @@
 - [ ] `releases/`: Public ledger populated with 1.0 release entries for all core repos
 - [ ] `docs/`: All documentation links validated with no broken references
 - [ ] `README.md`: Canonical paths documented and verified reachable (product matrix SVG, project index JSON)
+
+## Milestone 5 — Distributed Trust Network & Multi-Domain Ecosystem
+
+- [ ] `trust-network/`: Public registry launches for agent identity and artifact discovery (discovery.trust.wasmagent.dev)
+- [ ] `wasmagent-js/`: Multi-tenant verification runtime supports concurrent agent isolation with per-tenant trust policies
+- [ ] `healthcare-agent/`: Healthcare domain workload lands with HIPAA-compliant evidence collection and PHI-audit trails
+- [ ] `devops-agent/`: DevOps domain workload with deployment verification and infrastructure-as-code evidence capture
+- [ ] `finance-agent/`: Finance domain workload with SOX compliance controls and transaction-replay verification
+- [ ] `agent-trust-infra/`: Trust propagation protocol enables artifact chaining across domain boundaries (AgentBOM → AgentBOM)
+- [ ] `wasmagent-ops/`: Continuous verification daemon monitors running agents and alerts on trust-policy violations
+- [ ] `docs/`: Domain workload authoring guide with templates for new vertical-specific agents and verifier patterns
+- [ ] `wasmagent-js/`: Policy-as-code framework enables declarative trust rules (e.g., "require AEP events for all data mutations")
+- [ ] `trust-network/`: Public explorer renders live trust graph showing agent relationships and artifact provenance
+- [ ] `docs/project-index.json`: Updated with three new domain agents and trust-network registry
+- [ ] `tests/`: Cross-domain integration tests validate trust artifact propagation and policy enforcement boundaries
