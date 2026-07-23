@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "org": "WasmAgent",
-  "description": "Machine-readable source of truth for the WasmAgent project index. Lists every repository in the organization with its category, role, status, and visibility. Consumed by the org profile (profile/README.md project table) and the living roadmap (docs/roadmap.md) so the public project matrix is rendered from a single registry instead of maintained by hand, preventing omissions.",
+  "description": "Machine-readable source of truth for the WasmAgent project index. Lists every repository in the organization with its category, role, status, and visibility. Consumed by the org profile (profile/README.md project table) and the living roadmap (docs/roadmap.md) so the public project matrix is rendered from a single registry instead of maintained by hand, preventing omissions. Each repo also carries a `focus` field (see focus_legend) marking its place relative to the core spine and its long-term lifecycle.",
   "source_url": "https://github.com/WasmAgent/.github/blob/main/docs/project-index.json",
-  "last_reviewed": "2026-07-19",
+  "last_reviewed": "2026-07-23",
   "consumers": [
     "profile/README.md \u2014 Projects table",
     "docs/roadmap.md \u2014 project layers"
@@ -12,6 +12,17 @@
     "shipped": "Public repository exists and is the source of truth for its layer.",
     "in_progress": "Spec or reference implementation landing.",
     "planned": "Not yet public."
+  },
+  "focus_legend": {
+    "core-spine": "Mission core: evidence, verification, trust. Sustained long-term investment.",
+    "planned-core": "Planned addition to the core spine; repo not yet created.",
+    "adjacent": "Extends the spine to a surface; moves to community maintenance once its roadmap lands.",
+    "product": "Commercial product surface downstream of the spine.",
+    "research": "Research project; results and interfaces may change.",
+    "reference-workload": "Reference workload / Golden Path fixture producer, not a general product.",
+    "org-hub": "Org portal and governance.",
+    "internal": "Internal automation or operations; ships no public product.",
+    "planned-workload": "Planned reference workload; repo not yet created."
   },
   "categories": {
     "project-home": "Public landing page that directs readers to the org hub.",
@@ -35,7 +46,8 @@
       "visibility": "public",
       "in_profile": true,
       "summary": "Organization portal and sole public entry point: profile, roadmap, claims registry, release ledger, RFC registry, and cross-repo documentation.",
-      "url": "https://github.com/WasmAgent/.github"
+      "url": "https://github.com/WasmAgent/.github",
+      "focus": "org-hub"
     },
     {
       "name": "wasmagent-js",
@@ -46,7 +58,8 @@
       "in_profile": true,
       "summary": "Embedded agent runtime v1.x: WASM kernels (QuickJS, Pyodide, Wasmtime, Remote), MCP gateway + attestation, AEP emitter, capability manifests; adapters for A2A, AG-UI, AI SDK, Claude Agent SDK.",
       "url": "https://github.com/WasmAgent/wasmagent-js",
-      "latest_version": "1.20.0"
+      "latest_version": "1.20.0",
+      "focus": "core-spine"
     },
     {
       "name": "bscode",
@@ -56,7 +69,8 @@
       "visibility": "public",
       "in_profile": true,
       "summary": "Coding-agent workload on Cloudflare Workers \u2014 AEP evidence export, deny capabilities, output taint labels, RolloutProvenance.",
-      "url": "https://github.com/WasmAgent/bscode"
+      "url": "https://github.com/WasmAgent/bscode",
+      "focus": "reference-workload"
     },
     {
       "name": "trace-pipeline",
@@ -66,7 +80,8 @@
       "visibility": "public",
       "in_profile": true,
       "summary": "evomerge on PyPI \u2014 eval_trust paired statistics, AgentTrustScore stable JSON schema, training-data admission gate, wasmagent-js v1.x schema compatible.",
-      "url": "https://github.com/WasmAgent/trace-pipeline"
+      "url": "https://github.com/WasmAgent/trace-pipeline",
+      "focus": "adjacent"
     },
     {
       "name": "agent-trust-infra",
@@ -76,7 +91,8 @@
       "visibility": "public",
       "in_profile": true,
       "summary": "AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI; EU AI Act Annex IV compliance mapping in draft (covers 20/29 sub-items, deadline 2026-08-02).",
-      "url": "https://github.com/WasmAgent/agent-trust-infra"
+      "url": "https://github.com/WasmAgent/agent-trust-infra",
+      "focus": "core-spine"
     },
     {
       "name": "open-agent-audit",
@@ -87,7 +103,8 @@
       "in_profile": true,
       "summary": "Enterprise audit product with AEP v0.3 adapter; deployed at trustavo.com. Packages: @openagentaudit/core, adapters, schema.",
       "url": "https://github.com/WasmAgent/open-agent-audit",
-      "latest_version": "0.2.4"
+      "latest_version": "0.2.4",
+      "focus": "product"
     },
     {
       "name": "fresharena",
@@ -97,7 +114,8 @@
       "visibility": "public",
       "in_profile": true,
       "summary": "Dynamic, verifiable, adversarial evaluation \u2014 FAEP schema, submit-then-test adversarial testing, Public Immunity Pool; technical paper in preparation.",
-      "url": "https://github.com/WasmAgent/fresharena"
+      "url": "https://github.com/WasmAgent/fresharena",
+      "focus": "research"
     },
     {
       "name": "claude-bot",
@@ -107,7 +125,8 @@
       "visibility": "internal",
       "in_profile": false,
       "summary": "Internal automation: issue triage, PR review, and cross-repo coherence patrol. Not a public product.",
-      "url": "https://github.com/WasmAgent/claude-bot"
+      "url": "https://github.com/WasmAgent/claude-bot",
+      "focus": "internal"
     },
     {
       "name": "wasmagent-ops",
@@ -117,7 +136,8 @@
       "visibility": "internal",
       "in_profile": false,
       "summary": "Internal operations hub: generators, release ops, eval, research, and continuous verification daemon that monitors running agents and alerts on trust-policy violations. Not a public product.",
-      "url": "https://github.com/WasmAgent/wasmagent-ops"
+      "url": "https://github.com/WasmAgent/wasmagent-ops",
+      "focus": "internal"
     },
     {
       "name": "erp-agent",
@@ -127,7 +147,8 @@
       "visibility": "public",
       "in_profile": false,
       "summary": "Planned ERP-domain workload with order-state and ledger verifiers, mirroring the role bscode plays for coding tasks.",
-      "url": "https://github.com/WasmAgent/erp-agent"
+      "url": "https://github.com/WasmAgent/erp-agent",
+      "focus": "planned-workload"
     },
     {
       "name": "symkernel",
@@ -137,7 +158,8 @@
       "visibility": "public",
       "in_profile": true,
       "summary": "Go-based symbolic verification backend for the WasmAgent ecosystem: cel-go lightweight rules, wazero Wasm sandbox hard-isolation, Z3 SMT satisfiability proofs. HTTP service with OPA-style request/response envelope; language-agnostic \u2014 consumed by wasmagent-js and future wasmagent-py via a thin adapter.",
-      "url": "https://github.com/WasmAgent/symkernel"
+      "url": "https://github.com/WasmAgent/symkernel",
+      "focus": "core-spine"
     },
     {
       "name": "wasmagent-proxy",
@@ -147,7 +169,8 @@
       "visibility": "public",
       "in_profile": true,
       "summary": "Proxy-Wasm Rust module for Envoy, Istio, Kong, and Consul: intercepts Agent/MCP/A2A HTTP traffic, applies validation\u2192delta\u2192full recording policy, emits PROV-DM AEP records signed with Ed25519 (DSSE). Joins with wasmagent-js mcp-firewall via shared trace_id for full causal coverage from gateway to tool call.",
-      "url": "https://github.com/WasmAgent/wasmagent-proxy"
+      "url": "https://github.com/WasmAgent/wasmagent-proxy",
+      "focus": "adjacent"
     },
     {
       "name": "wasmagent-train-replay",
@@ -157,7 +180,8 @@
       "visibility": "public",
       "in_profile": true,
       "summary": "Causal evidence layer for distributed GPU training: reads PyTorch Flight Recorder dumps, builds cross-rank PROV-DM provenance graphs, records Ed25519-signed EpochEvidenceBundles, and supports deterministic replay and tensor-origin tracing. Shares AEP schema and RecordingMode semantics with wasmagent-js.",
-      "url": "https://github.com/WasmAgent/wasmagent-train-replay"
+      "url": "https://github.com/WasmAgent/wasmagent-train-replay",
+      "focus": "adjacent"
     },
     {
       "name": "wasmagent-py",
@@ -165,9 +189,10 @@
       "role": "Python runtime (planned)",
       "status": "planned",
       "visibility": "public",
-      "in_profile": true,
+      "in_profile": false,
       "summary": "Planned Python agent runtime \u2014 sibling to wasmagent-js. Will share AEP schema, Criterion/ConstraintIR protocol, and symkernel HTTP adapter so Python agents receive the same evidence recording, MCP policy enforcement, and symbolic verification as the JS runtime.",
-      "url": "https://github.com/WasmAgent/wasmagent-py"
+      "url": "https://github.com/WasmAgent/wasmagent-py",
+      "focus": "planned-core"
     }
   ]
 }

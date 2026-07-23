@@ -19,6 +19,25 @@ For per-repo maturity see `docs/maturity-matrix.md`.
 | **Tier 4** — Research | `fresharena` | Dynamic evaluation protocol |
 | **Infrastructure** | `wasmagent-proxy`, `symkernel`, `wasmagent-train-replay` | Gateway evidence, verification, training audit |
 
+## Focus & lifecycle
+
+The maturity tiers above answer *"how stable is this repo?"* A second,
+orthogonal axis answers *"how central is it to the mission, and what happens to
+it long-term?"* — captured by the `focus` field in `docs/project-index.json`:
+
+- **Core spine** — `wasmagent-js`, `symkernel`, `agent-trust-infra`, and planned
+  `wasmagent-py`. Evidence, verification, trust. Sustained investment; these
+  define the org's identity.
+- **Adjacent** — `wasmagent-proxy`, `trace-pipeline`, `wasmagent-train-replay`.
+  Extend the spine to a surface. Their **exit condition** (per the "Adding a new
+  repository" rule) is *roadmap complete → community maintenance*, not
+  archival: code, schemas, and history stay in place.
+- **Product / research / reference** — `open-agent-audit`, `fresharena`,
+  `bscode`. Downstream surfaces, governed by their own repo scope.
+
+A repo's focus changing (e.g. adjacent → community-maintained) is an
+architecture-review event, like any change to org-wide structure.
+
 ## Rules
 
 ### Adding a new capability

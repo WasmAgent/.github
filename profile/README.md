@@ -24,24 +24,59 @@ See [`golden-path/README.md`](../golden-path/README.md) for details.
 
 ## Projects
 
-The **architecture** layer below is the human-readable view of
+WasmAgent is **open infrastructure for _provable_ AI agents** — not another
+agent framework. The core spine answers one question end-to-end: *can you prove
+the agent ran correctly?* Every other repository is organized around that spine
+so a first-time visitor can tell the mission from its supporting cast at a
+glance.
+
+This section is the human-readable view of
 [`docs/project-index.json`](../docs/project-index.json), the machine-readable
-source of truth for the project list. This repository (`.github`) is the
-organization's sole public portal.
+source of truth (see each repo's `focus` field). This repository (`.github`) is
+the organization's sole public portal.
+
+### Core spine — evidence, verification, trust
+
+The mission lives here. These repositories receive sustained, long-term
+investment.
 
 | Repository | Role |
 | --- | --- |
-| [`.github`](https://github.com/WasmAgent/.github) | **Org hub** · Organization portal — roadmap, claims registry, release ledger, project index, and cross-repo documentation |
-| [wasmagent-js](https://github.com/WasmAgent/wasmagent-js) | **Runtime** · Embedded agent runtime v1.x — WASM kernels (QuickJS, Pyodide, Wasmtime, Remote), MCP gateway + attestation, AEP emitter, capability manifests; adapters for A2A, AG-UI, AI SDK, and Claude Agent SDK |
-| wasmagent-py *(planned — repo not yet created)* | **Runtime (planned)** · Python agent runtime — sibling to wasmagent-js; shares AEP schema, Criterion/ConstraintIR protocol, and symkernel HTTP adapter |
+| [wasmagent-js](https://github.com/WasmAgent/wasmagent-js) | **Runtime** · Embedded agent runtime v1.x — WASM kernels (QuickJS, Pyodide, Wasmtime, Remote), MCP gateway + attestation, AEP emitter, capability manifests; adapters for A2A, AG-UI, AI SDK, and Claude Agent SDK. This is where signed evidence is born. |
+| [symkernel](https://github.com/WasmAgent/symkernel) | **Verification** 🚧 · Go symbolic verification backend — cel-go lightweight rules, wazero Wasm sandbox hard-isolation, Z3 SMT proofs; HTTP service consumed by wasmagent-js and wasmagent-py. "Proving it ran correctly" is the mission itself. |
+| [agent-trust-infra](https://github.com/WasmAgent/agent-trust-infra) | **Trust & compliance** · AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI; EU AI Act Annex IV compliance mapping (draft, deadline **2026-08-02**). |
+
+> **`wasmagent-py`** *(planned)* joins the spine as the Python runtime sibling —
+> same AEP schema, Criterion/ConstraintIR protocol, and symkernel adapter — so
+> evidence is emitted wherever agents actually run, not just in JS.
+>
+> **AEP (Agent Evidence Protocol)** is the connective standard across the spine.
+> It is sedimented from the shipping runtime rather than designed up front; its
+> RFCs live in the [RFC registry](../docs/RFC/README.md), not a standalone repo.
+
+### Adjacent — maturing, then handed to the community
+
+These extend the spine to specific surfaces. Once their roadmaps land they move
+to **community maintenance** — they are not retired, and their code, evidence
+schemas, and history stay put.
+
+| Repository | Role |
+| --- | --- |
 | [wasmagent-proxy](https://github.com/WasmAgent/wasmagent-proxy) | **Gateway** 🚧 · Proxy-Wasm (Rust) evidence engine for Envoy, Istio, Kong, Consul — intercepts Agent/MCP/A2A traffic, emits Ed25519-signed AEP records, joins mcp-firewall via shared trace_id |
-| [symkernel](https://github.com/WasmAgent/symkernel) | **Verification** 🚧 · Go symbolic verification backend — cel-go lightweight rules, wazero Wasm sandbox hard-isolation, Z3 SMT proofs; HTTP service consumed by wasmagent-js and wasmagent-py |
-| [bscode](https://github.com/WasmAgent/bscode) | **Workload** · Coding-agent workload on Cloudflare Workers — AEP evidence export, deny capabilities, output taint labels, RolloutProvenance |
-| [fresharena](https://github.com/WasmAgent/fresharena) | **Evaluation protocol** · Dynamic, verifiable, adversarial evaluation — FAEP schema, submit-then-test, Public Immunity Pool; paper in preparation |
 | [trace-pipeline](https://github.com/WasmAgent/trace-pipeline) | **Evidence pipeline** · `evomerge` — trace-to-training backend: eval_trust paired statistics, AgentTrustScore, training-data admission gate, wasmagent-js v1.x schema compat |
 | [wasmagent-train-replay](https://github.com/WasmAgent/wasmagent-train-replay) | **Evidence pipeline** 🚧 · Causal evidence for distributed GPU training — cross-rank PROV-DM provenance graph, Ed25519-signed EpochEvidenceBundles, tensor-origin tracing, deterministic replay CLI |
-| [agent-trust-infra](https://github.com/WasmAgent/agent-trust-infra) | **Trust artifacts** · AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI; EU AI Act Annex IV compliance mapping (draft, deadline **2026-08-02**) |
-| [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | **Audit** · Enterprise audit product with AEP v0.2 adapter; deployed at [trustavo.com](https://trustavo.com) |
+
+### Product, research, and reference
+
+Downstream of the spine: the commercial audit surface, the research lab, the
+reference workload, and this portal.
+
+| Repository | Role |
+| --- | --- |
+| [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | **Audit product** · Enterprise audit product with AEP adapter; deployed at [trustavo.com](https://trustavo.com) |
+| [fresharena](https://github.com/WasmAgent/fresharena) | **Research — evaluation** · Dynamic, verifiable, adversarial evaluation — FAEP schema, submit-then-test, Public Immunity Pool; paper in preparation |
+| [bscode](https://github.com/WasmAgent/bscode) | **Reference workload** · Coding-agent workload on Cloudflare Workers — AEP evidence export, deny capabilities, output taint labels, RolloutProvenance |
+| [`.github`](https://github.com/WasmAgent/.github) | **Org hub** · Organization portal — roadmap, claims registry, release ledger, project index, and cross-repo documentation |
 
 ## Vision
 
