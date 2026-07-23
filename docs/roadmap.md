@@ -12,6 +12,28 @@ counterpart is [`project-index.json`](project-index.json).
 - 🚧 In progress — spec or reference implementation landing.
 - 📋 Planned — not yet public.
 
+## Focus & lifecycle
+
+WasmAgent's north star is **open infrastructure for _provable_ AI agents**.
+Repositories are ranked by how close they sit to that mission, orthogonal to the
+maturity tiers in
+[`repository-boundaries.md`](repository-boundaries.md):
+
+- **Core spine** (`wasmagent-js`, `symkernel`, `agent-trust-infra`, and the
+  planned `wasmagent-py`) — evidence emission, verification, and trust artifacts.
+  Sustained long-term investment. AEP is their connective standard, sedimented
+  from the shipping runtime rather than designed up front.
+- **Adjacent** (`wasmagent-proxy`, `trace-pipeline`, `wasmagent-train-replay`) —
+  extend the spine to specific surfaces. Once their roadmaps land they move to
+  **community maintenance**; they are not retired, and their code and evidence
+  schemas stay put.
+- **Product / research / reference** (`open-agent-audit`, `fresharena`,
+  `bscode`) — the commercial audit surface, the research lab, and the reference
+  workload, all downstream of the spine.
+
+The machine-readable `focus` field in
+[`project-index.json`](project-index.json) is the source of truth for this axis.
+
 ## Layers
 
 ### Runtime ✅
