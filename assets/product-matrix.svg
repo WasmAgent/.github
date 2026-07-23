@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 860" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
   <title>WasmAgent — The Trusted Agent OS</title>
-  <desc>The Trusted Agent OS: Gateway (wasmagent-proxy) feeds Runtime (wasmagent-js, symkernel, wasmagent-py). Workloads (bscode, fresharena) and Runtime produce traces that flow into Evidence Pipelines (trace-pipeline, wasmagent-train-replay), which feed Trust Artifacts and Audit. All anchored by the Org Hub (.github).</desc>
+  <desc>WasmAgent — open infrastructure for provable AI agents. Core spine (marked ★): the wasmagent-js runtime and symkernel verification backend emit and check Ed25519-signed AEP evidence, sedimented into agent-trust-infra trust artifacts and EU AI Act compliance; wasmagent-py is the planned Python runtime sibling. Adjacent repos — the wasmagent-proxy gateway and the trace-pipeline / wasmagent-train-replay evidence pipelines — extend the spine and move to community maintenance once their roadmaps land. Product, research, and reference surfaces: open-agent-audit, fresharena, bscode. All anchored by the .github org hub.</desc>
 
   <defs>
     <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
@@ -20,8 +20,8 @@
   <rect width="1040" height="860" fill="#f8fafc"/>
 
   <!-- Title -->
-  <text x="520" y="36" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">WasmAgent — The Trusted Agent OS</text>
-  <text x="520" y="56" text-anchor="middle" font-size="11.5" fill="#64748b">Gateway · Runtime · Verification · Workloads · Evidence Pipelines · Trust Artifacts · Audit · Evaluation</text>
+  <text x="520" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">WasmAgent — open infrastructure for provable AI agents</text>
+  <text x="520" y="54" text-anchor="middle" font-size="11.5" fill="#64748b">★ Core spine (sustained) · Adjacent (fades to community) · Product / Research / Reference — a Trusted Agent OS</text>
 
   <!-- ================================================================ -->
   <!-- ROW 1: GATEWAY (wasmagent-proxy)                                  -->
@@ -46,6 +46,7 @@
   <line x1="330" y1="175" x2="330" y2="265" stroke="#bfdbfe" stroke-width="1" stroke-dasharray="4,3"/>
   <text x="58" y="187" font-size="9.5" font-weight="700" fill="#1d4ed8" letter-spacing="1.5">RUNTIME</text>
   <text x="58" y="210" font-size="15" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">wasmagent-js</text>
+  <text x="205" y="210" font-size="13" fill="#f59e0b">★</text>
   <text x="58" y="230" font-size="11" fill="#475569">WASM kernels: QuickJS · Pyodide · Wasmtime · Remote</text>
   <text x="58" y="248" font-size="11" fill="#475569">MCP gateway · attestation · AEP emitter · capability manifests</text>
   <text x="58" y="266" font-size="11" fill="#475569">Adapters: A2A · AG-UI · AI SDK · Claude Agent SDK</text>
@@ -59,6 +60,7 @@
   <rect x="622" y="165" width="118" height="110" rx="10" fill="#fdf4ff" stroke="#e879f9" stroke-width="1.5"/>
   <text x="640" y="187" font-size="9.5" font-weight="700" fill="#86198f" letter-spacing="1.5">VERIF.</text>
   <text x="640" y="208" font-size="13" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">symkernel</text>
+  <text x="722" y="208" font-size="12" fill="#f59e0b">★</text>
   <text x="640" y="225" font-size="9.5" fill="#475569">🚧 in progress</text>
   <text x="640" y="243" font-size="10.5" fill="#475569">cel-go rules</text>
   <text x="640" y="259" font-size="10.5" fill="#475569">wazero sandbox</text>
@@ -66,7 +68,7 @@
 
   <!-- wasmagent-py (planned) -->
   <rect x="752" y="165" width="248" height="110" rx="10" fill="#f0f9ff" stroke="#7dd3fc" stroke-width="1.5" stroke-dasharray="6,3"/>
-  <text x="770" y="187" font-size="9.5" font-weight="700" fill="#0369a1" letter-spacing="1.5">RUNTIME (PLANNED)</text>
+  <text x="770" y="187" font-size="9.5" font-weight="700" fill="#0369a1" letter-spacing="1.5">RUNTIME (PLANNED) ★</text>
   <text x="770" y="210" font-size="15" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">wasmagent-py</text>
   <text x="770" y="232" font-size="11" fill="#475569">Python agent runtime</text>
   <text x="770" y="250" font-size="11" fill="#475569">AEP · MCP policy</text>
@@ -132,6 +134,7 @@
   <rect x="40" y="512" width="440" height="100" rx="10" fill="#faf5ff" stroke="#d8b4fe" stroke-width="1.5"/>
   <text x="58" y="534" font-size="9.5" font-weight="700" fill="#7c3aed" letter-spacing="1.5">TRUST ARTIFACTS</text>
   <text x="58" y="557" font-size="15" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">agent-trust-infra</text>
+  <text x="255" y="557" font-size="13" fill="#f59e0b">★</text>
   <text x="58" y="577" font-size="11" fill="#475569">AgentBOM · MCP Posture · Trust Passport</text>
   <text x="58" y="595" font-size="11" fill="#475569">trust-cli · EU AI Act Annex IV mapping (draft, 20/29)</text>
   <text x="58" y="612" font-size="11" fill="#475569">Deadline: 2026-08-02 (Article 11, high-risk AI)</text>
@@ -169,7 +172,7 @@
   <text x="778" y="648" font-size="10" fill="#475569">HTTP (bidirectional)</text>
 
   <!-- in-progress badge explanation -->
-  <text x="60" y="666" font-size="10" fill="#64748b">🚧 = in progress (repo exists, implementation landing)   📋 = planned (not yet public)</text>
+  <text x="60" y="666" font-size="10" fill="#64748b"><tspan fill="#f59e0b" font-weight="700">★</tspan> = core spine (sustained investment)   🚧 = in progress   📋 = planned   Adjacent repos (proxy, pipelines) → community maintenance once roadmaps land</text>
 
   <!-- ================================================================ -->
   <!-- ROW 7: ORG HUB                                                   -->
