@@ -25,58 +25,78 @@ See [`golden-path/README.md`](../golden-path/README.md) for details.
 ## Projects
 
 WasmAgent is **open infrastructure for _provable_ AI agents** — not another
-agent framework. The core spine answers one question end-to-end: *can you prove
-the agent ran correctly?* Every other repository is organized around that spine
-so a first-time visitor can tell the mission from its supporting cast at a
-glance.
+agent framework. The mission answers one question end-to-end: *can you prove the
+agent ran correctly?* The organization is a **tree**, not a flat list: a **Core**
+spine, the **Official tooling** and **Apps** that will grow around it, the
+**Research** that feeds it, and the **evidence surfaces** that extend it. A
+first-time visitor should tell the mission from its supporting cast at a glance.
 
 This section is the human-readable view of
 [`docs/project-index.json`](../docs/project-index.json), the machine-readable
 source of truth (see each repo's `focus` field). This repository (`.github`) is
 the organization's sole public portal.
 
-### Core spine — evidence, verification, trust
+### ⭐ Core — the platform
 
-The mission lives here. These repositories receive sustained, long-term
-investment.
+Evidence, verification, trust. Sustained, long-term investment; these define the
+platform's identity.
 
 | Repository | Role |
 | --- | --- |
 | [wasmagent-js](https://github.com/WasmAgent/wasmagent-js) | **Runtime** · Embedded agent runtime v1.x — WASM kernels (QuickJS, Pyodide, Wasmtime, Remote), MCP gateway + attestation, AEP emitter, capability manifests; adapters for A2A, AG-UI, AI SDK, and Claude Agent SDK. This is where signed evidence is born. |
+| [wasmagent-protocol](https://github.com/WasmAgent/wasmagent-protocol) | **Protocol** · Canonical AEP + compliance JSON Schemas — the single source of truth every repo agrees on. Published as `@wasmagent/protocol` (npm) and `wasmagent-protocol` (PyPI). |
 | [symkernel](https://github.com/WasmAgent/symkernel) | **Verification** 🚧 · Go symbolic verification backend — cel-go lightweight rules, wazero Wasm sandbox hard-isolation, Z3 SMT proofs; HTTP service consumed by wasmagent-js and wasmagent-py. "Proving it ran correctly" is the mission itself. |
 | [agent-trust-infra](https://github.com/WasmAgent/agent-trust-infra) | **Trust & compliance** · AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI; EU AI Act Annex IV compliance mapping (draft, deadline **2026-08-02**). |
 
-> **`wasmagent-py`** *(planned)* joins the spine as the Python runtime sibling —
-> same AEP schema, Criterion/ConstraintIR protocol, and symkernel adapter — so
+> **`wasmagent-py`** *(planned)* joins Core as the Python runtime sibling — same
+> AEP schema, Criterion/ConstraintIR protocol, and symkernel adapter — so
 > evidence is emitted wherever agents actually run, not just in JS.
 >
-> **AEP (Agent Evidence Protocol)** is the connective standard across the spine.
-> It is sedimented from the shipping runtime rather than designed up front; its
-> RFCs live in the [RFC registry](../docs/RFC/README.md), not a standalone repo.
+> **AEP (Agent Evidence Protocol)** is the connective standard across Core,
+> sedimented from the shipping runtime rather than designed up front and now
+> versioned in `wasmagent-protocol`.
 
-### Adjacent — maturing, then handed to the community
+### 🛠 Official tooling
 
-These extend the spine to specific surfaces. Once their roadmaps land they move
-to **community maintenance** — they are not retired, and their code, evidence
+Official supporting tools that will grow around Core — CLI, devtools, examples,
+starters. *Planned; no public repos yet.* Tracked so the tree has a home for
+them rather than scattering them later.
+
+### 🔌 Evidence surfaces — maturing, then handed to the community
+
+These extend Core to a specific surface (gateway, training, pipeline). Once
+their roadmaps land they move to **community maintenance** — not retired; code,
 schemas, and history stay put.
 
 | Repository | Role |
 | --- | --- |
 | [wasmagent-proxy](https://github.com/WasmAgent/wasmagent-proxy) | **Gateway** 🚧 · Proxy-Wasm (Rust) evidence engine for Envoy, Istio, Kong, Consul — intercepts Agent/MCP/A2A traffic, emits Ed25519-signed AEP records, joins mcp-firewall via shared trace_id |
-| [trace-pipeline](https://github.com/WasmAgent/trace-pipeline) | **Evidence pipeline** · `evomerge` — trace-to-training backend: eval_trust paired statistics, AgentTrustScore, training-data admission gate, wasmagent-js v1.x schema compat |
+| [trace-pipeline](https://github.com/WasmAgent/trace-pipeline) | **Evidence pipeline** · `evomerge` — trace-to-training backend: eval_trust paired statistics, AgentTrustScore, training-data admission gate, consumes `wasmagent-protocol` |
 | [wasmagent-train-replay](https://github.com/WasmAgent/wasmagent-train-replay) | **Evidence pipeline** 🚧 · Causal evidence for distributed GPU training — cross-rank PROV-DM provenance graph, Ed25519-signed EpochEvidenceBundles, tensor-origin tracing, deterministic replay CLI |
 
-### Product, research, and reference
+### 🧪 Research
 
-Downstream of the spine: the commercial audit surface, the research lab, the
-reference workload, and this portal.
+Grounds the platform in measured results; interfaces may change as experiments
+evolve.
+
+| Repository | Role |
+| --- | --- |
+| [fresharena](https://github.com/WasmAgent/fresharena) | **Evaluation** · Dynamic, verifiable, adversarial evaluation — FAEP schema, submit-then-test, Public Immunity Pool; paper in preparation |
+
+### 📦 Product, reference & hub
+
+The commercial audit surface, the reference workload, and this portal.
 
 | Repository | Role |
 | --- | --- |
 | [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | **Audit product** · Enterprise audit product with AEP adapter; deployed at [trustavo.com](https://trustavo.com) |
-| [fresharena](https://github.com/WasmAgent/fresharena) | **Research — evaluation** · Dynamic, verifiable, adversarial evaluation — FAEP schema, submit-then-test, Public Immunity Pool; paper in preparation |
 | [bscode](https://github.com/WasmAgent/bscode) | **Reference workload** · Coding-agent workload on Cloudflare Workers — AEP evidence export, deny capabilities, output taint labels, RolloutProvenance |
 | [`.github`](https://github.com/WasmAgent/.github) | **Org hub** · Organization portal — roadmap, claims registry, release ledger, project index, and cross-repo documentation |
+
+### 🎮 Apps
+
+End-user applications on top of the platform — playground, desktop, editor
+extensions, demos. *Planned; no public repos yet.*
 
 ## Vision
 

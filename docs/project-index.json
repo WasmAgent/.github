@@ -22,7 +22,8 @@
     "reference-workload": "Reference workload / Golden Path fixture producer, not a general product.",
     "org-hub": "Org portal and governance.",
     "internal": "Internal automation or operations; ships no public product.",
-    "planned-workload": "Planned reference workload; repo not yet created."
+    "planned-workload": "Planned reference workload; repo not yet created.",
+    "official-tooling": "Official supporting tool downstream of the core spine (CLI, devtools, examples). Planned surface."
   },
   "categories": {
     "project-home": "Public landing page that directs readers to the org hub.",
@@ -35,7 +36,8 @@
     "evaluation": "Adversarial evaluation protocol.",
     "internal-tool": "Internal automation or operations; ships no public product.",
     "verification": "Symbolic verification and sandbox execution backend.",
-    "gateway": "Network-boundary evidence engine (Proxy-Wasm)."
+    "gateway": "Network-boundary evidence engine (Proxy-Wasm).",
+    "protocol": "Cross-repository schema/contract specifications (single canonical source)."
   },
   "repos": [
     {
@@ -60,6 +62,17 @@
       "url": "https://github.com/WasmAgent/wasmagent-js",
       "latest_version": "1.20.0",
       "focus": "core-spine"
+    },
+    {
+      "name": "wasmagent-protocol",
+      "category": "protocol",
+      "role": "Protocol",
+      "status": "shipped",
+      "visibility": "public",
+      "in_profile": true,
+      "focus": "core-spine",
+      "summary": "Canonical JSON Schemas for the Agent Evidence Protocol (AEP) and the compliance contract family. Single source of truth consumed by wasmagent-js and trace-pipeline; published as @wasmagent/protocol (npm) and wasmagent-protocol (PyPI).",
+      "url": "https://github.com/WasmAgent/wasmagent-protocol"
     },
     {
       "name": "bscode",
