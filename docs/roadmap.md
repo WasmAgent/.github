@@ -19,17 +19,22 @@ Repositories are ranked by how close they sit to that mission, orthogonal to the
 maturity tiers in
 [`repository-boundaries.md`](repository-boundaries.md):
 
-- **Core spine** (`wasmagent-js`, `symkernel`, `agent-trust-infra`, and the
-  planned `wasmagent-py`) — evidence emission, verification, and trust artifacts.
-  Sustained long-term investment. AEP is their connective standard, sedimented
-  from the shipping runtime rather than designed up front.
-- **Adjacent** (`wasmagent-proxy`, `trace-pipeline`, `wasmagent-train-replay`) —
-  extend the spine to specific surfaces. Once their roadmaps land they move to
-  **community maintenance**; they are not retired, and their code and evidence
-  schemas stay put.
-- **Product / research / reference** (`open-agent-audit`, `fresharena`,
-  `bscode`) — the commercial audit surface, the research lab, and the reference
-  workload, all downstream of the spine.
+- **⭐ Core** (`wasmagent-js`, `wasmagent-protocol`, `symkernel`,
+  `agent-trust-infra`, and the planned `wasmagent-py`) — runtime, protocol,
+  verification, and trust artifacts. Sustained long-term investment. AEP is
+  their connective standard, sedimented from the shipping runtime and now
+  versioned in `wasmagent-protocol`.
+- **🛠 Official tooling** — CLI, devtools, examples, starters. Planned; no
+  public repos yet. The tree reserves a home for them.
+- **🔌 Evidence surfaces** (`wasmagent-proxy`, `trace-pipeline`,
+  `wasmagent-train-replay`) — extend Core to specific surfaces. Once their
+  roadmaps land they move to **community maintenance**; not retired — code and
+  evidence schemas stay put.
+- **🧪 Research** (`fresharena`) — grounds the platform in measured results.
+- **📦 Product, reference & hub** (`open-agent-audit`, `bscode`, `.github`) —
+  the commercial audit surface, the reference workload, and this portal.
+- **🎮 Apps** — playground, desktop, editor extensions, demos. Planned; no
+  public repos yet.
 
 The machine-readable `focus` field in
 [`project-index.json`](project-index.json) is the source of truth for this axis.

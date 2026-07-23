@@ -25,15 +25,21 @@ The maturity tiers above answer *"how stable is this repo?"* A second,
 orthogonal axis answers *"how central is it to the mission, and what happens to
 it long-term?"* — captured by the `focus` field in `docs/project-index.json`:
 
-- **Core spine** — `wasmagent-js`, `symkernel`, `agent-trust-infra`, and planned
-  `wasmagent-py`. Evidence, verification, trust. Sustained investment; these
-  define the org's identity.
-- **Adjacent** — `wasmagent-proxy`, `trace-pipeline`, `wasmagent-train-replay`.
-  Extend the spine to a surface. Their **exit condition** (per the "Adding a new
-  repository" rule) is *roadmap complete → community maintenance*, not
-  archival: code, schemas, and history stay in place.
-- **Product / research / reference** — `open-agent-audit`, `fresharena`,
-  `bscode`. Downstream surfaces, governed by their own repo scope.
+The org is organized as a tree (Core → Official tooling → Evidence surfaces
+→ Research → Product/Apps), captured by the `focus` field:
+
+- **⭐ Core** — `wasmagent-js`, `wasmagent-protocol`, `symkernel`,
+  `agent-trust-infra`, and planned `wasmagent-py`. Runtime, protocol,
+  verification, trust. Sustained investment; these define the org's identity.
+- **🛠 Official tooling** — CLI, devtools, examples. Planned; reserved in the
+  tree, no public repos yet.
+- **🔌 Evidence surfaces** — `wasmagent-proxy`, `trace-pipeline`,
+  `wasmagent-train-replay`. Extend Core to a surface. Their **exit condition**
+  (per the "Adding a new repository" rule) is *roadmap complete → community
+  maintenance*, not archival: code, schemas, and history stay in place.
+- **🧪 Research** — `fresharena`.
+- **📦 Product / reference / hub** — `open-agent-audit`, `bscode`, `.github`.
+- **🎮 Apps** — playground, desktop, editor extensions. Planned.
 
 A repo's focus changing (e.g. adjacent → community-maintained) is an
 architecture-review event, like any change to org-wide structure.

@@ -1,184 +1,148 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 860" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
-  <title>WasmAgent — The Trusted Agent OS</title>
-  <desc>WasmAgent — open infrastructure for provable AI agents. Core spine (marked ★): the wasmagent-js runtime and symkernel verification backend emit and check Ed25519-signed AEP evidence, sedimented into agent-trust-infra trust artifacts and EU AI Act compliance; wasmagent-py is the planned Python runtime sibling. Adjacent repos — the wasmagent-proxy gateway and the trace-pipeline / wasmagent-train-replay evidence pipelines — extend the spine and move to community maintenance once their roadmaps land. Product, research, and reference surfaces: open-agent-audit, fresharena, bscode. All anchored by the .github org hub.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 900" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title>WasmAgent — open infrastructure for provable AI agents</title>
+  <desc>WasmAgent organized as a tiered tree. Core (the platform): wasmagent-js runtime, wasmagent-protocol canonical AEP + compliance schemas, symkernel verification, agent-trust-infra trust and EU AI Act compliance, plus the planned wasmagent-py Python runtime. Official tooling (CLI, devtools, examples) and Apps (playground, desktop, editor extensions) are planned tiers reserved in the tree. Evidence surfaces extend Core and move to community maintenance once their roadmaps land: wasmagent-proxy gateway, trace-pipeline, wasmagent-train-replay. Research: fresharena. Product, reference and hub: open-agent-audit (Trustavo), bscode, and the .github org portal.</desc>
 
   <defs>
-    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
-    </marker>
-    <marker id="arr-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-      <path d="M0,0 L10,5 L0,10 z" fill="#60a5fa"/>
-    </marker>
-    <marker id="arr-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-      <path d="M0,0 L10,5 L0,10 z" fill="#4ade80"/>
-    </marker>
-    <marker id="arr-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-      <path d="M0,0 L10,5 L0,10 z" fill="#c084fc"/>
-    </marker>
+    <linearGradient id="coreGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eff6ff"/>
+      <stop offset="1" stop-color="#e0edff"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-4%" y="-4%" width="108%" height="116%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-color="#0f172a" flood-opacity="0.10"/>
+    </filter>
   </defs>
 
-  <rect width="1040" height="860" fill="#f8fafc"/>
+  <rect width="1040" height="900" fill="#f8fafc"/>
 
   <!-- Title -->
-  <text x="520" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">WasmAgent — open infrastructure for provable AI agents</text>
-  <text x="520" y="54" text-anchor="middle" font-size="11.5" fill="#64748b">★ Core spine (sustained) · Adjacent (fades to community) · Product / Research / Reference — a Trusted Agent OS</text>
+  <text x="520" y="44" text-anchor="middle" font-size="21" font-weight="700" fill="#0f172a">WasmAgent — open infrastructure for provable AI agents</text>
+  <text x="520" y="66" text-anchor="middle" font-size="12" fill="#64748b">One question, end to end: can you prove the agent ran correctly?</text>
 
-  <!-- ================================================================ -->
-  <!-- ROW 1: GATEWAY (wasmagent-proxy)                                  -->
-  <!-- ================================================================ -->
-  <rect x="40" y="70" width="960" height="80" rx="10" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
-  <text x="58" y="92" font-size="9.5" font-weight="700" fill="#065f46" letter-spacing="1.5">GATEWAY</text>
-  <text x="58" y="114" font-size="15" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">wasmagent-proxy</text>
-  <text x="222" y="114" font-size="11" fill="#64748b" font-style="italic"> · 🚧 in progress</text>
-  <text x="58" y="134" font-size="11" fill="#475569">Proxy-Wasm (Rust) for Envoy · Istio · Kong · Consul — intercepts Agent/MCP/A2A HTTP traffic</text>
-  <text x="580" y="114" font-size="11" fill="#475569">x-aep-recording-mode header · Ed25519 DSSE AEP records · validation → delta → full policy</text>
-  <text x="580" y="134" font-size="11" fill="#475569">joins wasmagent-js mcp-firewall via shared trace_id for full gateway-to-tool-call causal graph</text>
+  <!-- ============================================================= -->
+  <!-- TIER 1: CORE                                                   -->
+  <!-- ============================================================= -->
+  <rect x="30" y="88" width="980" height="150" rx="14" fill="url(#coreGrad)" stroke="#93c5fd" stroke-width="2"/>
+  <text x="52" y="114" font-size="11" font-weight="700" fill="#1d4ed8" letter-spacing="1.5">★ CORE — THE PLATFORM</text>
+  <text x="52" y="130" font-size="10.5" fill="#64748b">Evidence · Protocol · Verification · Trust — sustained, long-term investment</text>
 
-  <!-- arrow: gateway → runtime -->
-  <line x1="520" y1="150" x2="520" y2="163" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- core cards -->
+  <g filter="url(#cardShadow)">
+    <rect x="52" y="142" width="222" height="80" rx="9" fill="#ffffff" stroke="#93c5fd" stroke-width="1.3"/>
+    <rect x="286" y="142" width="222" height="80" rx="9" fill="#ffffff" stroke="#93c5fd" stroke-width="1.3"/>
+    <rect x="520" y="142" width="222" height="80" rx="9" fill="#ffffff" stroke="#93c5fd" stroke-width="1.3"/>
+    <rect x="754" y="142" width="234" height="80" rx="9" fill="#ffffff" stroke="#93c5fd" stroke-width="1.3"/>
+  </g>
 
-  <!-- ================================================================ -->
-  <!-- ROW 2: RUNTIME (wasmagent-js) + VERIFICATION (symkernel) + RUNTIME (wasmagent-py) -->
-  <!-- ================================================================ -->
+  <text x="66" y="164" font-size="13.5" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">wasmagent-js</text>
+  <text x="66" y="182" font-size="10" font-weight="700" fill="#1d4ed8" letter-spacing="0.8">RUNTIME</text>
+  <text x="66" y="199" font-size="10" fill="#475569">WASM kernels · MCP gateway</text>
+  <text x="66" y="213" font-size="10" fill="#475569">AEP emitter · where evidence is born</text>
 
-  <!-- wasmagent-js -->
-  <rect x="40" y="165" width="570" height="110" rx="10" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
-  <line x1="330" y1="175" x2="330" y2="265" stroke="#bfdbfe" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="58" y="187" font-size="9.5" font-weight="700" fill="#1d4ed8" letter-spacing="1.5">RUNTIME</text>
-  <text x="58" y="210" font-size="15" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">wasmagent-js</text>
-  <text x="205" y="210" font-size="13" fill="#f59e0b">★</text>
-  <text x="58" y="230" font-size="11" fill="#475569">WASM kernels: QuickJS · Pyodide · Wasmtime · Remote</text>
-  <text x="58" y="248" font-size="11" fill="#475569">MCP gateway · attestation · AEP emitter · capability manifests</text>
-  <text x="58" y="266" font-size="11" fill="#475569">Adapters: A2A · AG-UI · AI SDK · Claude Agent SDK</text>
-  <text x="348" y="190" font-size="10" font-weight="600" fill="#64748b">Packages (v1.x)</text>
-  <text x="348" y="210" font-size="11" fill="#475569">@wasmagent/core · cli · aep · compliance</text>
-  <text x="348" y="228" font-size="11" fill="#475569">mcp-gateway · mcp-attestation · devtools</text>
-  <text x="348" y="246" font-size="11" fill="#475569">evals-runner · kernel-* · mcp-firewall</text>
-  <text x="348" y="264" font-size="11" fill="#475569">capability-compiler · otel-exporter</text>
+  <text x="300" y="164" font-size="13.5" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">wasmagent-protocol</text>
+  <text x="300" y="182" font-size="10" font-weight="700" fill="#1d4ed8" letter-spacing="0.8">PROTOCOL</text>
+  <text x="300" y="199" font-size="10" fill="#475569">Canonical AEP + compliance schemas</text>
+  <text x="300" y="213" font-size="10" fill="#475569">npm @wasmagent/protocol · PyPI</text>
 
-  <!-- symkernel (verification) -->
-  <rect x="622" y="165" width="118" height="110" rx="10" fill="#fdf4ff" stroke="#e879f9" stroke-width="1.5"/>
-  <text x="640" y="187" font-size="9.5" font-weight="700" fill="#86198f" letter-spacing="1.5">VERIF.</text>
-  <text x="640" y="208" font-size="13" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">symkernel</text>
-  <text x="722" y="208" font-size="12" fill="#f59e0b">★</text>
-  <text x="640" y="225" font-size="9.5" fill="#475569">🚧 in progress</text>
-  <text x="640" y="243" font-size="10.5" fill="#475569">cel-go rules</text>
-  <text x="640" y="259" font-size="10.5" fill="#475569">wazero sandbox</text>
-  <text x="640" y="275" font-size="10.5" fill="#475569">Z3 SMT proofs</text>
+  <text x="534" y="164" font-size="13.5" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">symkernel</text>
+  <text x="534" y="182" font-size="10" font-weight="700" fill="#1d4ed8" letter-spacing="0.8">VERIFICATION 🚧</text>
+  <text x="534" y="199" font-size="10" fill="#475569">cel-go · wazero sandbox · Z3 SMT</text>
+  <text x="534" y="213" font-size="10" fill="#475569">proving it ran correctly</text>
 
-  <!-- wasmagent-py (planned) -->
-  <rect x="752" y="165" width="248" height="110" rx="10" fill="#f0f9ff" stroke="#7dd3fc" stroke-width="1.5" stroke-dasharray="6,3"/>
-  <text x="770" y="187" font-size="9.5" font-weight="700" fill="#0369a1" letter-spacing="1.5">RUNTIME (PLANNED) ★</text>
-  <text x="770" y="210" font-size="15" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">wasmagent-py</text>
-  <text x="770" y="232" font-size="11" fill="#475569">Python agent runtime</text>
-  <text x="770" y="250" font-size="11" fill="#475569">AEP · MCP policy</text>
-  <text x="770" y="268" font-size="11" fill="#475569">symkernel adapter</text>
+  <text x="768" y="164" font-size="13.5" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">agent-trust-infra</text>
+  <text x="768" y="182" font-size="10" font-weight="700" fill="#1d4ed8" letter-spacing="0.8">TRUST &amp; COMPLIANCE</text>
+  <text x="768" y="199" font-size="10" fill="#475569">AgentBOM · MCP Posture · Passport</text>
+  <text x="768" y="213" font-size="10" fill="#475569">EU AI Act Annex IV · 2026-08-02</text>
 
-  <!-- symkernel ↔ wasmagent-js (bidirectional HTTP) -->
-  <line x1="624" y1="217" x2="608" y2="217" stroke="#e879f9" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-purple)"/>
-  <line x1="608" y1="225" x2="624" y2="225" stroke="#e879f9" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-purple)"/>
+  <!-- planned wasmagent-py note -->
+  <text x="52" y="234" font-size="9.5" fill="#64748b">📋 planned: <tspan font-family="ui-monospace,Menlo,monospace" fill="#475569">wasmagent-py</tspan> — Python runtime sibling, same AEP schema · AEP is the connective standard across Core</text>
 
-  <!-- symkernel ↔ wasmagent-py (bidirectional HTTP) -->
-  <line x1="738" y1="217" x2="754" y2="217" stroke="#e879f9" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-purple)"/>
-  <line x1="754" y1="225" x2="738" y2="225" stroke="#e879f9" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-purple)"/>
+  <!-- ============================================================= -->
+  <!-- TIER 2: OFFICIAL TOOLING (planned)                             -->
+  <!-- ============================================================= -->
+  <rect x="30" y="256" width="980" height="58" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="7,4"/>
+  <text x="52" y="280" font-size="11" font-weight="700" fill="#64748b" letter-spacing="1.5">🛠 OFFICIAL TOOLING</text>
+  <text x="52" y="298" font-size="10.5" fill="#94a3b8">CLI · devtools · examples · starters — 📋 planned, reserved in the tree (no public repos yet)</text>
 
-  <!-- arrows: runtimes → workloads -->
-  <line x1="210" y1="275" x2="210" y2="290" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
-  <line x1="876" y1="275" x2="720" y2="290" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- ============================================================= -->
+  <!-- TIER 3: EVIDENCE SURFACES                                      -->
+  <!-- ============================================================= -->
+  <rect x="30" y="330" width="980" height="128" rx="14" fill="#f0fdf4" stroke="#86efac" stroke-width="2"/>
+  <text x="52" y="356" font-size="11" font-weight="700" fill="#15803d" letter-spacing="1.5">🔌 EVIDENCE SURFACES</text>
+  <text x="52" y="372" font-size="10.5" fill="#64748b">Extend Core to a surface · move to community maintenance once their roadmaps land (not retired)</text>
 
-  <!-- ================================================================ -->
-  <!-- ROW 3: WORKLOADS (bscode + fresharena)                            -->
-  <!-- ================================================================ -->
-  <rect x="40" y="292" width="380" height="90" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
-  <text x="58" y="314" font-size="9.5" font-weight="700" fill="#2563eb" letter-spacing="1.5">WORKLOAD</text>
-  <text x="58" y="337" font-size="15" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">bscode</text>
-  <text x="58" y="357" font-size="11" fill="#475569">Cloudflare Workers coding agent · AEP evidence</text>
-  <text x="58" y="374" font-size="11" fill="#475569">Deny capabilities · output_taint_labels · RolloutProvenance</text>
+  <g filter="url(#cardShadow)">
+    <rect x="52" y="384" width="300" height="62" rx="9" fill="#ffffff" stroke="#86efac" stroke-width="1.3"/>
+    <rect x="364" y="384" width="300" height="62" rx="9" fill="#ffffff" stroke="#86efac" stroke-width="1.3"/>
+    <rect x="676" y="384" width="312" height="62" rx="9" fill="#ffffff" stroke="#86efac" stroke-width="1.3"/>
+  </g>
 
-  <rect x="440" y="292" width="380" height="90" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
-  <text x="458" y="314" font-size="9.5" font-weight="700" fill="#2563eb" letter-spacing="1.5">EVALUATION</text>
-  <text x="458" y="337" font-size="15" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">fresharena</text>
-  <text x="458" y="357" font-size="11" fill="#475569">Dynamic, verifiable, adversarial evaluation protocol</text>
-  <text x="458" y="374" font-size="11" fill="#475569">FAEP schema · submit-then-test · Public Immunity Pool</text>
+  <text x="66" y="406" font-size="12.5" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">wasmagent-proxy <tspan font-size="9.5" font-family="ui-sans-serif" font-weight="400" fill="#64748b">🚧</tspan></text>
+  <text x="66" y="423" font-size="10" fill="#475569">Gateway — Proxy-Wasm (Rust) evidence engine</text>
+  <text x="66" y="437" font-size="10" fill="#475569">Envoy · Istio · Kong — signed AEP records</text>
 
-  <!-- arrows: workloads → evidence pipelines -->
-  <path d="M 220,382 L 220,390 L 310,390 L 310,400" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
-  <path d="M 630,382 L 630,390 L 540,390 L 540,400" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+  <text x="378" y="406" font-size="12.5" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">trace-pipeline</text>
+  <text x="378" y="423" font-size="10" fill="#475569">evomerge — trace-to-training backend</text>
+  <text x="378" y="437" font-size="10" fill="#475569">admission gate · consumes wasmagent-protocol</text>
 
-  <!-- ================================================================ -->
-  <!-- ROW 4: EVIDENCE PIPELINES (trace-pipeline + wasmagent-train-replay) -->
-  <!-- ================================================================ -->
-  <rect x="40" y="402" width="440" height="90" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
-  <text x="58" y="424" font-size="9.5" font-weight="700" fill="#15803d" letter-spacing="1.5">EVIDENCE PIPELINE</text>
-  <text x="58" y="447" font-size="15" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">trace-pipeline</text>
-  <text x="225" y="447" font-size="11" fill="#64748b" font-style="italic"> · pip install evomerge</text>
-  <text x="58" y="467" font-size="11" fill="#475569">eval_trust · AgentTrustScore · paired statistics</text>
-  <text x="58" y="484" font-size="11" fill="#475569">training-data admission gate · wasmagent-js v1.x AEP schema</text>
+  <text x="690" y="406" font-size="12.5" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">wasmagent-train-replay <tspan font-size="9.5" font-family="ui-sans-serif" font-weight="400" fill="#64748b">🚧</tspan></text>
+  <text x="690" y="423" font-size="10" fill="#475569">Causal evidence for distributed GPU training</text>
+  <text x="690" y="437" font-size="10" fill="#475569">PROV-DM graph · EpochEvidenceBundle · replay</text>
 
-  <rect x="500" y="402" width="460" height="90" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
-  <text x="518" y="424" font-size="9.5" font-weight="700" fill="#15803d" letter-spacing="1.5">EVIDENCE PIPELINE · GPU TRAINING</text>
-  <text x="518" y="447" font-size="14" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">wasmagent-train-replay</text>
-  <text x="518" y="447" font-size="9.5" fill="#64748b" font-style="italic"/>
-  <text x="518" y="467" font-size="11" fill="#475569">PyTorch Flight Recorder · cross-rank PROV-DM causal graph</text>
-  <text x="518" y="484" font-size="11" fill="#475569">EpochEvidenceBundle (Ed25519) · tensor-origin tracing · replay CLI</text>
-  <!-- in-progress badge -->
-  <text x="934" y="424" font-size="9.5" fill="#64748b" font-style="italic">🚧 in progress</text>
+  <!-- ============================================================= -->
+  <!-- TIER 4: RESEARCH + PRODUCT/REFERENCE/HUB (side by side)        -->
+  <!-- ============================================================= -->
+  <!-- Research -->
+  <rect x="30" y="474" width="318" height="128" rx="14" fill="#fdf4ff" stroke="#e9a5f5" stroke-width="2"/>
+  <text x="52" y="500" font-size="11" font-weight="700" fill="#86198f" letter-spacing="1.5">🧪 RESEARCH</text>
+  <text x="52" y="516" font-size="10.5" fill="#64748b">Grounds the platform in results</text>
+  <g filter="url(#cardShadow)">
+    <rect x="52" y="528" width="274" height="60" rx="9" fill="#ffffff" stroke="#e9a5f5" stroke-width="1.3"/>
+  </g>
+  <text x="66" y="550" font-size="12.5" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">fresharena</text>
+  <text x="66" y="567" font-size="10" fill="#475569">Dynamic, verifiable, adversarial evaluation</text>
+  <text x="66" y="581" font-size="10" fill="#475569">FAEP · submit-then-test · paper in prep</text>
 
-  <!-- arrows: trace-pipeline → trust-infra, audit -->
-  <path d="M 180,492 L 180,500 L 130,500 L 130,510" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
-  <path d="M 330,492 L 330,500 L 830,500 L 830,510" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arr)"/>
+  <!-- Product / reference / hub -->
+  <rect x="360" y="474" width="650" height="128" rx="14" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+  <text x="382" y="500" font-size="11" font-weight="700" fill="#c2410c" letter-spacing="1.5">📦 PRODUCT · REFERENCE · HUB</text>
+  <g filter="url(#cardShadow)">
+    <rect x="382" y="512" width="196" height="76" rx="9" fill="#ffffff" stroke="#fdba74" stroke-width="1.3"/>
+    <rect x="590" y="512" width="196" height="76" rx="9" fill="#ffffff" stroke="#fdba74" stroke-width="1.3"/>
+    <rect x="798" y="512" width="190" height="76" rx="9" fill="#ffffff" stroke="#fdba74" stroke-width="1.3"/>
+  </g>
+  <text x="396" y="534" font-size="12" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">open-agent-audit</text>
+  <text x="396" y="551" font-size="9.5" font-weight="700" fill="#c2410c">AUDIT PRODUCT</text>
+  <text x="396" y="567" font-size="10" fill="#475569">Enterprise audit · AEP</text>
+  <text x="396" y="581" font-size="10" fill="#475569">trustavo.com</text>
 
-  <!-- ================================================================ -->
-  <!-- ROW 5: TRUST ARTIFACTS + AUDIT                                   -->
-  <!-- ================================================================ -->
-  <rect x="40" y="512" width="440" height="100" rx="10" fill="#faf5ff" stroke="#d8b4fe" stroke-width="1.5"/>
-  <text x="58" y="534" font-size="9.5" font-weight="700" fill="#7c3aed" letter-spacing="1.5">TRUST ARTIFACTS</text>
-  <text x="58" y="557" font-size="15" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">agent-trust-infra</text>
-  <text x="255" y="557" font-size="13" fill="#f59e0b">★</text>
-  <text x="58" y="577" font-size="11" fill="#475569">AgentBOM · MCP Posture · Trust Passport</text>
-  <text x="58" y="595" font-size="11" fill="#475569">trust-cli · EU AI Act Annex IV mapping (draft, 20/29)</text>
-  <text x="58" y="612" font-size="11" fill="#475569">Deadline: 2026-08-02 (Article 11, high-risk AI)</text>
+  <text x="604" y="534" font-size="12" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">bscode</text>
+  <text x="604" y="551" font-size="9.5" font-weight="700" fill="#c2410c">REFERENCE WORKLOAD</text>
+  <text x="604" y="567" font-size="10" fill="#475569">Coding agent on CF Workers</text>
+  <text x="604" y="581" font-size="10" fill="#475569">AEP evidence export</text>
 
-  <rect x="500" y="512" width="460" height="100" rx="10" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/>
-  <text x="518" y="534" font-size="9.5" font-weight="700" fill="#c2410c" letter-spacing="1.5">AUDIT</text>
-  <text x="518" y="557" font-size="15" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">open-agent-audit</text>
-  <text x="518" y="577" font-size="11" fill="#475569">Enterprise audit reports · AEP v0.3 · trustavo.com</text>
-  <text x="518" y="595" font-size="11" fill="#475569">@openagentaudit/core · adapters · schema</text>
-  <text x="518" y="612" font-size="11" fill="#475569">OWASP Agentic Top 10 · NIST AI RMF · EU AI Act</text>
+  <text x="812" y="534" font-size="12" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">.github</text>
+  <text x="812" y="551" font-size="9.5" font-weight="700" fill="#c2410c">ORG HUB</text>
+  <text x="812" y="567" font-size="10" fill="#475569">Portal · roadmap · RFC</text>
+  <text x="812" y="581" font-size="10" fill="#475569">claims · release ledger</text>
 
-  <!-- cross arrow: trust-infra → audit -->
-  <line x1="481" y1="562" x2="498" y2="562" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- ============================================================= -->
+  <!-- TIER 5: APPS (planned)                                         -->
+  <!-- ============================================================= -->
+  <rect x="30" y="618" width="980" height="58" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="7,4"/>
+  <text x="52" y="642" font-size="11" font-weight="700" fill="#64748b" letter-spacing="1.5">🎮 APPS</text>
+  <text x="52" y="660" font-size="10.5" fill="#94a3b8">playground · desktop · editor extensions · demos — 📋 planned, reserved in the tree (no public repos yet)</text>
 
-  <!-- ================================================================ -->
-  <!-- ROW 6: LEGEND / KEY                                              -->
-  <!-- ================================================================ -->
-  <rect x="40" y="630" width="920" height="44" rx="8" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
-  <text x="60" y="648" font-size="10" font-weight="600" fill="#475569">Legend:</text>
-  <rect x="110" y="638" width="14" height="10" rx="2" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
-  <text x="128" y="648" font-size="10" fill="#475569">Runtime</text>
-  <rect x="190" y="638" width="14" height="10" rx="2" fill="#f0f9ff" stroke="#7dd3fc" stroke-width="1.5" stroke-dasharray="4,2"/>
-  <text x="208" y="648" font-size="10" fill="#475569">Planned</text>
-  <rect x="278" y="638" width="14" height="10" rx="2" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
-  <text x="296" y="648" font-size="10" fill="#475569">Gateway</text>
-  <rect x="362" y="638" width="14" height="10" rx="2" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
-  <text x="380" y="648" font-size="10" fill="#475569">Evidence Pipeline</text>
-  <rect x="482" y="638" width="14" height="10" rx="2" fill="#faf5ff" stroke="#d8b4fe" stroke-width="1.5"/>
-  <text x="500" y="648" font-size="10" fill="#475569">Trust Artifacts</text>
-  <rect x="592" y="638" width="14" height="10" rx="2" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/>
-  <text x="610" y="648" font-size="10" fill="#475569">Audit</text>
-  <rect x="652" y="638" width="14" height="10" rx="2" fill="#fdf4ff" stroke="#e879f9" stroke-width="1.5"/>
-  <text x="670" y="648" font-size="10" fill="#475569">Verification</text>
-  <line x1="748" y1="643" x2="772" y2="643" stroke="#e879f9" stroke-width="1.5" stroke-dasharray="5,3"/>
-  <text x="778" y="648" font-size="10" fill="#475569">HTTP (bidirectional)</text>
+  <!-- ============================================================= -->
+  <!-- LEGEND                                                         -->
+  <!-- ============================================================= -->
+  <rect x="30" y="694" width="980" height="72" rx="12" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="52" y="716" font-size="10.5" font-weight="700" fill="#334155">How to read this tree</text>
+  <text x="52" y="734" font-size="10" fill="#475569">★ Core = sustained investment, the platform's identity   ·   🔌 Evidence surfaces → community maintenance once roadmaps land (not retired)</text>
+  <text x="52" y="750" font-size="10" fill="#475569">🚧 = in progress   ·   📋 = planned (dashed tiers have no public repos yet)   ·   AEP (Agent Evidence Protocol) is the standard connecting every tier</text>
 
-  <!-- in-progress badge explanation -->
-  <text x="60" y="666" font-size="10" fill="#64748b"><tspan fill="#f59e0b" font-weight="700">★</tspan> = core spine (sustained investment)   🚧 = in progress   📋 = planned   Adjacent repos (proxy, pipelines) → community maintenance once roadmaps land</text>
-
-  <!-- ================================================================ -->
-  <!-- ROW 7: ORG HUB                                                   -->
-  <!-- ================================================================ -->
-  <rect x="40" y="688" width="920" height="58" rx="10" fill="#0f172a"/>
-  <text x="58" y="712" font-size="9.5" font-weight="700" fill="#93c5fd" letter-spacing="1.5">PROJECT HOME &amp; ORG HUB</text>
-  <text x="58" y="733" font-size="14" font-weight="700" fill="#ffffff" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">.github · wasmagent</text>
-  <text x="950" y="723" text-anchor="end" font-size="11" fill="#cbd5e1">Org profile · roadmap · RFC registry · claims · release ledger · github.com/WasmAgent</text>
+  <!-- Footer / north star -->
+  <rect x="30" y="782" width="980" height="88" rx="14" fill="#0f172a"/>
+  <text x="52" y="812" font-size="11" font-weight="700" fill="#93c5fd" letter-spacing="1.5">WASMAGENT PLATFORM</text>
+  <text x="52" y="836" font-size="14" font-weight="700" fill="#ffffff">Open infrastructure for provable AI agents</text>
+  <text x="52" y="856" font-size="10.5" fill="#cbd5e1">Runtime emits signed evidence → symkernel verifies → agent-trust-infra proves compliance → github.com/WasmAgent</text>
 </svg>
