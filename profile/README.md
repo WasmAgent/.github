@@ -46,7 +46,7 @@ platform's identity.
 | [wasmagent-js](https://github.com/WasmAgent/wasmagent-js) | **Runtime** · Embedded agent runtime v1.x — WASM kernels (QuickJS, Pyodide, Wasmtime, Remote), MCP gateway + attestation, AEP emitter, capability manifests; adapters for A2A, AG-UI, AI SDK, and Claude Agent SDK. This is where signed evidence is born. |
 | [wasmagent-protocol](https://github.com/WasmAgent/wasmagent-protocol) | **Protocol** · Canonical AEP + compliance JSON Schemas — the single source of truth every repo agrees on. Published as `@wasmagent/protocol` (npm) and `wasmagent-protocol` (PyPI). |
 | [symkernel](https://github.com/WasmAgent/symkernel) | **Verification** 🚧 · Go symbolic verification backend — cel-go lightweight rules, wazero Wasm sandbox hard-isolation, Z3 SMT proofs; HTTP service consumed by wasmagent-js and wasmagent-py. "Proving it ran correctly" is the mission itself. |
-| [agent-trust-infra](https://github.com/WasmAgent/agent-trust-infra) | **Trust & compliance** · AgentBOM, MCP Posture, and Trust Passport spec, reference impl, and CLI; EU AI Act Annex IV compliance mapping (draft, deadline **2026-08-02**). |
+| [agent-trust-infra](https://github.com/WasmAgent/agent-trust-infra) | **Trust tooling** · AgentBOM and MCP Posture validators, `@wasmagent/trust-cli` developer CLI, EU AI Act Annex IV compliance mapping (draft, deadline **2026-08-02**). Trust Passport spec → [wasmagent-protocol](https://github.com/WasmAgent/wasmagent-protocol). |
 
 > **`wasmagent-py`** *(planned)* joins Core as the Python runtime sibling — same
 > AEP schema, Criterion/ConstraintIR protocol, and symkernel adapter — so
@@ -142,8 +142,10 @@ GPU training jobs: it reads PyTorch Flight Recorder dumps, builds a cross-rank
 PROV-DM causal graph, and produces tamper-evident `EpochEvidenceBundle` records,
 enabling tensor-origin tracing and deterministic replay.
 
-`agent-trust-infra` layers on trust artifacts — AgentBOM, MCP Posture, and Trust
-Passport — giving every agent run a machine-readable identity and policy posture.
+`agent-trust-infra` produces trust artifacts — AgentBOM and MCP Posture — giving every
+agent run a machine-readable identity and policy posture. Trust Passport spec lives in
+`wasmagent-protocol`; the Trust Passport product (issuance, signing, revocation) lives in
+`open-agent-audit`.
 An EU AI Act Annex IV compliance mapping (Article 11 / Annex IV, effective 2026-08-02)
 is in draft, covering 20 of 29 Annex IV sub-items.
 
@@ -174,7 +176,7 @@ sustained track record.
 - **Verification** — `symkernel`, cel-go rules, wazero sandbox, Z3 SMT integration (Go)
 - **Pipelines** — `trace-pipeline` / `evomerge` (measurement trust, admission, training audit)
 - **Training evidence** — `wasmagent-train-replay`, PyTorch Flight Recorder, PROV-DM, GPU training causal graphs
-- **Trust artifacts** — `agent-trust-infra` (AgentBOM, MCP Posture, Trust Passport, EU AI Act mapping)
+- **Trust tooling** — `agent-trust-infra` (AgentBOM/MCP Posture validators + CLI); Trust Passport spec → `wasmagent-protocol`; Trust Passport product → `open-agent-audit`
 - **Audit product** — `open-agent-audit` / Trustavo (evidence reports, Cloudflare Workers)
 - **Evaluation** — `fresharena` (dynamic, verifiable, adversarial evaluation; paper preparation)
 - **Adapters** — OpenTelemetry GenAI, Langfuse, LangSmith ingestion
