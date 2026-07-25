@@ -85,3 +85,12 @@ for each repo's own CI.
 - [ ] Weekly KPI tracking (Golden Path pass/fail, external users, npm downloads)
 - [ ] `claims/` registry updated with verified external citations
 - [ ] `docs/RFC/` — first RFC for cross-repo AEP contract versioning
+
+## Project Index Consistency (MANDATORY)
+
+The CI gate `scripts/validate_project_index.py` checks that `docs/project-index.json`
+is consistent with `docs/roadmap.md`.
+
+**When adding or updating a repository in `docs/roadmap.md`:**
+1. Also update `docs/project-index.json` with the same repo entry
+2. Run locally: `python3 scripts/validate_project_index.py` — must exit 0
