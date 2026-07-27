@@ -19,13 +19,7 @@ jobs:
         uses: DavidAnson/markdownlint-cli2-action@v16
         with:
           globs: "**/*.md"
-          config: |
-            {
-              "default": true,
-              "MD013": false,
-              "MD033": false,
-              "MD041": false
-            }
+          config: ".markdownlint-cli2.jsonc"
 
   check-links:
     name: Check Documentation Links
@@ -33,12 +27,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Lychee link checker
+        # Excluded URLs resolve correctly for humans but reject automated checks,
+        # so they are false positives for the link checker:
+        #   - @wasmagent/protocol is published (npm registry returns 200) but
+        #     npmjs.com returns 403 to non-browser user agents.
+        #   - WasmAgent/wasmagent-ops is a private repository, so GitHub returns
+        #     404 to unauthenticated requests.
         uses: lycheeverse/lychee-action@v2
         with:
           args: |
             --verbose
             --no-progress
-            --exclude-mail
+            --exclude "https://www.npmjs.com/package/@wasmagent/protocol"
+            --exclude "https://github.com/WasmAgent/wasmagent-ops"
             docs/
             README.md
             **/*.md
