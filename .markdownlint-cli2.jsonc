@@ -1,6 +1,16 @@
 {
-  "default": true,
-  "MD013": false,
-  "MD033": false,
-  "MD041": false
+  "config": {
+    "default": true,
+    "MD013": false,
+    "MD033": false,
+    "MD041": false,
+    "MD032": false,
+    "MD022": false,
+    "MD040": false,
+    "MD049": false,
+    "MD037": false,
+    "MD036": false,
+    "MD012": false,
+    "MD004": false
+  }
 }
