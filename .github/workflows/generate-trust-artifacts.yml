@@ -1,6 +1,20 @@
 name: Generate Trust Artifacts
 
 on:
+  workflow_call:
+    inputs:
+      release_tag:
+        description: 'Release tag to generate artifacts for'
+        required: true
+        type: string
+      trace_file:
+        description: 'Path to trace file (for AgentBOM generation)'
+        required: false
+        type: string
+      aep_file:
+        description: 'Path to AEP events file (for Trust Passport generation)'
+        required: false
+        type: string
   release:
     types: [created, published]
   workflow_dispatch:
