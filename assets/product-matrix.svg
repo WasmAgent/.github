@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 900" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
   <title>WasmAgent — open infrastructure for provable AI agents</title>
-  <desc>WasmAgent organized as a tiered tree. Core (the platform): wasmagent-js runtime, wasmagent-protocol canonical AEP + compliance schemas, symkernel verification, agent-trust-infra trust and EU AI Act compliance, plus the planned wasmagent-py Python runtime. Official tooling (CLI, devtools, examples) and Apps (playground, desktop, editor extensions) are planned tiers reserved in the tree. Evidence surfaces extend Core and move to community maintenance once their roadmaps land: wasmagent-proxy gateway, trace-pipeline, wasmagent-train-replay. Research: fresharena. Product, reference and hub: open-agent-audit (Trustavo), bscode, and the .github org portal.</desc>
+  <desc>WasmAgent organized as a tiered tree. Core (the platform): wasmagent-js runtime (includes mcp-posture + mcp-firewall), wasmagent-protocol canonical AEP + compliance schemas, symkernel verification, agentbom AgentBOM and compliance tooling (migrated from archived agent-trust-infra), plus the planned wasmagent-py Python runtime. Official tooling (CLI, devtools, examples) and Apps (playground, desktop, editor extensions) are planned tiers reserved in the tree. Evidence surfaces extend Core and move to community maintenance once their roadmaps land: wasmagent-proxy gateway, trace-pipeline, wasmagent-train-replay. Research: fresharena. Product, reference and hub: open-agent-audit (Trustavo), bscode, and the .github org portal.</desc>
 
   <defs>
     <linearGradient id="coreGrad" x1="0" y1="0" x2="0" y2="1">
@@ -35,7 +35,7 @@
 
   <text x="66" y="164" font-size="13.5" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">wasmagent-js</text>
   <text x="66" y="182" font-size="10" font-weight="700" fill="#1d4ed8" letter-spacing="0.8">RUNTIME</text>
-  <text x="66" y="199" font-size="10" fill="#475569">WASM kernels · MCP gateway</text>
+  <text x="66" y="199" font-size="10" fill="#475569">WASM kernels · MCP gateway · mcp-posture</text>
   <text x="66" y="213" font-size="10" fill="#475569">AEP emitter · where evidence is born</text>
 
   <text x="300" y="164" font-size="13.5" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">wasmagent-protocol</text>
@@ -48,10 +48,10 @@
   <text x="534" y="199" font-size="10" fill="#475569">cel-go · wazero sandbox · Z3 SMT</text>
   <text x="534" y="213" font-size="10" fill="#475569">proving it ran correctly</text>
 
-  <text x="768" y="164" font-size="13.5" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">agent-trust-infra</text>
-  <text x="768" y="182" font-size="10" font-weight="700" fill="#1d4ed8" letter-spacing="0.8">TRUST &amp; COMPLIANCE</text>
-  <text x="768" y="199" font-size="10" fill="#475569">AgentBOM · MCP Posture · Passport</text>
-  <text x="768" y="213" font-size="10" fill="#475569">EU AI Act Annex IV · 2026-08-02</text>
+  <text x="768" y="164" font-size="13.5" font-weight="700" fill="#0f172a" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace">agentbom</text>
+  <text x="768" y="182" font-size="10" font-weight="700" fill="#1d4ed8" letter-spacing="0.8">TRUST &amp; BOM TOOLING</text>
+  <text x="768" y="199" font-size="10" fill="#475569">agentbom-core/cli · AgentBOM validator</text>
+  <text x="768" y="213" font-size="9.5" fill="#64748b">↳ migrated from agent-trust-infra (archived)</text>
 
   <!-- planned wasmagent-py note -->
   <text x="52" y="234" font-size="9.5" fill="#64748b">📋 planned: <tspan font-family="ui-monospace,Menlo,monospace" fill="#475569">wasmagent-py</tspan> — Python runtime sibling, same AEP schema · AEP is the connective standard across Core</text>
@@ -144,5 +144,5 @@
   <rect x="30" y="782" width="980" height="88" rx="14" fill="#0f172a"/>
   <text x="52" y="812" font-size="11" font-weight="700" fill="#93c5fd" letter-spacing="1.5">WASMAGENT PLATFORM</text>
   <text x="52" y="836" font-size="14" font-weight="700" fill="#ffffff">Open infrastructure for provable AI agents</text>
-  <text x="52" y="856" font-size="10.5" fill="#cbd5e1">Runtime emits signed evidence → symkernel verifies → agent-trust-infra proves compliance → github.com/WasmAgent</text>
+  <text x="52" y="856" font-size="10.5" fill="#cbd5e1">Runtime emits signed evidence → symkernel verifies → agentbom validates BOM &amp; compliance → github.com/WasmAgent</text>
 </svg>
