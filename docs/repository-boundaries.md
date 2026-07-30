@@ -15,7 +15,7 @@ For per-repo maturity see `docs/maturity-matrix.md`.
 | **Tier 0** — Governance | `.github` | Org portal, Golden Path, ledgers, governance docs |
 | **Tier 1** — Core product | `wasmagent-js`, `open-agent-audit`, `trace-pipeline` | Runtime, audit, admission |
 | **Tier 2** — Reference workload | `bscode` | Real coding workload, Golden Path fixture producer |
-| **Tier 3** — Specification incubator | `agent-trust-infra` | AgentBOM, MCP Posture specs |
+| **Tier 3** — Trust BOM tooling | `agentbom` | AgentBOM validator, compliance checker, MCP Posture, CLI |
 | **Tier 4** — Research | `fresharena` | Dynamic evaluation protocol |
 | **Infrastructure** | `wasmagent-proxy`, `symkernel`, `wasmagent-train-replay` | Gateway evidence, verification, training audit |
 
@@ -29,7 +29,7 @@ The org is organized as a tree (Core → Official tooling → Evidence surfaces
 → Research → Product/Apps), captured by the `focus` field:
 
 - **⭐ Core** — `wasmagent-js`, `wasmagent-protocol`, `symkernel`,
-  `agent-trust-infra`, and planned `wasmagent-py`. Runtime, protocol,
+  `agentbom`, and planned `wasmagent-py`. Runtime, protocol,
   verification, trust. Sustained investment; these define the org's identity.
 - **🛠 Official tooling** — CLI, devtools, examples. Planned; reserved in the
   tree, no public repos yet.

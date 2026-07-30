@@ -4,7 +4,7 @@ Canonical ownership of all cross-repository schemas, protocols, and trust artifa
 Update this file when ownership changes. This is the authoritative reference —
 individual repo CLAUDE.md files should agree with this table.
 
-Last updated: 2026-07-27
+Last updated: 2026-07-30
 
 ## Single source of truth
 
@@ -34,9 +34,9 @@ but the schema JSON itself lives only in `wasmagent-protocol`.
 | `TaskSpec` (`task-spec`) | `wasmagent-protocol` | `compliance/v1` | `wasmagent-js` | `wasmagent-js`, `trace-pipeline` |
 | `ComplianceEvalRecord` (`compliance-eval-record`) | `wasmagent-protocol` | `compliance-eval-record/v1` | `wasmagent-js` | `wasmagent-js`, `trace-pipeline` |
 | Rollout wire format (`rollout-wire`) | `wasmagent-protocol` | `rollout-wire/v1` | `wasmagent-js` | `wasmagent-js`, `trace-pipeline` |
-| AgentBOM (`agentbom`) | `wasmagent-protocol` | `agentbom/v0.1` | `agent-trust-infra` | `agent-trust-infra`, `open-agent-audit` |
-| MCP Posture (`mcp-posture`) | `wasmagent-protocol` | `mcp-posture/v0.1` | `agent-trust-infra` | `agent-trust-infra`, `open-agent-audit` |
-| Trust Passport (`trust-passport`) | `wasmagent-protocol` | `trust-passport/v0.1` | `open-agent-audit` | `agent-trust-infra`, `open-agent-audit` |
+| AgentBOM (`agentbom`) | `wasmagent-protocol` | `agentbom/v0.1` | `agentbom` | `agentbom`, `open-agent-audit`, `wasmagent-js` |
+| MCP Posture (`mcp-posture`) | `wasmagent-protocol` | `mcp-posture/v0.1` | `agentbom` | `agentbom`, `wasmagent-js`, `open-agent-audit` |
+| Trust Passport (`trust-passport`) | `wasmagent-protocol` | `trust-passport/v0.1` | `open-agent-audit` | `agentbom`, `open-agent-audit` |
 
 ### Repo-local schemas (single consumer — intentionally NOT centralized)
 
@@ -77,5 +77,5 @@ If any of these gains a second org consumer, it must be promoted into
    propose it upstream in `wasmagent-protocol`.
 4. Any new cross-repo schema requires promotion into `wasmagent-protocol` and an entry in
    this table before the second consumer merges.
-5. `agent-trust-infra` `specs/trust-passport/` is **frozen** — consume the canonical
+5. `agent-trust-infra` was **archived 2026-07-29**; its successor is `agentbom`. Consume the canonical
    `trust-passport` schema from `@wasmagent/protocol` instead.
