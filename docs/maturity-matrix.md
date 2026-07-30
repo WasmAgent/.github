@@ -3,7 +3,7 @@
 Per-repo maturity, contract stability, and intended use.
 Mirrors the status blocks in each repo's README. Update both when status changes.
 
-Last updated: 2026-07-21
+Last updated: 2026-07-30
 
 | Repository | Status | Contract stability | Recommended for | Not recommended for |
 |---|---|---|---|---|
@@ -11,7 +11,7 @@ Last updated: 2026-07-21
 | `open-agent-audit` | Beta | Stable (`schema`, `core`, `adapters`); Evolving (`passport`) | Enterprise audit trail, regulatory compliance evidence | Self-certified compliance without independent review |
 | `trace-pipeline` | Experimental | Evolving | AEP validation, training-data admission, benchmark contamination audit | General observability platform; training framework |
 | `bscode` | Reference Workload | Stable (evidence export API); Evolving (bench-v0 task set) | Golden Path integration testing; AEP evidence generation | Cursor/Claude Code replacement; general coding IDE |
-| `agent-trust-infra` | Research Preview | Evolving | AgentBOM/MCP Posture spec implementers, conformance testing | Production deployments; Trust Passport (migrated to open-agent-audit) |
+| `agentbom` | Beta | Stable (`core`, `agentbom-cli`); Evolving (`autogen`, `langchain`, `llamaindex`) | AgentBOM generation, MCP Posture spec implementation, compliance checking, trust passport signing | Direct replacement for agent-trust-infra (archived) |
 | `fresharena` | Research | Evolving | Solver rank-comparison experiments; dynamic evaluation research | Production compliance reporting; substitute for open-agent-audit |
 | `wasmagent-proxy` | Experimental | Evolving | Gateway-level AEP evidence; Envoy/Istio/Kong sidecar | Endpoint-local MCP servers; general gateway RBAC/routing |
 | `wasmagent-train-replay` | Experimental | Evolving | Distributed training audit; tamper-evident epoch evidence | General PyTorch profiling (use `fr_trace`); real-time monitoring |
