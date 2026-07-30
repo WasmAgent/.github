@@ -44,7 +44,7 @@ Tracked in: WasmAgent/.github issue [#103](https://github.com/WasmAgent/.github/
 | Audit | `open-agent-audit` | `@openagentaudit/core` — verifies AEP, generates report |
 | Admit | `trace-pipeline` | `evomerge admission-gate` — admission decision |
 | Workload | `bscode` | `fixtures/bench-v0/` — safe and malicious call fixtures |
-| Specs (optional) | `agent-trust-infra` | conformance fixtures |
+| Specs (optional) | `agentbom` | MCP Posture conformance fixtures (replaces archived agent-trust-infra) |
 | Evaluation (optional) | `fresharena` | evaluation scenario |
 
 ## Files
