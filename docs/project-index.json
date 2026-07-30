@@ -165,17 +165,6 @@
       "focus": "internal"
     },
     {
-      "name": "erp-agent",
-      "category": "workload",
-      "role": "Workload (planned)",
-      "status": "planned",
-      "visibility": "public",
-      "in_profile": false,
-      "summary": "Planned ERP-domain workload with order-state and ledger verifiers, mirroring the role bscode plays for coding tasks. Note: the runnable ERP-flavoured demo now lives in agent-golden-path (a procurement copilot); this entry specifically tracks the order-state/ledger verifier fixtures for symkernel, not a general ERP app.",
-      "url": "https://github.com/WasmAgent/erp-agent",
-      "focus": "planned-workload"
-    },
-    {
       "name": "symkernel",
       "category": "verification",
       "role": "Symbolic verification kernel",

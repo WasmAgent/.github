@@ -71,8 +71,10 @@ The machine-readable `focus` field in
 
 - ✅ `bscode` — coding-agent workload on Cloudflare Workers with AEP evidence
   export, deny capabilities, output taint labels, and RolloutProvenance.
-- 📋 `erp-agent` — ERP-domain workload with order-state and ledger verifiers,
-  mirroring the role `bscode` plays for coding tasks.
+- ✅ `agent-golden-path` — ERP-domain (procurement) reference workload: a
+  runnable copilot that mirrors the role `bscode` plays for coding tasks and
+  proves the full provable-agent chain end to end. Supersedes the planned
+  `erp-agent` (RFC-0001).
 
 ### Evidence pipelines ✅
 
@@ -125,7 +127,6 @@ The machine-readable `focus` field in
 - 🚧 Ingestion adapters: OpenTelemetry GenAI (field-level AEP↔OTel GenAI
   mapping landed in `wasmagent-protocol/docs/AEP-OTEL-MAPPING.md`; adapter
   code pending), Langfuse, LangSmith.
-- 📋 `erp-agent` public repository.
 - 📋 `wasmagent-py` Python runtime and symkernel adapter.
 - 📋 Cross-repo coherence patrol: org repo list ↔ profile README ↔
   cross-repo URLs ↔ roadmap completion.

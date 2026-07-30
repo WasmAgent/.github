@@ -2,7 +2,7 @@
 
 | Field | Value |
 |-------|-------|
-| Status | Draft |
+| Status | Superseded — fulfilled by `agent-golden-path` (procurement reference workload, shipped 2026-07-30) |
 | Author | @telleroutlook |
 | Created | 2025-01-01 |
 | Discussion | [wasmagent-js#8](https://github.com/WasmAgent/wasmagent-js/issues/8) |
