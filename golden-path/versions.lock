@@ -7,6 +7,6 @@ repositories:
   open-agent-audit: latest
   trace-pipeline: latest
   bscode: latest
-  agent-trust-infra: latest   # optional: conformance fixtures only
+  agentbom: latest             # optional: MCP Posture conformance fixtures (replaces archived agent-trust-infra)
 
 # Last verified: not yet verified — scaffold only
