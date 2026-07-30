@@ -1,26 +1,33 @@
-# WasmAgent — The Trusted Agent OS
+# WasmAgent — Open infrastructure for provable AI agents
 
 > The industry's focus is shifting from *"can the agent do the task?"* to *"can the agent run reliably, at scale, over time?"* We believe that is still not enough. The real question is: **"can you prove the agent ran correctly?"**
 >
-> WasmAgent is building the infrastructure layer for that — a Trusted Agent OS: runtime isolation, protocol-level interception, symbolic verification, tamper-evident evidence, and regulatory compliance, composable as open infrastructure rather than a single product.
+> WasmAgent is **open infrastructure for _provable_ AI agents** — the layer that turns agent execution into signed, verifiable, auditable evidence: runtime isolation, protocol-level interception, symbolic verification, tamper-evident evidence, and regulatory compliance, composable rather than a single product.
 >
 > Parts of this vision are shipping today. Parts are in active development. The table below is honest about which is which.
 
 
 ## Golden Path
 
-The fastest way to see WasmAgent's trust loop end-to-end:
+The fastest way to see the provable-agent stack run end-to-end is the
+**[`agent-golden-path`](https://github.com/WasmAgent/agent-golden-path)** reference
+app (public, MIT) — a runnable procurement copilot that wires every layer together:
 
 ```bash
-git clone https://github.com/WasmAgent/.github
-cd .github/golden-path
-./scripts/demo.sh
+git clone https://github.com/WasmAgent/agent-golden-path
+cd agent-golden-path
+bun install && bun test        # end-to-end chain test, no live LLM required
 ```
 
-This runs `Protect → Record → Audit → Admit` across all core repos.
-See [`golden-path/README.md`](../golden-path/README.md) for details.
+It proves the full chain in one app: agent execution → tool admission
+(`mcp-firewall`) → compliance verification → signed **AEP** evidence → audit
+report + trust passport (`open-agent-audit`). This is the canonical reference the
+rest of the ecosystem points to.
 
-> **Status:** scaffolded — not yet runnable. Track progress via the [issue tracker](https://github.com/WasmAgent/.github/issues?q=is%3Aissue+golden-path).
+> There is also an org-level cross-repo integration harness in
+> [`golden-path/`](../golden-path/) (`Protect → Record → Audit → Admit`, one step
+> per core repo). It is the multi-repo contract acceptance line and is still a
+> work in progress — for a runnable demo, use `agent-golden-path` above.
 
 ## Projects
 
