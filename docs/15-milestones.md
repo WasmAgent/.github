@@ -2,10 +2,10 @@
 
 ## Milestone 1 — Trust Artifact Reference Implementations
 
-- [ ] `agent-trust-infra/`: Ship reference implementation for all three artifact types (AgentBOM, MCP Posture, Trust Passport)
-- [ ] `agent-trust-infra/cli`: CLI emits valid AgentBOM JSON for any agent run (`agent-trust-cli --run-id <id> --output agentbom.json`)
-- [ ] `agent-trust-infra/`: MCP Posture verification passes against sample agent manifest (`verify-posture --manifest examples/manifest.yaml`)
-- [ ] `agent-trust-infra/`: Trust Passport export includes signed AEP events (`passport export --format json --include-aep`)
+- [ ] `agentbom/`: Ship reference implementation for all three artifact types (AgentBOM, MCP Posture, Trust Passport)
+- [ ] `agentbom/cli`: CLI emits valid AgentBOM JSON for any agent run (`agentbom --run-id <id> --output agentbom.json`)
+- [ ] `agentbom/`: MCP Posture verification passes against sample agent manifest (`verify-posture --manifest examples/manifest.yaml`)
+- [ ] `agentbom/`: Trust Passport export includes signed AEP events (`passport export --format json --include-aep`)
 - [ ] `docs/`: Publish trust artifact spec docs with JSON schema validation (`docs/trust-artifacts.md` with embedded schema)
 - [ ] `tests/`: Integration test suite passes for all three artifact types (`npm run test:trust-artifacts`)
 
@@ -44,7 +44,7 @@
 - [ ] `healthcare-agent/`: Healthcare domain workload lands with HIPAA-compliant evidence collection and PHI-audit trails
 - [ ] `devops-agent/`: DevOps domain workload with deployment verification and infrastructure-as-code evidence capture
 - [ ] `finance-agent/`: Finance domain workload with SOX compliance controls and transaction-replay verification
-- [ ] `agent-trust-infra/`: Trust propagation protocol enables artifact chaining across domain boundaries (AgentBOM → AgentBOM)
+- [ ] `agentbom/`: Trust propagation protocol enables artifact chaining across domain boundaries (AgentBOM → AgentBOM)
 - [ ] `wasmagent-ops/`: Continuous verification daemon monitors running agents and alerts on trust-policy violations
 - [ ] `docs/`: Domain workload authoring guide with templates for new vertical-specific agents and verifier patterns
 - [ ] `wasmagent-js/`: Policy-as-code framework enables declarative trust rules (e.g., "require AEP events for all data mutations")

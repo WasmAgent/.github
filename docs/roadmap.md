@@ -20,12 +20,13 @@ maturity tiers in
 [`repository-boundaries.md`](repository-boundaries.md):
 
 - **⭐ Core** (`wasmagent-js`, `wasmagent-protocol`, `symkernel`,
-  `agent-trust-infra`, and the planned `wasmagent-py`) — runtime, protocol,
+  `agentbom`, and the planned `wasmagent-py`) — runtime, protocol,
   verification, and trust artifacts. Sustained long-term investment. AEP is
   their connective standard, sedimented from the shipping runtime and now
   versioned in `wasmagent-protocol`.
-- **🛠 Official tooling** — CLI, devtools, examples, starters. Planned; no
-  public repos yet. The tree reserves a home for them.
+- **🛠 Official tooling** — CLI, devtools, examples, starters. Landing:
+  `@wasmagent/agentbom-cli` (in `agentbom`) and `agent-golden-path` (the
+  runnable provable-stack reference app) are public; more devtools planned.
 - **🔌 Evidence surfaces** (`wasmagent-proxy`, `trace-pipeline`,
   `wasmagent-train-replay`) — extend Core to specific surfaces. Once their
   roadmaps land they move to **community maintenance**; not retired — code and
@@ -61,7 +62,10 @@ The machine-readable `focus` field in
 - 🚧 `symkernel` — Go symbolic verification backend: cel-go lightweight rules,
   wazero Wasm sandbox hard-isolation, Z3 SMT satisfiability proofs. OPA-style
   HTTP service; consumed by wasmagent-js (CelGoVerifier / Z3Verifier) and
-  future wasmagent-py via a thin adapter. Deploys on Cloudflare Containers.
+  future wasmagent-py via a thin adapter. Now imports **OPA Rego and AWS Cedar
+  policies** (translated to CEL, fail-closed — `internal/policyimport`),
+  positioning symkernel as a Z3-proof backend for existing policy languages.
+  Deploys on Cloudflare Containers.
 
 ### Workloads ✅
 
@@ -82,8 +86,11 @@ The machine-readable `focus` field in
 
 ### Trust artifacts ✅
 
-- ✅ `agent-trust-infra` — AgentBOM, MCP Posture, and Trust Passport: spec,
-  reference implementation, and CLI.
+- ✅ `agentbom` — AgentBOM, MCP Posture, and Trust Passport tooling:
+  `@wasmagent/agentbom-core` (validator, compliance checker, BOM diff/drift)
+  and `@wasmagent/agentbom-cli`. **Successor to `agent-trust-infra` (archived
+  2026-07-29)**; the library packages and CLI now live here. Trust Passport /
+  AgentBOM canonical schema → `wasmagent-protocol`.
 - 🚧 EU AI Act Annex IV compliance mapping — draft covers 20/29 Annex IV
   sub-items; deadline 2026-08-02 (Article 11 effective for high-risk AI).
 
@@ -115,7 +122,9 @@ The machine-readable `focus` field in
 
 ## Cross-cutting (planned)
 
-- 📋 Ingestion adapters: OpenTelemetry GenAI, Langfuse, LangSmith.
+- 🚧 Ingestion adapters: OpenTelemetry GenAI (field-level AEP↔OTel GenAI
+  mapping landed in `wasmagent-protocol/docs/AEP-OTEL-MAPPING.md`; adapter
+  code pending), Langfuse, LangSmith.
 - 📋 `erp-agent` public repository.
 - 📋 `wasmagent-py` Python runtime and symkernel adapter.
 - 📋 Cross-repo coherence patrol: org repo list ↔ profile README ↔

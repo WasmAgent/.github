@@ -33,9 +33,11 @@ Ingests AEP traces, applies paired-statistics checks as an evidence
 admission gate for training data, and records every training run as
 auditable evidence.
 
-### Trust artifacts — `agent-trust-infra`
+### Trust artifacts — `agentbom`
 
-Layers machine-readable identity and policy posture onto each run:
+Layers machine-readable identity and policy posture onto each run
+(`@wasmagent/agentbom-core` + `@wasmagent/agentbom-cli`; successor to the
+archived `agent-trust-infra`):
 
 - **AgentBOM** — bill of materials for an agent (model, tools, dependencies).
 - **MCP Posture** — declared and observed MCP surface and capabilities.
@@ -147,11 +149,11 @@ graph TB
 - **Evidence Store** — Immutable storage for admitted traces
 - **Training Evidence Index** — Queryable index of auditable training data
 
-### Trust artifacts layer — `agent-trust-infra`
+### Trust artifacts layer — `agentbom`
 
 ```mermaid
 graph TB
-    subgraph agent_trust_infra["agent-trust-infra"]
+    subgraph agentbom["agentbom"]
         BOM[AgentBOM Generator]
         Posture[MCP Posture Analyzer]
         Passport[Trust Passport Generator]
@@ -171,7 +173,7 @@ graph TB
 
     Artifacts[Trust Artifacts] --> Schema
 
-    style agent_trust_infra fill:#f3e5f5
+    style agentbom fill:#f3e5f5
     style Artifacts fill:#fff4e6
 ```
 
@@ -273,6 +275,6 @@ graph TB
 1. `wasmagent-js` protects a run and emits AEP events.
 2. Workloads such as `bscode` produce verifiable runtime traces.
 3. `trace-pipeline` admits and stores those traces as evidence.
-4. `agent-trust-infra` attaches AgentBOM, MCP Posture, and Trust Passport.
+4. `agentbom` attaches AgentBOM, MCP Posture, and Trust Passport.
 5. `open-agent-audit` renders the chain into audit reports.
 6. `fresharena` evaluates agents adversarially; results re-enter step 3.
