@@ -98,6 +98,17 @@
       "focus": "reference-workload"
     },
     {
+      "name": "agent-golden-path",
+      "category": "workload",
+      "role": "Reference workload (Golden Path)",
+      "status": "shipped",
+      "visibility": "public",
+      "in_profile": true,
+      "summary": "Canonical runnable Golden Path: a procurement copilot that wires the full provable-agent stack end to end (agent execution -> mcp-firewall tool admission -> compliance verification -> signed AEP evidence -> open-agent-audit report + trust passport). `bun install && bun test` proves the chain with no live LLM.",
+      "url": "https://github.com/WasmAgent/agent-golden-path",
+      "focus": "reference-workload"
+    },
+    {
       "name": "trace-pipeline",
       "category": "evidence-pipeline",
       "role": "Evidence pipeline",
@@ -160,7 +171,7 @@
       "status": "planned",
       "visibility": "public",
       "in_profile": false,
-      "summary": "Planned ERP-domain workload with order-state and ledger verifiers, mirroring the role bscode plays for coding tasks.",
+      "summary": "Planned ERP-domain workload with order-state and ledger verifiers, mirroring the role bscode plays for coding tasks. Note: the runnable ERP-flavoured demo now lives in agent-golden-path (a procurement copilot); this entry specifically tracks the order-state/ledger verifier fixtures for symkernel, not a general ERP app.",
       "url": "https://github.com/WasmAgent/erp-agent",
       "focus": "planned-workload"
     },

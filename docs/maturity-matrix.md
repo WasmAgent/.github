@@ -16,6 +16,7 @@ Last updated: 2026-07-30
 | `wasmagent-proxy` | Experimental | Evolving | Gateway-level AEP evidence; Envoy/Istio/Kong sidecar | Endpoint-local MCP servers; general gateway RBAC/routing |
 | `wasmagent-train-replay` | Experimental | Evolving | Distributed training audit; tamper-evident epoch evidence | General PyTorch profiling (use `fr_trace`); real-time monitoring |
 | `symkernel` | Experimental | Unstable | WasmAgent-ecosystem CEL/wazero/Z3 verification | Standalone production policy engine |
+| `agent-golden-path` | Reference Workload | Stable (end-to-end chain test) | Golden Path integration testing; runnable provable-agent stack demo | General procurement product; SAP-specific integration (see internal procureiq) |
 | `.github` | Active | Stable (ledgers, assets); Evolving (Golden Path) | Org navigation, cross-repo integration testing, governance | Product-specific runtime code |
 
 ## Status definitions

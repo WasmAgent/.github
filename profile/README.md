@@ -98,6 +98,7 @@ The commercial audit surface, the reference workload, and this portal.
 | --- | --- |
 | [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | **Audit product** · Enterprise audit product with AEP adapter; deployed at [trustavo.com](https://trustavo.com) |
 | [bscode](https://github.com/WasmAgent/bscode) | **Reference workload** · Coding-agent workload on Cloudflare Workers — AEP evidence export, deny capabilities, output taint labels, RolloutProvenance |
+| [agent-golden-path](https://github.com/WasmAgent/agent-golden-path) | **Reference workload** · Runnable Golden Path — a procurement copilot proving the full chain end to end: agent execution → `mcp-firewall` tool admission → compliance → signed **AEP** evidence → `open-agent-audit` report + trust passport. `bun install && bun test`, no live LLM. |
 | [`.github`](https://github.com/WasmAgent/.github) | **Org hub** · Organization portal — roadmap, claims registry, release ledger, project index, and cross-repo documentation |
 
 ### 🎮 Apps
