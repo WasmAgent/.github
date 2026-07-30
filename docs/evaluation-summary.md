@@ -21,7 +21,7 @@ and re-usable.
   AEP evidence into `trace-pipeline`.
 - `trace-pipeline` — admits evaluation runs as evidence and records them in
   the training-audit log.
-- `agent-trust-infra` — attaches AgentBOM, MCP Posture, and Trust Passport to
+- `agentbom` — attaches AgentBOM, MCP Posture, and Trust Passport to
   each evaluated run so results bind to a specific, reproducible
   configuration.
 
@@ -29,5 +29,5 @@ and re-usable.
 
 Evaluation results are not a leaderboard endpoint. They re-enter the evidence
 chain, where they inform training-data admission (`trace-pipeline`), audit
-reporting (`open-agent-audit`), and trust posture (`agent-trust-infra`). This
+reporting (`open-agent-audit`), and trust posture (`agentbom`). This
 keeps the runtime, evidence, and audit story grounded in measured behavior.

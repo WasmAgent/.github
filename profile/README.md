@@ -52,7 +52,7 @@ platform's identity.
 | --- | --- |
 | [wasmagent-js](https://github.com/WasmAgent/wasmagent-js) | **Runtime** · Embedded agent runtime v1.x — WASM kernels (QuickJS, Pyodide, Wasmtime, Remote), MCP gateway + attestation, AEP emitter, capability manifests; `@wasmagent/mcp-posture` (migrated from `agent-trust-infra`), `@wasmagent/mcp-firewall`; adapters for A2A, AG-UI, AI SDK, and Claude Agent SDK. This is where signed evidence is born. |
 | [wasmagent-protocol](https://github.com/WasmAgent/wasmagent-protocol) | **Protocol** · Canonical AEP + compliance JSON Schemas — the single source of truth every repo agrees on. Published as `@wasmagent/protocol` (npm) and `wasmagent-protocol` (PyPI). |
-| [symkernel](https://github.com/WasmAgent/symkernel) | **Verification** 🚧 · Go symbolic verification backend — cel-go lightweight rules, wazero Wasm sandbox hard-isolation, Z3 SMT proofs; HTTP service consumed by wasmagent-js and wasmagent-py. "Proving it ran correctly" is the mission itself. |
+| [symkernel](https://github.com/WasmAgent/symkernel) | **Verification** 🚧 · Go symbolic verification backend — cel-go lightweight rules, wazero Wasm sandbox hard-isolation, Z3 SMT proofs; imports OPA Rego / AWS Cedar policies (translated to CEL, fail-closed) so existing policies gain formal proof. HTTP service consumed by wasmagent-js and wasmagent-py. "Proving it ran correctly" is the mission itself. |
 | [agentbom](https://github.com/WasmAgent/agentbom) | **Trust & BOM tooling** · `@wasmagent/agentbom-core`, `@wasmagent/agentbom-cli` — Agent Bill of Materials, validator, compliance checker, CLI tools. Migrated from `agent-trust-infra` (now archived). Trust Passport spec → [wasmagent-protocol](https://github.com/WasmAgent/wasmagent-protocol). |
 
 > **`wasmagent-py`** *(planned)* joins Core as the Python runtime sibling — same
@@ -111,15 +111,15 @@ The broader industry is converging on *Agent Runtime / Agent OS* as the next inf
 
 **Reliability is necessary but not sufficient.** An agent that runs stably but whose behavior cannot be verified, audited, or proven correct is not ready for production systems, regulated industries, or multi-agent trust chains. The gap between "it finished" and "it did the right thing" is exactly where WasmAgent operates.
 
-The Trusted Agent OS adds three layers that a plain Agent Runtime omits:
+Provable AI agents rest on three layers that a plain Agent Runtime omits:
 
 | Layer | What it solves | Status |
 | --- | --- | --- |
-| **Provable correctness** | `symkernel` — cel-go rules, wazero hard-isolation, Z3 SMT proofs | 🚧 in progress |
+| **Provable correctness** | `symkernel` — cel-go rules, wazero hard-isolation, Z3 SMT proofs; imports OPA Rego / AWS Cedar policies (fail-closed) so existing policies gain formal proof | 🚧 in progress |
 | **Tamper-evident evidence** | AEP (Agent Evidence Protocol) — Ed25519-signed behavioral records at gateway and runtime | shipping in `wasmagent-js` v1.x |
-| **Regulatory compliance** | EU AI Act Annex IV mapping, OWASP Agentic Top 10, NIST AI RMF | draft in `agent-trust-infra` |
+| **Regulatory compliance** | EU AI Act Annex IV mapping, OWASP Agentic Top 10, NIST AI RMF | draft in `agentbom` |
 
-The analogy: if Agent Runtime is Kubernetes (run things reliably at scale), the Trusted Agent OS is Kubernetes + audit logging + policy enforcement + compliance reporting — composable, open, and infrastructure-grade.
+Put plainly: a plain Agent Runtime runs things reliably at scale; open infrastructure for *provable* AI agents adds the proof, signed evidence, and compliance mapping on top — composable, open, and infrastructure-grade.
 
 ## Architecture
 
