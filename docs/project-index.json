@@ -3,7 +3,7 @@
   "org": "WasmAgent",
   "description": "Machine-readable source of truth for the WasmAgent project index. Lists every repository in the organization with its category, role, status, and visibility. Consumed by the org profile (profile/README.md project table) and the living roadmap (docs/roadmap.md) so the public project matrix is rendered from a single registry instead of maintained by hand, preventing omissions. Each repo also carries a `focus` field (see focus_legend) marking its place relative to the core spine and its long-term lifecycle.",
   "source_url": "https://github.com/WasmAgent/.github/blob/main/docs/project-index.json",
-  "last_reviewed": "2026-07-30",
+  "last_reviewed": "2026-08-01",
   "consumers": [
     "profile/README.md — Projects table",
     "docs/roadmap.md — project layers"
@@ -19,6 +19,7 @@
     "adjacent": "Extends the spine to a surface; moves to community maintenance once its roadmap lands.",
     "product": "Commercial product surface downstream of the spine.",
     "research": "Research project; results and interfaces may change.",
+    "research-preview": "Research / Preview stage: no stable API, no published package, limited external usability; interfaces change without notice.",
     "reference-workload": "Reference workload / Golden Path fixture producer, not a general product.",
     "org-hub": "Org portal and governance.",
     "internal": "Internal automation or operations; ships no public product.",
@@ -171,9 +172,9 @@
       "status": "in_progress",
       "visibility": "public",
       "in_profile": true,
-      "summary": "Go-based symbolic verification backend for the WasmAgent ecosystem: cel-go lightweight rules, wazero Wasm sandbox hard-isolation, Z3 SMT satisfiability proofs. HTTP service with OPA-style request/response envelope; language-agnostic — consumed by wasmagent-js and future wasmagent-py via a thin adapter.",
+      "summary": "Go-based symbolic verification backend for the WasmAgent ecosystem: cel-go lightweight rules, wazero Wasm sandbox hard-isolation, Z3 SMT satisfiability proofs. HTTP service with OPA-style request/response envelope; language-agnostic — consumed by wasmagent-js and future wasmagent-py via a thin adapter. Research / Preview stage: no stable API, no published package, interfaces change without notice.",
       "url": "https://github.com/WasmAgent/symkernel",
-      "focus": "core-spine"
+      "focus": "research-preview"
     },
     {
       "name": "wasmagent-proxy",
@@ -193,9 +194,9 @@
       "status": "in_progress",
       "visibility": "public",
       "in_profile": true,
-      "summary": "Causal evidence layer for distributed GPU training: reads PyTorch Flight Recorder dumps, builds cross-rank PROV-DM provenance graphs, records Ed25519-signed EpochEvidenceBundles, and supports deterministic replay and tensor-origin tracing. Shares AEP schema and RecordingMode semantics with wasmagent-js.",
+      "summary": "Causal evidence layer for distributed GPU training: reads PyTorch Flight Recorder dumps, builds cross-rank PROV-DM provenance graphs, records Ed25519-signed EpochEvidenceBundles, and supports deterministic replay and tensor-origin tracing. Shares AEP schema and RecordingMode semantics with wasmagent-js. Research / Preview stage: no stable API, no published package, interfaces change without notice.",
       "url": "https://github.com/WasmAgent/wasmagent-train-replay",
-      "focus": "adjacent"
+      "focus": "research-preview"
     },
     {
       "name": "wasmagent-py",

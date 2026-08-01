@@ -35,8 +35,10 @@ WasmAgent is **open infrastructure for _provable_ AI agents** — not another
 agent framework. The mission answers one question end-to-end: *can you prove the
 agent ran correctly?* The organization is a **tree**, not a flat list: a **Core**
 spine, the **Official tooling** and **Apps** that will grow around it, the
-**Research** that feeds it, and the **evidence surfaces** that extend it. A
-first-time visitor should tell the mission from its supporting cast at a glance.
+**Research / Preview** that feeds it, and the **evidence surfaces** that extend
+it. A first-time visitor should tell the mission from its supporting cast at a
+glance — Core repos are actively maintained with stable APIs; Research / Preview
+repos are research-stage with no stable API or published package.
 
 This section is the human-readable view of
 [`docs/project-index.json`](../docs/project-index.json), the machine-readable
@@ -52,7 +54,6 @@ platform's identity.
 | --- | --- |
 | [wasmagent-js](https://github.com/WasmAgent/wasmagent-js) | **Runtime** · Embedded agent runtime v1.x — WASM kernels (QuickJS, Pyodide, Wasmtime, Remote), MCP gateway + attestation, AEP emitter, capability manifests; `@wasmagent/mcp-posture` (migrated from `agent-trust-infra`), `@wasmagent/mcp-firewall`; adapters for A2A, AG-UI, AI SDK, and Claude Agent SDK. This is where signed evidence is born. |
 | [wasmagent-protocol](https://github.com/WasmAgent/wasmagent-protocol) | **Protocol** · Canonical AEP + compliance JSON Schemas — the single source of truth every repo agrees on. Published as `@wasmagent/protocol` (npm) and `wasmagent-protocol` (PyPI). |
-| [symkernel](https://github.com/WasmAgent/symkernel) | **Verification** 🚧 · Go symbolic verification backend — cel-go lightweight rules, wazero Wasm sandbox hard-isolation, Z3 SMT proofs; imports OPA Rego / AWS Cedar policies (translated to CEL, fail-closed) so existing policies gain formal proof. HTTP service consumed by wasmagent-js and wasmagent-py. "Proving it ran correctly" is the mission itself. |
 | [agentbom](https://github.com/WasmAgent/agentbom) | **Trust & BOM tooling** · `@wasmagent/agentbom-core`, `@wasmagent/agentbom-cli` — Agent Bill of Materials, validator, compliance checker, CLI tools. Migrated from `agent-trust-infra` (now archived). Trust Passport spec → [wasmagent-protocol](https://github.com/WasmAgent/wasmagent-protocol). |
 
 > **`wasmagent-py`** *(planned)* joins Core as the Python runtime sibling — same
@@ -71,24 +72,26 @@ them rather than scattering them later.
 
 ### 🔌 Evidence surfaces — maturing, then handed to the community
 
-These extend Core to a specific surface (gateway, training, pipeline). Once
-their roadmaps land they move to **community maintenance** — not retired; code,
+These extend Core to a specific surface (gateway, pipeline). Once their
+roadmaps land they move to **community maintenance** — not retired; code,
 schemas, and history stay put.
 
 | Repository | Role |
 | --- | --- |
 | [wasmagent-proxy](https://github.com/WasmAgent/wasmagent-proxy) | **Gateway** 🚧 · Proxy-Wasm (Rust) evidence engine for Envoy, Istio, Kong, Consul — intercepts Agent/MCP/A2A traffic, emits Ed25519-signed AEP records, joins mcp-firewall via shared trace_id |
 | [trace-pipeline](https://github.com/WasmAgent/trace-pipeline) | **Evidence pipeline** · `evomerge` — trace-to-training backend: eval_trust paired statistics, AgentTrustScore, training-data admission gate, consumes `wasmagent-protocol` |
-| [wasmagent-train-replay](https://github.com/WasmAgent/wasmagent-train-replay) | **Evidence pipeline** 🚧 · Causal evidence for distributed GPU training — cross-rank PROV-DM provenance graph, Ed25519-signed EpochEvidenceBundles, tensor-origin tracing, deterministic replay CLI |
 
-### 🧪 Research
+### 🧪 Research / Preview
 
-Grounds the platform in measured results; interfaces may change as experiments
-evolve.
+Grounds the platform in measured results and research-stage experiments.
+**Research / Preview** projects have no stable API, no published package, and
+limited external usability — interfaces change as experiments evolve.
 
 | Repository | Role |
 | --- | --- |
 | [fresharena](https://github.com/WasmAgent/fresharena) | **Evaluation** · Dynamic, verifiable, adversarial evaluation — FAEP schema, submit-then-test, Public Immunity Pool; paper in preparation |
+| [symkernel](https://github.com/WasmAgent/symkernel) | **Verification** 🚧 · Go symbolic verification backend — cel-go lightweight rules, wazero Wasm sandbox hard-isolation, Z3 SMT proofs; imports OPA Rego / AWS Cedar policies (translated to CEL, fail-closed) so existing policies gain formal proof. Research / Preview: no stable API or published package yet; consumed experimentally by wasmagent-js and wasmagent-py. |
+| [wasmagent-train-replay](https://github.com/WasmAgent/wasmagent-train-replay) | **Training evidence** 🚧 · Causal evidence for distributed GPU training — cross-rank PROV-DM provenance graph, Ed25519-signed EpochEvidenceBundles, tensor-origin tracing, deterministic replay CLI. Research / Preview: no stable API or published package yet. |
 
 ### 📦 Product, reference & hub
 
@@ -116,7 +119,7 @@ Provable AI agents rest on three layers that a plain Agent Runtime omits:
 
 | Layer | What it solves | Status |
 | --- | --- | --- |
-| **Provable correctness** | `symkernel` — cel-go rules, wazero hard-isolation, Z3 SMT proofs; imports OPA Rego / AWS Cedar policies (fail-closed) so existing policies gain formal proof | 🚧 in progress |
+| **Provable correctness** | `symkernel` — cel-go rules, wazero hard-isolation, Z3 SMT proofs; imports OPA Rego / AWS Cedar policies (fail-closed) so existing policies gain formal proof | 🚧 in progress · Research / Preview |
 | **Tamper-evident evidence** | AEP (Agent Evidence Protocol) — Ed25519-signed behavioral records at gateway and runtime | shipping in `wasmagent-js` v1.x |
 | **Regulatory compliance** | EU AI Act Annex IV mapping, OWASP Agentic Top 10, NIST AI RMF | draft in `agentbom` |
 
@@ -136,19 +139,22 @@ and emits signed AEP events that flow into verifiable runtime traces. A Python
 sibling, `wasmagent-py`, is planned and will share the same AEP schema, protocol,
 and symkernel adapter.
 
-`symkernel` backs both runtimes with symbolic verification: cel-go for lightweight
-high-frequency rule evaluation, wazero for hard-isolated Wasm sandbox execution of
-LLM-generated code, and Z3 SMT solving for combinatorial constraint proofs.
+`symkernel` (Research / Preview) backs both runtimes with symbolic verification:
+cel-go for lightweight high-frequency rule evaluation, wazero for hard-isolated
+Wasm sandbox execution of LLM-generated code, and Z3 SMT solving for combinatorial
+constraint proofs. It has no stable API or published package yet; interfaces change
+as experiments evolve.
 
 `bscode` and `fresharena` are the two live agent surfaces: coding workload and
 adversarial evaluation, both instrumented to produce AEP evidence.
 
 `trace-pipeline` (`evomerge` on PyPI) gates training-data admission with paired
 statistics and records every training run as auditable evidence. Compatible with
-`wasmagent-js` v1.x AEP schema. `wasmagent-train-replay` extends this to distributed
-GPU training jobs: it reads PyTorch Flight Recorder dumps, builds a cross-rank
-PROV-DM causal graph, and produces tamper-evident `EpochEvidenceBundle` records,
-enabling tensor-origin tracing and deterministic replay.
+`wasmagent-js` v1.x AEP schema. `wasmagent-train-replay` (Research / Preview)
+extends this to distributed GPU training jobs: it reads PyTorch Flight Recorder
+dumps, builds a cross-rank PROV-DM causal graph, and produces tamper-evident
+`EpochEvidenceBundle` records, enabling tensor-origin tracing and deterministic
+replay. It is research-stage — no stable API or published package yet.
 
 `agentbom` (`@wasmagent/agentbom-core`, `@wasmagent/agentbom-cli`) produces trust
 artifacts — Agent Bill of Materials, validator, compliance checker — giving every agent run
@@ -181,9 +187,9 @@ sustained track record.
 - **Runtime** — `wasmagent-js`, AEP, MCP gateway/attestation, capability manifests
 - **Runtime (Python)** — `wasmagent-py`, Python agent runtime and symkernel adapter
 - **Gateway** — `wasmagent-proxy`, Proxy-Wasm evidence engine (Rust, Envoy/Istio/Kong)
-- **Verification** — `symkernel`, cel-go rules, wazero sandbox, Z3 SMT integration (Go)
+- **Verification (Research / Preview)** — `symkernel`, cel-go rules, wazero sandbox, Z3 SMT integration (Go)
 - **Pipelines** — `trace-pipeline` / `evomerge` (measurement trust, admission, training audit)
-- **Training evidence** — `wasmagent-train-replay`, PyTorch Flight Recorder, PROV-DM, GPU training causal graphs
+- **Training evidence (Research / Preview)** — `wasmagent-train-replay`, PyTorch Flight Recorder, PROV-DM, GPU training causal graphs
 - **Trust tooling** — `agentbom` (`@wasmagent/agentbom-core`, `@wasmagent/agentbom-cli`; migrated from archived `agent-trust-infra`); `@wasmagent/mcp-posture` now in `wasmagent-js`; Trust Passport spec → `wasmagent-protocol`; Trust Passport product → `open-agent-audit`
 - **Audit product** — `open-agent-audit` / Trustavo (evidence reports, Cloudflare Workers)
 - **Evaluation** — `fresharena` (dynamic, verifiable, adversarial evaluation; paper preparation)
