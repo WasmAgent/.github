@@ -16,8 +16,12 @@ For per-repo maturity see `docs/maturity-matrix.md`.
 | **Tier 1** — Core product | `wasmagent-js`, `open-agent-audit`, `trace-pipeline` | Runtime, audit, admission |
 | **Tier 2** — Reference workload | `bscode` | Real coding workload, Golden Path fixture producer |
 | **Tier 3** — Trust BOM tooling | `agentbom` | AgentBOM validator, compliance checker, MCP Posture, CLI |
-| **Tier 4** — Research | `fresharena` | Dynamic evaluation protocol |
+| **Tier 4** — Research / Preview | `fresharena`, `symkernel`, `wasmagent-train-replay` | Dynamic evaluation protocol, symbolic verification, training audit — research-stage, no stable API |
 | **Infrastructure** | `wasmagent-proxy`, `symkernel`, `wasmagent-train-replay` | Gateway evidence, verification, training audit |
+
+> `symkernel` and `wasmagent-train-replay` are **Research / Preview** projects —
+> they are not Core. They have no stable API, no published package, and limited
+> external usability; interfaces change without notice.
 
 ## Focus & lifecycle
 
@@ -26,18 +30,21 @@ orthogonal axis answers *"how central is it to the mission, and what happens to
 it long-term?"* — captured by the `focus` field in `docs/project-index.json`:
 
 The org is organized as a tree (Core → Official tooling → Evidence surfaces
-→ Research → Product/Apps), captured by the `focus` field:
+→ Research / Preview → Product/Apps), captured by the `focus` field:
 
-- **⭐ Core** — `wasmagent-js`, `wasmagent-protocol`, `symkernel`,
+- **⭐ Core** — `wasmagent-js`, `wasmagent-protocol`,
   `agentbom`, and planned `wasmagent-py`. Runtime, protocol,
-  verification, trust. Sustained investment; these define the org's identity.
+  trust. Sustained investment; these define the org's identity.
 - **🛠 Official tooling** — CLI, devtools, examples. Planned; reserved in the
   tree, no public repos yet.
-- **🔌 Evidence surfaces** — `wasmagent-proxy`, `trace-pipeline`,
-  `wasmagent-train-replay`. Extend Core to a surface. Their **exit condition**
+- **🔌 Evidence surfaces** — `wasmagent-proxy`, `trace-pipeline`.
+  Extend Core to a surface. Their **exit condition**
   (per the "Adding a new repository" rule) is *roadmap complete → community
   maintenance*, not archival: code, schemas, and history stay in place.
-- **🧪 Research** — `fresharena`.
+- **🧪 Research / Preview** — `fresharena`, `symkernel`,
+  `wasmagent-train-replay`. Research-stage projects with no stable API, no
+  published package, and limited external usability; interfaces change as
+  experiments evolve.
 - **📦 Product / reference / hub** — `open-agent-audit`, `bscode`, `.github`.
 - **🎮 Apps** — playground, desktop, editor extensions. Planned.
 

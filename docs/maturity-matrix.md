@@ -3,7 +3,7 @@
 Per-repo maturity, contract stability, and intended use.
 Mirrors the status blocks in each repo's README. Update both when status changes.
 
-Last updated: 2026-07-30
+Last updated: 2026-08-01
 
 | Repository | Status | Contract stability | Recommended for | Not recommended for |
 |---|---|---|---|---|
@@ -14,8 +14,8 @@ Last updated: 2026-07-30
 | `agentbom` | Beta | Stable (`core`, `agentbom-cli`); Evolving (`autogen`, `langchain`, `llamaindex`) | AgentBOM generation, MCP Posture spec implementation, compliance checking, trust passport signing | Direct replacement for agent-trust-infra (archived) |
 | `fresharena` | Research | Evolving | Solver rank-comparison experiments; dynamic evaluation research | Production compliance reporting; substitute for open-agent-audit |
 | `wasmagent-proxy` | Experimental | Evolving | Gateway-level AEP evidence; Envoy/Istio/Kong sidecar | Endpoint-local MCP servers; general gateway RBAC/routing |
-| `wasmagent-train-replay` | Experimental | Evolving | Distributed training audit; tamper-evident epoch evidence | General PyTorch profiling (use `fr_trace`); real-time monitoring |
-| `symkernel` | Experimental | Unstable | WasmAgent-ecosystem CEL/wazero/Z3 verification | Standalone production policy engine |
+| `wasmagent-train-replay` | Research Preview | Evolving | Distributed training audit research; tamper-evident epoch evidence experiments | General PyTorch profiling (use `fr_trace`); real-time monitoring |
+| `symkernel` | Research Preview | Unstable | WasmAgent-ecosystem CEL/wazero/Z3 verification research | Standalone production policy engine |
 | `agent-golden-path` | Reference Workload | Stable (end-to-end chain test) | Golden Path integration testing; runnable provable-agent stack demo | General procurement product; SAP-specific integration (see internal procureiq) |
 | `.github` | Active | Stable (ledgers, assets); Evolving (Golden Path) | Org navigation, cross-repo integration testing, governance | Product-specific runtime code |
 

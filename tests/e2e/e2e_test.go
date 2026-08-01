@@ -111,7 +111,7 @@ func TestProjectIndexConsistency(t *testing.T) {
 		"wasmagent-js",
 		"bscode",
 		"trace-pipeline",
-		"agent-trust-infra",
+		"agentbom",
 	}
 
 	repoNames := make(map[string]bool)
@@ -194,23 +194,23 @@ func TestTrustArtifactsChain(t *testing.T) {
 	}
 
 	// Validate trust artifact infrastructure exists
-	var trustInfra *docs.ProjectRepo
+	var trustArtifacts *docs.ProjectRepo
 	for _, repo := range projectIndex.Repos {
-		if repo.Name == "agent-trust-infra" {
-			trustInfra = &repo
+		if repo.Name == "agentbom" {
+			trustArtifacts = &repo
 			break
 		}
 	}
 
-	if trustInfra == nil {
-		t.Error("agent-trust-infra repository not found in project index")
+	if trustArtifacts == nil {
+		t.Error("agentbom repository not found in project index")
 		return
 	}
 
 	// Validate trust artifacts flow
-	if trustInfra.Category != "trust-artifacts" {
-		t.Errorf("agent-trust-infra has incorrect category: %s (expected: trust-artifacts)",
-			trustInfra.Category)
+	if trustArtifacts.Category != "trust-artifacts" {
+		t.Errorf("agentbom has incorrect category: %s (expected: trust-artifacts)",
+			trustArtifacts.Category)
 	}
 
 	// Validate workflow file exists for trust artifact generation
@@ -311,13 +311,13 @@ func TestRuntimeWorkloadIntegration(t *testing.T) {
 
 // verificationDaemon represents a continuous verification daemon configuration fixture.
 type verificationDaemon struct {
-	SpecVersion      string                `json:"specVersion"`
+	SpecVersion      string                 `json:"specVersion"`
 	Metadata         map[string]interface{} `json:"metadata"`
-	DaemonConfig     daemonConfig          `json:"daemonConfig"`
-	MonitoredAgents  []monitoredAgent      `json:"monitoredAgents"`
-	TrustPolicies    []trustPolicy         `json:"trustPolicies"`
-	AlertChannels    []alertChannel        `json:"alertChannels"`
-	SampleViolations []sampleViolation     `json:"sampleViolations"`
+	DaemonConfig     daemonConfig           `json:"daemonConfig"`
+	MonitoredAgents  []monitoredAgent       `json:"monitoredAgents"`
+	TrustPolicies    []trustPolicy          `json:"trustPolicies"`
+	AlertChannels    []alertChannel         `json:"alertChannels"`
+	SampleViolations []sampleViolation      `json:"sampleViolations"`
 }
 
 type daemonConfig struct {
@@ -328,9 +328,9 @@ type daemonConfig struct {
 }
 
 type monitoredAgent struct {
-	AgentID       string `json:"agentId"`
-	Namespace     string `json:"namespace"`
-	Endpoint      string `json:"endpoint"`
+	AgentID        string `json:"agentId"`
+	Namespace      string `json:"namespace"`
+	Endpoint       string `json:"endpoint"`
 	TrustPolicyRef string `json:"trustPolicyRef"`
 }
 

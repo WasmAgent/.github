@@ -19,19 +19,22 @@ Repositories are ranked by how close they sit to that mission, orthogonal to the
 maturity tiers in
 [`repository-boundaries.md`](repository-boundaries.md):
 
-- **⭐ Core** (`wasmagent-js`, `wasmagent-protocol`, `symkernel`,
+- **⭐ Core** (`wasmagent-js`, `wasmagent-protocol`,
   `agentbom`, and the planned `wasmagent-py`) — runtime, protocol,
-  verification, and trust artifacts. Sustained long-term investment. AEP is
+  and trust artifacts. Sustained long-term investment. AEP is
   their connective standard, sedimented from the shipping runtime and now
   versioned in `wasmagent-protocol`.
 - **🛠 Official tooling** — CLI, devtools, examples, starters. Landing:
   `@wasmagent/agentbom-cli` (in `agentbom`) and `agent-golden-path` (the
   runnable provable-stack reference app) are public; more devtools planned.
-- **🔌 Evidence surfaces** (`wasmagent-proxy`, `trace-pipeline`,
-  `wasmagent-train-replay`) — extend Core to specific surfaces. Once their
-  roadmaps land they move to **community maintenance**; not retired — code and
-  evidence schemas stay put.
-- **🧪 Research** (`fresharena`) — grounds the platform in measured results.
+- **🔌 Evidence surfaces** (`wasmagent-proxy`, `trace-pipeline`) — extend
+  Core to specific surfaces. Once their roadmaps land they move to
+  **community maintenance**; not retired — code and evidence schemas stay put.
+- **🧪 Research / Preview** (`fresharena`, `symkernel`,
+  `wasmagent-train-replay`) — grounds the platform in measured results and
+  research-stage experiments. Research / Preview repos have **no stable API, no
+  published package, and limited external usability**; interfaces change without
+  notice as experiments evolve.
 - **📦 Product, reference & hub** (`open-agent-audit`, `bscode`, `.github`) —
   the commercial audit surface, the reference workload, and this portal.
 - **🎮 Apps** — playground, desktop, editor extensions, demos. Planned; no
@@ -59,13 +62,14 @@ The machine-readable `focus` field in
 
 ### Verification 🚧
 
-- 🚧 `symkernel` — Go symbolic verification backend: cel-go lightweight rules,
+- 🚧 `symkernel` — **Research / Preview**: Go symbolic verification backend
+  with no stable API or published package yet: cel-go lightweight rules,
   wazero Wasm sandbox hard-isolation, Z3 SMT satisfiability proofs. OPA-style
-  HTTP service; consumed by wasmagent-js (CelGoVerifier / Z3Verifier) and
-  future wasmagent-py via a thin adapter. Now imports **OPA Rego and AWS Cedar
-  policies** (translated to CEL, fail-closed — `internal/policyimport`),
-  positioning symkernel as a Z3-proof backend for existing policy languages.
-  Deploys on Cloudflare Containers.
+  HTTP service; consumed experimentally by wasmagent-js (CelGoVerifier /
+  Z3Verifier) and future wasmagent-py via a thin adapter. Now imports
+  **OPA Rego and AWS Cedar policies** (translated to CEL, fail-closed —
+  `internal/policyimport`), positioning symkernel as a Z3-proof backend for
+  existing policy languages. Deploys on Cloudflare Containers.
 
 ### Workloads ✅
 
@@ -81,10 +85,11 @@ The machine-readable `focus` field in
 - ✅ `trace-pipeline` (`evomerge` on PyPI) — eval_trust paired statistics,
   AgentTrustScore stable JSON schema, training-data admission gate; schema
   compatible with `wasmagent-js` v1.x AEP.
-- 🚧 `wasmagent-train-replay` — causal evidence layer for distributed GPU
-  training: reads PyTorch Flight Recorder dumps, builds cross-rank PROV-DM
-  provenance graphs, records Ed25519-signed `EpochEvidenceBundle`s, supports
-  tensor-origin tracing and deterministic replay.
+- 🚧 `wasmagent-train-replay` — **Research / Preview**: causal evidence layer
+  for distributed GPU training with no stable API or published package yet:
+  reads PyTorch Flight Recorder dumps, builds cross-rank PROV-DM provenance
+  graphs, records Ed25519-signed `EpochEvidenceBundle`s, supports tensor-origin
+  tracing and deterministic replay.
 
 ### Trust artifacts ✅
 
@@ -131,5 +136,6 @@ The machine-readable `focus` field in
 - 📋 Cross-repo coherence patrol: org repo list ↔ profile README ↔
   cross-repo URLs ↔ roadmap completion.
 - 📋 Trust Passport product module: issuance, verification, renewal (Trustavo).
-- 📋 symkernel Phase 1: wazero sandbox (`/v1/sandbox/run`), Z3 integration
-  (`/v1/verify/z3`), generate-error-repair loop.
+- 📋 symkernel Phase 1 (Research / Preview): wazero sandbox
+  (`/v1/sandbox/run`), Z3 integration (`/v1/verify/z3`),
+  generate-error-repair loop.

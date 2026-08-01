@@ -9,27 +9,31 @@ import (
 
 // ProjectIndex represents the structure of docs/project-index.json
 type ProjectIndex struct {
-	SchemaVersion int             `json:"schema_version"`
-	Org           string          `json:"org"`
-	Description   string          `json:"description"`
-	SourceURL     string          `json:"source_url"`
-	LastReviewed  string          `json:"last_reviewed"`
-	Consumers     []string        `json:"consumers"`
+	SchemaVersion int               `json:"schema_version"`
+	Org           string            `json:"org"`
+	Description   string            `json:"description"`
+	SourceURL     string            `json:"source_url"`
+	LastReviewed  string            `json:"last_reviewed"`
+	Consumers     []string          `json:"consumers"`
 	StatusLegend  map[string]string `json:"status_legend"`
 	Categories    map[string]string `json:"categories"`
-	Repos         []ProjectRepo   `json:"repos"`
+	Repos         []ProjectRepo     `json:"repos"`
 }
 
-// ProjectRepo represents a single repository in the project index
+// ProjectRepo represents a single repository in the project index.
+// Focus is the machine-readable tier label from the focus_legend
+// (e.g. "core-spine" for Core repos, "research-preview" for
+// Research / Preview repos).
 type ProjectRepo struct {
-	Name        string `json:"name"`
-	Category    string `json:"category"`
-	Role        string `json:"role"`
-	Status      string `json:"status"`
-	Visibility  string `json:"visibility"`
-	InProfile   bool   `json:"in_profile"`
-	Summary     string `json:"summary"`
-	URL         string `json:"url"`
+	Name       string `json:"name"`
+	Category   string `json:"category"`
+	Role       string `json:"role"`
+	Status     string `json:"status"`
+	Visibility string `json:"visibility"`
+	InProfile  bool   `json:"in_profile"`
+	Summary    string `json:"summary"`
+	URL        string `json:"url"`
+	Focus      string `json:"focus"`
 }
 
 // LoadProjectIndex loads and parses the project-index.json file
@@ -40,9 +44,9 @@ func LoadProjectIndex() (*ProjectIndex, error) {
 
 	// Try both paths to handle different call sites
 	paths := []string{
-		"../../docs/project-index.json",  // Called from tests/e2e
-		"../docs/project-index.json",     // Called from pkg/docs
-		"docs/project-index.json",         // Called from repo root
+		"../../docs/project-index.json", // Called from tests/e2e
+		"../docs/project-index.json",    // Called from pkg/docs
+		"docs/project-index.json",       // Called from repo root
 	}
 
 	var lastErr error
