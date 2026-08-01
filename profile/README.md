@@ -185,6 +185,10 @@ authoritative voice. In AI governance, evidence only counts when it is trusted;
 Trustavo exists to make that trust legible to enterprise teams, auditors, and
 regulators.
 
+## Governance Continuity
+
+The primary maintainer for WasmAgent is [@telleroutlook](https://github.com/telleroutlook). Report urgent issues in the relevant project repository; if there is no response within 7 days, escalate by opening an [issue in `WasmAgent/.github`](https://github.com/WasmAgent/.github/issues). This organization hub is actively maintained for organization navigation, governance documentation, shared ledgers, and cross-repository integration.
+
 ## Maintainers wanted
 
 We are looking for maintainers across several focus areas. Open to
