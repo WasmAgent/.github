@@ -187,7 +187,7 @@ regulators.
 
 ## Governance Continuity
 
-The primary maintainer for WasmAgent is [@telleroutlook](https://github.com/telleroutlook). Report urgent issues in the relevant project repository; if there is no response within 7 days, escalate by opening an [issue in `WasmAgent/.github`](https://github.com/WasmAgent/.github/issues). This organization hub is actively maintained for organization navigation, governance documentation, shared ledgers, and cross-repository integration.
+The primary maintainer for WasmAgent is [@telleroutlook](https://github.com/telleroutlook). Report urgent issues in the relevant project repository; if there is no response within 7 days, escalate by opening an [issue in `WasmAgent/.github`](https://github.com/WasmAgent/.github/issues) and tagging [@telleroutlook](https://github.com/telleroutlook). Core repositories — `wasmagent-js`, `wasmagent-protocol`, and `agentbom` — are actively maintained, while `symkernel` and `wasmagent-train-replay` are experimental Research / Preview projects that receive best-effort updates.
 
 ## Maintainers wanted
 
