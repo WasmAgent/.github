@@ -45,7 +45,7 @@ signed AEP evidence instead.
 ## Milestone 5 — Distributed Trust Network & Multi-Domain Ecosystem
 
 - [ ] `trust-network/`: Public registry launches for agent identity and artifact discovery (discovery.trust.wasmagent.dev)
-- [ ] `wasmagent-js/`: Multi-tenant verification runtime supports concurrent agent isolation with per-tenant trust policies
+- [x] `wasmagent-js/`: Multi-tenant verification runtime supports concurrent agent isolation with per-tenant trust policies
 - [ ] `healthcare-agent/`: Healthcare domain workload lands with HIPAA-compliant evidence collection and PHI-audit trails
 - [ ] `devops-agent/`: DevOps domain workload with deployment verification and infrastructure-as-code evidence capture
 - [ ] `finance-agent/`: Finance domain workload with SOX compliance controls and transaction-replay verification
