@@ -6,6 +6,13 @@
 >
 > Parts of this vision are shipping today. Parts are in active development. The table below is honest about which is which.
 
+## Verified Claims
+
+**5 active public claims** · Last reviewed: **2026-07-16**
+
+Our [`public-claims.yml`](https://github.com/WasmAgent/.github/blob/main/claims/public-claims.yml)
+contains 5 public claims about our software properties, each with an evidence
+link and review date — independently checkable.
 
 ## Golden Path
 
