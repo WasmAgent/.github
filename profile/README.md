@@ -6,6 +6,26 @@
 >
 > Parts of this vision are shipping today. Parts are in active development. The table below is honest about which is which.
 
+## One map: how the four names fit together
+
+```mermaid
+flowchart TD
+    W["**WasmAgent** · the GitHub org"] --> O["**OpenAgentAudit** · open audit spec & product"]
+    O --> T["**Trustavo** · commercial deployment layer"]
+    W --> B["**AgentBOM** · independent spec & CLI"]
+    click W href "https://github.com/WasmAgent" _blank
+    click O href "https://github.com/WasmAgent/open-agent-audit" _blank
+    click T href "https://trustavo.com" _blank
+    click B href "https://github.com/WasmAgent/agentbom" _blank
+```
+
+One line each — what it is, who it is for, where to find it:
+
+- **[WasmAgent](https://github.com/WasmAgent)** — the GitHub organization behind open infrastructure for provable AI agents; for anyone who needs signed, verifiable agent evidence; [github.com/WasmAgent](https://github.com/WasmAgent).
+- **[OpenAgentAudit](https://github.com/WasmAgent/open-agent-audit)** — the open audit specification and product; for enterprise teams, auditors, and regulators; [open-agent-audit](https://github.com/WasmAgent/open-agent-audit).
+- **[Trustavo](https://trustavo.com)** — the commercial compliance-report layer built on OpenAgentAudit; for teams that want the open stack deployed and managed for them; [trustavo.com](https://trustavo.com).
+- **[AgentBOM](https://github.com/WasmAgent/agentbom)** — the independent agent bill-of-materials spec and CLI; for developers who need machine-readable agent identity and dependency checks; [agentbom](https://github.com/WasmAgent/agentbom).
+
 ## Verified Claims
 
 **5 active public claims** · Last reviewed: **2026-07-16**
