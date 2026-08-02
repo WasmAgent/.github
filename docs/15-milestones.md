@@ -73,3 +73,15 @@ signed AEP evidence instead.
 - [ ] `wasmagent-ops/resilience/`: Automated circuit breaker and transactional rollback mechanism triggered on policy violation events
 - [ ] `docs/federation-spec.md`: Complete cross-domain agent federation protocol and ZK attestation architecture specification
 - [ ] `tests/mesh/`: End-to-end integration test suite validating multi-agent attestation, ZK evidence verification, and real-time revocation (`npm run test:mesh`)
+
+## Milestone 6 — Continuous Real-Time Attestation & Federated Trust Mesh
+
+- [ ] `wasmagent-runtime/attestation`: Implement streaming WebSocket/gRPC attestation service emitting live AEP event proofs during agent execution loops (`wasmagent serve-attestation --port 9090`)
+- [ ] `agentbom/federation`: Integrate Decentralized Identifier (DID) and Verifiable Credential (VC) support into Trust Passports for cross-organizational verification (`passport verify-did --did did:wasm:agent123`)
+- [ ] `wasmagent-ops/operator`: Ship Kubernetes Admission Controller (`wasmagent-operator`) to enforce AgentBOM posture and MCP policy gates at container admission (`kubectl apply -f deploy/operator.yaml`)
+- [ ] `agentbom/lineage`: Add multi-agent nested delegation tracking to AgentBOM schemas with cryptographic graph visualizer (`agentbom export-graph --trace-id <id> --format svg`)
+- [ ] `trace-pipeline/zk`: Introduce Zero-Knowledge proof verification adapter for AEP evidence, enabling compliance auditing without revealing proprietary payload data (`zk-verify --proof proof.json --schema aep-v1`)
+- [ ] `wasmagent-js/guardrails`: Implement active runtime policy auto-tightening and automatic sandboxing upon detecting MCP posture drift (`wasmagent-js --enforce-drift-policy`)
+- [ ] `wasmagent-ops/telemetry`: Export OpenTelemetry traces and Prometheus compliance metrics for enterprise agent fleet observability (`wasmagent-telemetry --metrics-port 9090`)
+- [ ] `docs/federated-trust.md`: Publish cross-domain trust mesh specification detailing AEP evidence federation and multi-tenant ledger synchronization (`docs/federated-trust.md`)
+- [ ] `tests/e2e/federation`: E2E test suite validating real-time attestation streams, lineage graph integrity, and cross-repo compliance verification (`bun test:federation`)
