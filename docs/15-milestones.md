@@ -63,7 +63,7 @@ signed AEP evidence instead.
 
 ## Milestone 6 — Distributed Agent Mesh & Continuous Attestation
 
-- [ ] `wasmagent-ops/federation/`: Control plane for multi-cluster agent mesh synchronization and cross-domain attestation (`wasmagent-mesh sync --peers mesh-peers.yaml`)
+- [x] `wasmagent-ops/federation/`: Control plane for multi-cluster agent mesh synchronization and cross-domain attestation (`wasmagent-mesh sync --peers mesh-peers.yaml`)
 - [ ] `aep/zk-proofs/`: Zero-Knowledge (ZK-SNARK) attestation exporter for privacy-preserving AEP evidence verification (`passport prove --privacy-mode zk`)
 - [ ] `agentbom/policy/`: Embed WebAssembly-native Open Policy Agent (OPA/Rego) evaluator for inline runtime guardrail enforcement
 - [ ] `wasmagent-js/spiffe/`: SPIFFE/SPIRE cryptographic identity driver binding Wasm sandbox workloads to enterprise mTLS credentials
