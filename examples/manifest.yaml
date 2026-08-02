@@ -1,0 +1,33 @@
+# Sample agent manifest for `verify-posture`.
+#
+# The manifest declares the agent's MCP surface: the servers it connects to,
+# the tools it exposes, and the audit posture it commits to. Verification
+# passes when the declared surface stays within the organization MCP Posture
+# policy (see agentbom.DefaultPosturePolicy and
+# tests/e2e/fixtures/mcp-posture-sample.json).
+#
+# Run:
+#   verify-posture --manifest examples/manifest.yaml
+$schema: https://wasmagent.github.io/agent-trust-infra/schemas/agent-manifest-1.json
+specVersion: "1.0"
+metadata:
+  agentId: sample-agent
+  name: Sample Agent
+mcp:
+  auditLevel: full
+  servers:
+    - name: filesystem-server
+      endpoint: stdio
+  tools:
+    - name: read_file
+      category: file-system
+      riskLevel: low
+      path: /workspace
+      operations:
+        - read
+    - name: write_file
+      category: file-system
+      riskLevel: medium
+      path: /workspace
+      operations:
+        - write
