@@ -72,7 +72,8 @@ signed AEP evidence instead.
 - [x] `wasmagent/edge/`: Low-latency WasmAgent edge runtime supporting offline evidence buffering and eventual ledger synchronization
   - Owner: `WasmAgent/wasmagent` (runtime tier; owns the edge runtime). Reference surface landed in this hub (`wasmagent/edge/edge.ts`) and is tracked by `tests/e2e/wasmagent_edge_runtime_test.go`; the production edge binary and ledger sync service live in the sibling repo.
 - [ ] `agent-golden-path/multi-agent/`: Multi-agent procurement federation workload (buyer copilot ↔ supplier copilot) under signed AEP contracts
-- [ ] `wasmagent-ops/resilience/`: Automated circuit breaker and transactional rollback mechanism triggered on policy violation events
+- [x] `wasmagent-ops/resilience/`: Automated circuit breaker and transactional rollback mechanism triggered on policy violation events
+  - Owner: `WasmAgent/wasmagent-ops` (internal-tool tier; owns the ops tooling). Reference surface landed in this hub (`wasmagent-ops/resilience/resilience.ts`) and is tracked by `tests/e2e/wasmagent_ops_resilience_test.go`; the production resilience daemon lives in the sibling repo.
 - [ ] `docs/federation-spec.md`: Complete cross-domain agent federation protocol and ZK attestation architecture specification
 - [ ] `tests/mesh/`: End-to-end integration test suite validating multi-agent attestation, ZK evidence verification, and real-time revocation (`npm run test:mesh`)
 
