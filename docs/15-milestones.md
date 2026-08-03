@@ -67,7 +67,8 @@ signed AEP evidence instead.
 - [ ] `aep/zk-proofs/`: Zero-Knowledge (ZK-SNARK) attestation exporter for privacy-preserving AEP evidence verification (`passport prove --privacy-mode zk`)
 - [ ] `agentbom/policy/`: Embed WebAssembly-native Open Policy Agent (OPA/Rego) evaluator for inline runtime guardrail enforcement
 - [x] `wasmagent-js/spiffe/`: SPIFFE/SPIRE cryptographic identity driver binding Wasm sandbox workloads to enterprise mTLS credentials
-- [ ] `trace-pipeline/stream/`: Real-time gRPC telemetry and event ingestion pipeline for instant posture drift detection and passport revocation
+- [x] `trace-pipeline/stream/`: Real-time gRPC telemetry and event ingestion pipeline for instant posture drift detection and passport revocation
+  - Owner: `WasmAgent/trace-pipeline` (evidence-pipeline tier; owns evidence admission / training-data pipeline). Reference surface landed in this hub (`trace-pipeline/stream/stream.ts`) and is tracked by `tests/e2e/trace_pipeline_stream_test.go`; the production gRPC service port lives in the sibling repo.
 - [ ] `wasmagent/edge/`: Low-latency WasmAgent edge runtime supporting offline evidence buffering and eventual ledger synchronization
 - [ ] `agent-golden-path/multi-agent/`: Multi-agent procurement federation workload (buyer copilot ↔ supplier copilot) under signed AEP contracts
 - [ ] `wasmagent-ops/resilience/`: Automated circuit breaker and transactional rollback mechanism triggered on policy violation events
