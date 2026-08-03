@@ -59,7 +59,7 @@
       "status": "shipped",
       "visibility": "public",
       "in_profile": true,
-      "summary": "Embedded agent runtime v1.x: WASM kernels (QuickJS, Pyodide, Wasmtime, Remote), MCP gateway + attestation, AEP emitter, capability manifests; adapters for A2A, AG-UI, AI SDK, Claude Agent SDK.",
+      "summary": "Embedded agent runtime v1.x: WASM kernels (QuickJS, Pyodide, Wasmtime, Remote), MCP gateway + attestation, AEP emitter, capability manifests, SPIFFE/SPIRE cryptographic identity driver binding Wasm sandbox workloads to enterprise mTLS credentials; adapters for A2A, AG-UI, AI SDK, Claude Agent SDK.",
       "url": "https://github.com/WasmAgent/wasmagent-js",
       "latest_version": "3.1.1",
       "focus": "core-spine"

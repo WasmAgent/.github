@@ -66,7 +66,7 @@ signed AEP evidence instead.
 - [ ] `wasmagent-ops/federation/`: Control plane for multi-cluster agent mesh synchronization and cross-domain attestation (`wasmagent-mesh sync --peers mesh-peers.yaml`)
 - [ ] `aep/zk-proofs/`: Zero-Knowledge (ZK-SNARK) attestation exporter for privacy-preserving AEP evidence verification (`passport prove --privacy-mode zk`)
 - [ ] `agentbom/policy/`: Embed WebAssembly-native Open Policy Agent (OPA/Rego) evaluator for inline runtime guardrail enforcement
-- [ ] `wasmagent-js/spiffe/`: SPIFFE/SPIRE cryptographic identity driver binding Wasm sandbox workloads to enterprise mTLS credentials
+- [x] `wasmagent-js/spiffe/`: SPIFFE/SPIRE cryptographic identity driver binding Wasm sandbox workloads to enterprise mTLS credentials
 - [ ] `trace-pipeline/stream/`: Real-time gRPC telemetry and event ingestion pipeline for instant posture drift detection and passport revocation
 - [ ] `wasmagent/edge/`: Low-latency WasmAgent edge runtime supporting offline evidence buffering and eventual ledger synchronization
 - [ ] `agent-golden-path/multi-agent/`: Multi-agent procurement federation workload (buyer copilot ↔ supplier copilot) under signed AEP contracts
