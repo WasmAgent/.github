@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://wasmagent.github.io/schemas/opa-evaluator-config-1.json",
+  "title": "OPA/Rego WASM Evaluator Configuration",
+  "description": "Configuration for embedding a WebAssembly-native Open Policy Agent (OPA/Rego) evaluator for inline runtime guardrail enforcement.",
+  "type": "object",
+  "required": [
+    "$schema",
+    "evaluatorFormat",
+    "specVersion",
+    "metadata",
+    "wasmModule",
+    "entrypoint",
+    "inputEnvelope",
+    "decision",
+    "failClosed"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "evaluatorFormat": {
+      "type": "string",
+      "const": "OPARegoWasmEvaluator"
+    },
+    "specVersion": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["generated", "repository", "release", "generator"],
+      "properties": {
+        "generated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "repository": {
+          "type": "string"
+        },
+        "release": {
+          "type": "string"
+        },
+        "generator": {
+          "type": "string"
+        }
+      }
+    },
+    "wasmModule": {
+      "type": "object",
+      "required": ["name", "source", "sha256"],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string"
+        }
+      }
+    },
+    "entrypoint": {
+      "type": "string"
+    },
+    "inputEnvelope": {
+      "type": "object",
+      "required": ["tool", "capability", "action", "declared_tools", "declared_capabilities"],
+      "properties": {
+        "tool": {
+          "type": "string"
+        },
+        "capability": {
+          "type": "string"
+        },
+        "action": {
+          "type": "string"
+        },
+        "declared_tools": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "declared_capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "has_aep_evidence": {
+          "type": "boolean"
+        }
+      }
+    },
+    "decision": {
+      "type": "string"
+    },
+    "failClosed": {
+      "type": "boolean"
+    }
+  }
+}
