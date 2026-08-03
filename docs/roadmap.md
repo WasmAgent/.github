@@ -83,7 +83,9 @@ The machine-readable `focus` field in
 ### Evidence pipelines ✅
 
 - ✅ `trace-pipeline` (`evomerge` on PyPI) — eval_trust paired statistics,
-  AgentTrustScore stable JSON schema, training-data admission gate; schema
+  AgentTrustScore stable JSON schema, training-data admission gate, and the
+  real-time gRPC telemetry / event ingestion stream (`trace-pipeline/stream/`)
+  for instant posture drift detection and passport revocation; schema
   compatible with `wasmagent-js` v1.x AEP.
 - 🚧 `wasmagent-train-replay` — **Research / Preview**: causal evidence layer
   for distributed GPU training with no stable API or published package yet:

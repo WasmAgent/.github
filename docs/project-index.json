@@ -116,7 +116,7 @@
       "status": "shipped",
       "visibility": "public",
       "in_profile": true,
-      "summary": "evomerge on PyPI — eval_trust paired statistics, AgentTrustScore stable JSON schema, training-data admission gate, wasmagent-js v1.x schema compatible.",
+      "summary": "evomerge on PyPI — eval_trust paired statistics, AgentTrustScore stable JSON schema, training-data admission gate, real-time gRPC telemetry/event ingestion stream with instant posture drift detection and passport revocation (trace-pipeline/stream/), wasmagent-js v1.x schema compatible.",
       "url": "https://github.com/WasmAgent/trace-pipeline",
       "focus": "adjacent"
     },
