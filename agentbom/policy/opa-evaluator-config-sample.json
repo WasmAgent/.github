@@ -1,0 +1,27 @@
+{
+  "$schema": "https://wasmagent.github.io/schemas/opa-evaluator-config-1.json",
+  "evaluatorFormat": "OPARegoWasmEvaluator",
+  "specVersion": "1.0",
+  "metadata": {
+    "generated": "2026-08-03T00:00:00Z",
+    "repository": "WasmAgent/.github",
+    "release": "v1.0.0",
+    "generator": "agentbom/policy (test fixture)"
+  },
+  "wasmModule": {
+    "name": "wasmagent_guardrails.wasm",
+    "source": "agentbom/policy/build/guardrails.wasm",
+    "sha256": "sha256-0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "entrypoint": "wasmagent.guardrails/allow",
+  "inputEnvelope": {
+    "tool": "data.write",
+    "capability": "storage.write",
+    "action": "tool.call",
+    "declared_tools": ["data.read", "data.write"],
+    "declared_capabilities": ["storage.read", "storage.write"],
+    "has_aep_evidence": true
+  },
+  "decision": "allow",
+  "failClosed": true
+}

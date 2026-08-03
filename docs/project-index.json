@@ -82,7 +82,7 @@
       "status": "shipped",
       "visibility": "public",
       "in_profile": true,
-      "summary": "AgentBOM validator, compliance checker (SOC2/ISO27001/EU AI Act), MCP Posture diff engine, CLI tools, and framework adapters (AutoGen, LangChain, LlamaIndex). Migrated from agent-trust-infra (archived 2026-07-29). Packages: @wasmagent/agentbom-core, @wasmagent/agentbom-cli.",
+      "summary": "AgentBOM validator, compliance checker (SOC2/ISO27001/EU AI Act), MCP Posture diff engine, CLI tools, framework adapters (AutoGen, LangChain, LlamaIndex), and a WASM-native OPA/Rego policy evaluator for inline runtime guardrail enforcement. Migrated from agent-trust-infra (archived 2026-07-29). Packages: @wasmagent/agentbom-core, @wasmagent/agentbom-cli.",
       "url": "https://github.com/WasmAgent/agentbom",
       "latest_version": "0.3.2",
       "focus": "core-spine"
