@@ -74,7 +74,7 @@ signed AEP evidence instead.
 - [ ] `agent-golden-path/multi-agent/`: Multi-agent procurement federation workload (buyer copilot ↔ supplier copilot) under signed AEP contracts
 - [ ] `wasmagent-ops/resilience/`: Automated circuit breaker and transactional rollback mechanism triggered on policy violation events
 - [x] `docs/federation-spec.md`: Complete cross-domain agent federation protocol and ZK attestation architecture specification
-- [ ] `tests/mesh/`: End-to-end integration test suite validating multi-agent attestation, ZK evidence verification, and real-time revocation (`npm run test:mesh`)
+- [x] `tests/mesh/`: End-to-end integration test suite validating multi-agent attestation, ZK evidence verification, and real-time revocation (`npm run test:mesh`)
 
 ## Milestone 6 — Federated Trust Mesh & Real-Time Policy Orchestration
 
