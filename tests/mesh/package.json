@@ -1,0 +1,10 @@
+{
+  "name": "@wasmagent/mesh-integration-tests",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "End-to-end integration test suite for the WasmAgent distributed agent mesh: multi-agent attestation, ZK evidence verification, and real-time revocation.",
+  "scripts": {
+    "test:mesh": "bun test mesh.test.ts"
+  }
+}
