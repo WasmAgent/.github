@@ -2,7 +2,7 @@
 
 ## Milestone 1 — Trust Artifact Reference Implementations
 
-- [ ] `agentbom/`: Ship reference implementation for all three artifact types (AgentBOM, MCP Posture, Trust Passport)
+- [x] `agentbom/`: Ship reference implementation for all three artifact types (AgentBOM, MCP Posture, Trust Passport)
 - [ ] `agentbom/cli`: CLI emits valid AgentBOM JSON for any agent run (`agentbom --run-id <id> --output agentbom.json`)
 - [ ] `agentbom/`: MCP Posture verification passes against sample agent manifest (`verify-posture --manifest examples/manifest.yaml`)
 - [ ] `agentbom/`: Trust Passport export includes signed AEP events (`passport export --format json --include-aep`)
