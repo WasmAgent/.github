@@ -3,7 +3,7 @@
 # status. This is a public ledger: edit in place only with merged evidence.
 schema_version: 1
 org: WasmAgent
-last_reviewed: 2026-07-16
+last_reviewed: 2026-09-12
 claims:
   - id: WA-C-0001
     domain: runtime
@@ -57,13 +57,13 @@ claims:
     domain: audit
     claim: >-
       open-agent-audit renders the full evidence chain into enterprise-readable
-      audit reports with AEP v0.3 adapter support, deployed at trustavo.com on
+      audit reports with AEP adapter support, deployed at trustavo.com on
       Cloudflare Workers.
     evidence:
       repo: open-agent-audit
       artifacts:
         - "@openagentaudit/core v0.2.2"
-        - "@openagentaudit/adapters v0.2.4 (aep/v0.3 support)"
+        - "@openagentaudit/adapters (aep/v0.5 attribution grading)"
         - "@openagentaudit/schema v0.2.0"
         - trustavo.com production deployment
     status: supported

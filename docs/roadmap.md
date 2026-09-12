@@ -105,7 +105,7 @@ The machine-readable `focus` field in
 
 ### Audit ✅
 
-- ✅ `open-agent-audit` — enterprise audit product with AEP v0.3 adapter;
+- ✅ `open-agent-audit` — enterprise audit product with AEP adapter;
   deployed at [trustavo.com](https://trustavo.com).
   `@openagentaudit/core`, `adapters`, `schema` published on npm.
 - 🚧 Regulatory profiles: OWASP Agentic Top 10, NIST AI RMF,

@@ -191,7 +191,7 @@ a machine-readable identity. `agent-trust-infra` is archived; `agentbom` is its 
 Passport product lives in `open-agent-audit`.
 
 `open-agent-audit` turns the full evidence chain into enterprise-readable audit
-reports with AEP v0.2 adapter support — deployed at **[trustavo.com](https://trustavo.com)**.
+reports with aep/v0.5 attribution-grading adapter support — deployed at **[trustavo.com](https://trustavo.com)**.
 
 `fresharena` closes the loop with dynamic, verifiable, adversarial evaluation,
 grounding the runtime, evidence, and audit story in measured benchmark performance.
