@@ -1,50 +1,100 @@
-# WasmAgent — Open infrastructure for provable AI agents
+<h1 align="center">WasmAgent</h1>
 
-> The industry's focus is shifting from *"can the agent do the task?"* to *"can the agent run reliably, at scale, over time?"* We believe that is still not enough. The real question is: **"can you prove the agent ran correctly?"**
->
-> WasmAgent is **open infrastructure for _provable_ AI agents** — the layer that turns agent execution into signed, verifiable, auditable evidence: runtime isolation, protocol-level interception, symbolic verification, tamper-evident evidence, and regulatory compliance, composable rather than a single product.
->
-> Parts of this vision are shipping today. Parts are in active development. The table below is honest about which is which.
+<p align="center"><strong>Open infrastructure for provable AI agents.</strong></p>
 
-## One map: how the four names fit together
+<p align="center">
+  Turn agent execution into signed, verifiable, auditable evidence — from runtime and gateway interception<br/>
+  to formal verification, trust artifacts, training gates, and enterprise audit.
+</p>
+
+<p align="center">
+  <a href="https://github.com/WasmAgent/wasmagent-protocol"><img alt="AEP v0.5" src="https://img.shields.io/badge/AEP-v0.5-0969da?style=flat-square"></a>
+  <a href="https://github.com/WasmAgent/agent-golden-path"><img alt="Golden Path" src="https://img.shields.io/badge/Golden_Path-runnable-1a7f37?style=flat-square"></a>
+  <a href="https://github.com/WasmAgent/.github/blob/main/claims/public-claims.yml"><img alt="Evidence-linked public claims" src="https://img.shields.io/badge/Public_claims-evidence--linked-8250df?style=flat-square"></a>
+  <a href="https://github.com/OWASP/www-project-mcp-top-10/issues/44"><img alt="OWASP MCP Top 10 upstream work" src="https://img.shields.io/badge/OWASP_MCP_Top_10-upstream_work-bc6f00?style=flat-square"></a>
+</p>
+
+<p align="center">
+  <a href="#start-here">Start here</a> ·
+  <a href="#evidence-lifecycle">Architecture</a> ·
+  <a href="#projects">Projects</a> ·
+  <a href="#standards--ecosystem">Standards &amp; ecosystem</a> ·
+  <a href="#maintainers-wanted">Contribute</a>
+</p>
+
+---
+
+> The industry's focus is shifting from *"can the agent do the task?"* to *"can the agent run reliably, at scale, over time?"* We believe that is still not enough.
+>
+> **The real question is: can you prove the agent ran correctly?**
+>
+> WasmAgent is the composable evidence layer for that question: runtime isolation, protocol-level interception, symbolic verification, tamper-evident records, trust artifacts, and regulatory evidence. Some parts ship today; some remain Research / Preview; planned work is marked explicitly.
+
+## Four names, one system
 
 ```mermaid
 flowchart LR
-    W["WasmAgent<br/>the GitHub org"]:::org
-    O["OpenAgentAudit<br/>open audit spec & product"]:::audit
-    T["Trustavo<br/>commercial deployment"]:::commercial
-    B["AgentBOM<br/>independent spec & CLI"]:::bom
+    W["WasmAgent<br/>open infrastructure"]:::org
+    O["OpenAgentAudit<br/>audit product"]:::audit
+    T["Trustavo<br/>managed deployment"]:::commercial
+    B["AgentBOM<br/>BOM and trust tooling"]:::bom
 
-    W --> O
+    W --> O --> T
     W --> B
-    O --> T
 
-    classDef org fill:#0969da,stroke:#0969da,color:#ffffff,stroke-width:2px
-    classDef audit fill:#8250df,stroke:#8250df,color:#ffffff,stroke-width:2px
-    classDef commercial fill:#bf3989,stroke:#bf3989,color:#ffffff,stroke-width:2px
-    classDef bom fill:#1a7f37,stroke:#1a7f37,color:#ffffff,stroke-width:2px
+    classDef org fill:#0969da,stroke:#0550ae,color:#ffffff,stroke-width:2px
+    classDef audit fill:#8250df,stroke:#6639ba,color:#ffffff,stroke-width:2px
+    classDef commercial fill:#bf3989,stroke:#99286e,color:#ffffff,stroke-width:2px
+    classDef bom fill:#1a7f37,stroke:#116329,color:#ffffff,stroke-width:2px
+    linkStyle default stroke:#8c959f,stroke-width:2px
+
+    click W href "https://github.com/WasmAgent" _blank
+    click O href "https://github.com/WasmAgent/open-agent-audit" _blank
+    click T href "https://trustavo.com" _blank
+    click B href "https://github.com/WasmAgent/agentbom" _blank
 ```
 
-One line each — what it is, who it is for, where to find it:
+<table>
+  <tr>
+    <th align="left">Name</th>
+    <th align="left">What it is</th>
+    <th align="left">Who it is for</th>
+  </tr>
+  <tr>
+    <td><strong><a href="https://github.com/WasmAgent">WasmAgent</a></strong></td>
+    <td>The GitHub organization behind the open provable-agent stack.</td>
+    <td>Builders who need signed, verifiable agent evidence.</td>
+  </tr>
+  <tr>
+    <td><strong><a href="https://github.com/WasmAgent/open-agent-audit">OpenAgentAudit</a></strong></td>
+    <td>The open audit specification and audit product.</td>
+    <td>Enterprise teams, auditors, and regulators.</td>
+  </tr>
+  <tr>
+    <td><strong><a href="https://trustavo.com">Trustavo</a></strong></td>
+    <td>The managed commercial deployment of OpenAgentAudit.</td>
+    <td>Teams that want the open stack deployed and operated for them.</td>
+  </tr>
+  <tr>
+    <td><strong><a href="https://github.com/WasmAgent/agentbom">AgentBOM</a></strong></td>
+    <td>Independent agent BOM, identity, posture, and trust tooling.</td>
+    <td>Developers who need machine-readable agent identity and dependency checks.</td>
+  </tr>
+</table>
 
-- **[WasmAgent](https://github.com/WasmAgent)** — the GitHub organization behind open infrastructure for provable AI agents; for anyone who needs signed, verifiable agent evidence; [github.com/WasmAgent](https://github.com/WasmAgent).
-- **[OpenAgentAudit](https://github.com/WasmAgent/open-agent-audit)** — the open audit specification and product; for enterprise teams, auditors, and regulators; [open-agent-audit](https://github.com/WasmAgent/open-agent-audit).
-- **[Trustavo](https://trustavo.com)** — the commercial compliance-report layer built on OpenAgentAudit; for teams that want the open stack deployed and managed for them; [trustavo.com](https://trustavo.com).
-- **[AgentBOM](https://github.com/WasmAgent/agentbom)** — the independent agent bill-of-materials spec and CLI; for developers who need machine-readable agent identity and dependency checks; [agentbom](https://github.com/WasmAgent/agentbom).
+## Evidence lifecycle
 
-## Verified Claims
+WasmAgent is organized by the **evidence lifecycle**: define the contract → produce evidence → verify and establish trust → use evidence to improve systems → prove the whole chain in a reference implementation.
 
-**5 active public claims** · Last reviewed: **2026-07-16**
+<p align="center">
+  <img src="../assets/product-matrix.svg" alt="WasmAgent evidence lifecycle architecture" width="100%" />
+</p>
 
-Our [`public-claims.yml`](https://github.com/WasmAgent/.github/blob/main/claims/public-claims.yml)
-contains 5 public claims about our software properties, each with an evidence
-link and review date — independently checkable.
+The connective contract is **AEP (Agent Evidence Protocol)**. Producers emit signed AEP records; verification and trust components consume them; training and evaluation systems reuse the same evidence as an admission, provenance, and measurement signal.
 
-## Golden Path
+## Start here
 
-The fastest way to see the provable-agent stack run end-to-end is the
-**[`agent-golden-path`](https://github.com/WasmAgent/agent-golden-path)** reference
-app (public, MIT) — a runnable procurement copilot that wires every layer together:
+The fastest way to understand the stack is the public MIT-licensed **[`agent-golden-path`](https://github.com/WasmAgent/agent-golden-path)** reference application — a runnable procurement copilot that wires the lifecycle together end to end.
 
 ```bash
 git clone https://github.com/WasmAgent/agent-golden-path
@@ -52,184 +102,158 @@ cd agent-golden-path
 bun install && bun test        # end-to-end chain test, no live LLM required
 ```
 
-It proves the full chain in one app: agent execution → tool admission
-(`mcp-firewall`) → compliance verification → signed **AEP** evidence → audit
-report + trust passport (`open-agent-audit`). This is the canonical reference the
-rest of the ecosystem points to.
+The chain is concrete:
 
-> There is also an org-level cross-repo integration harness in
-> [`golden-path/`](../golden-path/) (`Protect → Record → Audit → Admit`, one step
-> per core repo). It is the multi-repo contract acceptance line and is still a
-> work in progress — for a runnable demo, use `agent-golden-path` above.
+```text
+agent execution
+  → tool admission (mcp-firewall)
+  → compliance verification
+  → signed AEP evidence
+  → audit report + trust passport (open-agent-audit)
+```
+
+> There is also an org-level cross-repo integration harness in [`golden-path/`](../golden-path/) — `Protect → Record → Audit → Admit`, one step per core repository. It is the multi-repo contract acceptance line and remains a work in progress. For a runnable demo, use `agent-golden-path`.
+
+## Why provable agents?
+
+The industry is converging on *Agent Runtime / Agent OS* as the infrastructure layer that moves agents from stateless calls to long-running, stateful, recoverable systems. We agree with that framing — and add a second requirement.
+
+**Reliability is necessary but not sufficient.** A system that runs stably but cannot show what happened, under what authority, against which policy, and with what evidence is not ready for high-trust production environments or cross-organizational agent systems.
+
+A plain Agent Runtime answers **"did it run?"**. The WasmAgent stack adds the machinery needed to answer **"can another party verify what it did?"**
+
+| Layer | What it solves | Current status |
+| --- | --- | --- |
+| **Provable correctness** | `symkernel` — cel-go rules, wazero hard-isolation, Z3 SMT proofs; OPA Rego / AWS Cedar imports translated to CEL with fail-closed behavior | 🚧 Research / Preview |
+| **Tamper-evident evidence** | AEP — signed behavioral records emitted at runtime and gateway boundaries | ✅ Shipping in `wasmagent-js` v1.x and `wasmagent-proxy` |
+| **Regulatory evidence** | Audit/reporting and mapping for frameworks including EU AI Act, OWASP agent security guidance, and NIST AI RMF | 🚧 Evolving across `open-agent-audit` and `agentbom` |
 
 ## Projects
 
-WasmAgent is organized around the **evidence lifecycle** — the path from
-"the agent did something" to "here's proof it did the right thing." Repos are
-grouped by their role in that lifecycle: **define** the format, **produce**
-the evidence, **verify** it, and **improve** from it. A first-time visitor
-should be able to trace the pipeline from producer to consumer at a glance.
+[`docs/project-index.json`](../docs/project-index.json) is the machine-readable source of truth. This repository (`.github`) is the organization's public portal.
 
-This section is the human-readable view of
-[`docs/project-index.json`](../docs/project-index.json), the machine-readable
-source of truth. This repository (`.github`) is the organization's sole
-public portal.
+### 📐 01 · Protocol — the contract
 
-### 📐 Protocol — the contract
-
-Canonical JSON Schemas that every repo agrees on. Published as
-`@wasmagent/protocol` (npm) and `wasmagent-protocol` (PyPI). Per the org
-repository-boundary policy, schemas are **never vendored** — consumers always
-depend on the published package.
+Canonical JSON Schemas shared across the organization. Published as `@wasmagent/protocol` (npm) and `wasmagent-protocol` (PyPI). Schemas are **not vendored**; consumers depend on the published package boundary.
 
 | Repository | Role |
 | --- | --- |
-| [wasmagent-protocol](https://github.com/WasmAgent/wasmagent-protocol) | **Canonical AEP + compliance JSON Schemas** — aep-record (v0.5 attribution grading with floor, itemization, evidence count), compliance contract family, trust-score schema, RFC registry. Released 0.1.10. |
+| **[wasmagent-protocol](https://github.com/WasmAgent/wasmagent-protocol)** | **Canonical AEP + compliance JSON Schemas** — `aep-record` with aep/v0.5 attribution grading (floor, itemization, evidence count), compliance contract family, trust-score schema, and RFC registry. Released 0.1.10. |
 
-### ⚡ Evidence producers — where signed evidence is born
-
-| Repository | Role |
-| --- | --- |
-| [wasmagent-js](https://github.com/WasmAgent/wasmagent-js) | **Runtime monorepo** (v1.x, 40+ packages) — WASM kernels (QuickJS, Pyodide, Wasmtime, Remote), AEP emitter with aep/v0.5 attribution grading and DSSE signing, MCP gateway + attestation + firewall + posture, capability manifests, model adapters (Anthropic, OpenAI, Doubao, Qwen, local), CLI, devtools, evals-runner, Cloudflare Worker, React components. The **primary evidence producer**. |
-| [wasmagent-proxy](https://github.com/WasmAgent/wasmagent-proxy) | **Gateway** (Rust, Proxy-Wasm) — network-boundary evidence engine for Envoy, Istio, Kong, Consul. Emits aep/v0.5 records with DSSE signing and attribution grading at the network boundary. |
-| [bscode](https://github.com/WasmAgent/bscode) | **Coding workload** on Cloudflare Workers — AEP evidence export, deny capabilities, output taint labels, RolloutProvenance. |
-
-> **`wasmagent-py`** *(planned)* joins this tier as the Python runtime sibling —
-> same AEP schema, Criterion/ConstraintIR protocol, and symkernel adapter — so
-> evidence is emitted wherever agents actually run, not just in JS.
-
-### 🔍 Verification & trust — checking evidence, establishing trust
+### ⚡ 02 · Evidence producers — where signed evidence is born
 
 | Repository | Role |
 | --- | --- |
-| [open-agent-audit](https://github.com/WasmAgent/open-agent-audit) | **Audit product** — adapters (AEP → canonical events), scoring (Evidence Admission Score with attribution-integrity bonus), policy audit, reports (Markdown/HTML/PDF/CSV/JSON), dashboard, worker, Trust Passport signing. Deployed at [trustavo.com](https://trustavo.com). |
-| [agentbom](https://github.com/WasmAgent/agentbom) | **Trust & BOM tooling** — AgentBOM validator, compliance checker (SOC2/ISO27001/EU AI Act), MCP Posture diff engine, CLI, framework adapters (AutoGen, LangChain, LlamaIndex), WASM-native OPA/Rego policy evaluator. |
-| [symkernel](https://github.com/WasmAgent/symkernel) | **Formal proof engine** (Go, Research/Preview) — cel-go rules, wazero Wasm sandbox hard-isolation, Z3 SMT proofs; imports OPA Rego / AWS Cedar policies (translated to CEL, fail-closed). |
+| **[wasmagent-js](https://github.com/WasmAgent/wasmagent-js)** | **Runtime monorepo** (v1.x, 40+ packages) — WASM kernels (QuickJS, Pyodide, Wasmtime, Remote), AEP emitter with aep/v0.5 attribution grading and DSSE signing, MCP gateway + attestation + firewall + posture, capability manifests, model adapters, CLI, devtools, evals-runner, Cloudflare Worker, and React components. The **primary evidence producer**. |
+| **[wasmagent-proxy](https://github.com/WasmAgent/wasmagent-proxy)** | **Gateway** (Rust, Proxy-Wasm) — network-boundary evidence engine for Envoy, Istio, Kong, and Consul. Emits aep/v0.5 records with DSSE signing and attribution grading before requests reach the runtime. |
+| **[bscode](https://github.com/WasmAgent/bscode)** | **Coding workload** on Cloudflare Workers — AEP evidence export, deny capabilities, output taint labels, and RolloutProvenance. |
 
-### 📊 Training & evaluation — evidence-driven improvement
+> **`wasmagent-py` — planned.** The Python runtime sibling is intended to use the same AEP schema, Criterion / ConstraintIR protocol, and symkernel adapter so evidence is emitted wherever agents run, not only in JS.
 
-| Repository | Role |
-| --- | --- |
-| [trace-pipeline](https://github.com/WasmAgent/trace-pipeline) | **Training-data gate** (`evomerge` on PyPI) — AEP validation, attribution-grading consumption, trust score, paired statistics, adversarial suite, training-data admission gate. |
-| [wasmagent-train-replay](https://github.com/WasmAgent/wasmagent-train-replay) | **GPU training evidence** (Research/Preview) — PROV-DM provenance graph, Ed25519-signed EpochEvidenceBundles, deterministic replay CLI. |
-| [fresharena](https://github.com/WasmAgent/fresharena) | **Adversarial evaluation** — FAEP schema, submit-then-test, Public Immunity Pool; paper in preparation. |
-
-### 🔗 Reference & hub
+### 🔍 03 · Verification & trust — checking evidence, establishing trust
 
 | Repository | Role |
 | --- | --- |
-| [agent-golden-path](https://github.com/WasmAgent/agent-golden-path) | **Golden Path** — a procurement copilot proving the full chain end to end: execution → `mcp-firewall` → compliance → signed **AEP** evidence → audit report + trust passport. `bun install && bun test`, no live LLM. |
-| [`.github`](https://github.com/WasmAgent/.github) | **Org hub** — portal, roadmap, claims registry, release ledger, project index, cross-repo docs. |
+| **[open-agent-audit](https://github.com/WasmAgent/open-agent-audit)** | **Audit product** — adapters (AEP → canonical events), Evidence Admission Score with attribution-integrity bonus, policy audit, Markdown / HTML / PDF / CSV / JSON reports, dashboard, Worker deployment, and Trust Passport signing. Deployed at [trustavo.com](https://trustavo.com). |
+| **[agentbom](https://github.com/WasmAgent/agentbom)** | **Trust & BOM tooling** — AgentBOM validator, compliance checker (SOC 2 / ISO 27001 / EU AI Act), MCP Posture diff engine, CLI, framework adapters, and WASM-native OPA / Rego policy evaluation. |
+| **[symkernel](https://github.com/WasmAgent/symkernel)** | **Formal proof engine** (Go, Research / Preview) — cel-go rules, wazero Wasm sandbox hard-isolation, and Z3 SMT proofs; imports OPA Rego / AWS Cedar policies through fail-closed translation to CEL. |
 
-## Vision
+### 📊 04 · Training & evaluation — evidence-driven improvement
 
-The broader industry is converging on *Agent Runtime / Agent OS* as the next infrastructure frontier — the layer that moves agents from stateless one-shot calls to long-running, stateful, recoverable systems. We agree with that framing, and we go one step further.
+| Repository | Role |
+| --- | --- |
+| **[trace-pipeline](https://github.com/WasmAgent/trace-pipeline)** | **Training-data gate** (`evomerge` on PyPI) — AEP validation, attribution-grading consumption, trust score, paired statistics, adversarial suite, and training-data admission gate. |
+| **[fresharena](https://github.com/WasmAgent/fresharena)** | **Adversarial evaluation** — FAEP schema, submit-then-test, Public Immunity Pool; technical paper in preparation. |
+| **[wasmagent-train-replay](https://github.com/WasmAgent/wasmagent-train-replay)** | **GPU training evidence** (Research / Preview) — PyTorch Flight Recorder ingestion, cross-rank PROV-DM provenance graph, Ed25519-signed `EpochEvidenceBundle`, tensor-origin tracing, and deterministic replay. |
 
-**Reliability is necessary but not sufficient.** An agent that runs stably but whose behavior cannot be verified, audited, or proven correct is not ready for production systems, regulated industries, or multi-agent trust chains. The gap between "it finished" and "it did the right thing" is exactly where WasmAgent operates.
+### 🔗 05 · Reference & hub — prove and explain the whole chain
 
-Provable AI agents rest on three layers that a plain Agent Runtime omits:
+| Repository | Role |
+| --- | --- |
+| **[agent-golden-path](https://github.com/WasmAgent/agent-golden-path)** | **Golden Path** — runnable procurement copilot proving execution → `mcp-firewall` → compliance → signed AEP evidence → audit report + trust passport. `bun install && bun test`; no live LLM required. |
+| **[`.github`](https://github.com/WasmAgent/.github)** | **Organization hub** — portal, roadmap, claims registry, release ledger, project index, and cross-repository documentation. |
 
-| Layer | What it solves | Status |
+## How the runtime pieces connect
+
+The **gateway** layer — `wasmagent-proxy` — sits at the network boundary, intercepting Agent / MCP / A2A HTTP traffic across Envoy, Istio, Kong, and Consul and emitting signed AEP records before requests reach the runtime.
+
+The **runtime** layer — `wasmagent-js` v1.x — protects agent execution across multiple WASM kernels, enforces MCP policy through `mcp-gateway` and `mcp-attestation`, and emits signed AEP events into verifiable runtime traces. The planned `wasmagent-py` sibling will share the same AEP contract and symkernel adapter.
+
+`symkernel` backs the verification direction with symbolic techniques: cel-go for high-frequency rule evaluation, wazero for hard-isolated Wasm execution of generated code, and Z3 for combinatorial constraint proofs. It is Research / Preview, with no stable public API or package guarantee yet.
+
+`bscode` and `fresharena` are the two live agent surfaces — coding workload and adversarial evaluation — both instrumented to produce AEP evidence.
+
+`trace-pipeline` (`evomerge`) consumes evidence for training-data admission and paired statistical evaluation. `wasmagent-train-replay` extends the evidence model to distributed GPU jobs using Flight Recorder data, PROV-DM causal graphs, signed epoch bundles, and deterministic replay.
+
+`agentbom` produces machine-readable trust artifacts. `agent-trust-infra` is archived and superseded by `agentbom`; `@wasmagent/mcp-posture` now lives in `wasmagent-js` alongside `@wasmagent/mcp-firewall`. The Trust Passport specification lives in `wasmagent-protocol`; the Trust Passport product lives in `open-agent-audit`.
+
+`open-agent-audit` turns the evidence chain into enterprise-readable audit artifacts and is deployed at **[trustavo.com](https://trustavo.com)**. `fresharena` closes the feedback loop with dynamic, verifiable adversarial evaluation.
+
+## Standards & ecosystem
+
+### Public claims
+
+**5 public claims — all `supported`** · Registry last reviewed **2026-09-12**
+
+[`claims/public-claims.yml`](../claims/public-claims.yml) records public software-property claims together with evidence links and review dates so they can be checked independently. This is deliberately separate from marketing copy.
+
+### Active OWASP MCP Top 10 upstream work
+
+The following are **open upstream discussions / proposals**, not claims of OWASP endorsement or adoption:
+
+| Upstream item | Scope | Status |
 | --- | --- | --- |
-| **Provable correctness** | `symkernel` — cel-go rules, wazero hard-isolation, Z3 SMT proofs; imports OPA Rego / AWS Cedar policies (fail-closed) so existing policies gain formal proof | 🚧 in progress · Research / Preview |
-| **Tamper-evident evidence** | AEP (Agent Evidence Protocol) — Ed25519-signed behavioral records at gateway and runtime | shipping in `wasmagent-js` v1.x |
-| **Regulatory compliance** | EU AI Act Annex IV mapping, OWASP Agentic Top 10, NIST AI RMF | draft in `agentbom` |
+| [Issue #44](https://github.com/OWASP/www-project-mcp-top-10/issues/44) | Verifiable Authorization Lineage; offline-verifiable non-repudiation and attribution evidence | Open discussion |
+| [PR #58](https://github.com/OWASP/www-project-mcp-top-10/pull/58) | Recommended control: verifiable authorization lineage; graded attribution and offline scope re-evaluation | Open PR |
+| [PR #50](https://github.com/OWASP/www-project-mcp-top-10/pull/50) | MCP08 agent decision evidence; tamper-evident records and AEP implementation reference | Open PR |
+| [PR #53](https://github.com/OWASP/www-project-mcp-top-10/pull/53) | MCP07 identity and OAuth trust boundaries | Open PR |
 
-Put plainly: a plain Agent Runtime runs things reliably at scale; open infrastructure for *provable* AI agents adds the proof, signed evidence, and compliance mapping on top — composable, open, and infrastructure-grade.
+The goal is to contribute implementation-neutral control language and concrete open reference implementations where useful — while keeping upstream status explicit.
 
-## Architecture
+## Trustavo
 
-![WasmAgent architecture](../assets/product-matrix.svg)
+**[Trustavo](https://trustavo.com)** is the production deployment of OpenAgentAudit. It exists to make the evidence produced by the open stack legible to enterprise teams, auditors, and regulators: not just "a log exists," but what was verified, what evidence supports the result, and what remains outside the claim boundary.
 
-The **gateway** layer — `wasmagent-proxy` — sits at the network boundary, intercepting
-Agent/MCP/A2A HTTP traffic across Envoy, Istio, Kong, and Consul, and emitting
-Ed25519-signed AEP records before requests reach the runtime.
+## Governance continuity
 
-The **runtime** layer — `wasmagent-js` (v1.x) — protects agent execution across
-multiple WASM kernels, enforces MCP policy via `mcp-gateway` and `mcp-attestation`,
-and emits signed AEP events that flow into verifiable runtime traces. A Python
-sibling, `wasmagent-py`, is planned and will share the same AEP schema, protocol,
-and symkernel adapter.
+The primary maintainer for WasmAgent is [@telleroutlook](https://github.com/telleroutlook). Report urgent issues in the relevant project repository. If there is no response within 7 days, escalate through an [issue in `WasmAgent/.github`](https://github.com/WasmAgent/.github/issues) and tag [@telleroutlook](https://github.com/telleroutlook).
 
-`symkernel` (Research / Preview) backs both runtimes with symbolic verification:
-cel-go for lightweight high-frequency rule evaluation, wazero for hard-isolated
-Wasm sandbox execution of LLM-generated code, and Z3 SMT solving for combinatorial
-constraint proofs. It has no stable API or published package yet; interfaces change
-as experiments evolve.
-
-`bscode` and `fresharena` are the two live agent surfaces: coding workload and
-adversarial evaluation, both instrumented to produce AEP evidence.
-
-`trace-pipeline` (`evomerge` on PyPI) gates training-data admission with paired
-statistics and records every training run as auditable evidence. Compatible with
-`wasmagent-js` v1.x AEP schema. `wasmagent-train-replay` (Research / Preview)
-extends this to distributed GPU training jobs: it reads PyTorch Flight Recorder
-dumps, builds a cross-rank PROV-DM causal graph, and produces tamper-evident
-`EpochEvidenceBundle` records, enabling tensor-origin tracing and deterministic
-replay. It is research-stage — no stable API or published package yet.
-
-`agentbom` (`@wasmagent/agentbom-core`, `@wasmagent/agentbom-cli`) produces trust
-artifacts — Agent Bill of Materials, validator, compliance checker — giving every agent run
-a machine-readable identity. `agent-trust-infra` is archived; `agentbom` is its successor.
-`@wasmagent/mcp-posture` (MCP Posture validator) is now part of `wasmagent-js` alongside
-`@wasmagent/mcp-firewall`. Trust Passport spec lives in `wasmagent-protocol`; the Trust
-Passport product lives in `open-agent-audit`.
-
-`open-agent-audit` turns the full evidence chain into enterprise-readable audit
-reports with aep/v0.5 attribution-grading adapter support — deployed at **[trustavo.com](https://trustavo.com)**.
-
-`fresharena` closes the loop with dynamic, verifiable, adversarial evaluation,
-grounding the runtime, evidence, and audit story in measured benchmark performance.
-A technical paper (FAEP protocol + empirical results) is in preparation.
-
-## What is Trustavo?
-
-**[Trustavo](https://trustavo.com)** is the production deployment of
-OpenAgentAudit. The name combines *trust* with *-avo* — evoking a trustworthy,
-authoritative voice. In AI governance, evidence only counts when it is trusted;
-Trustavo exists to make that trust legible to enterprise teams, auditors, and
-regulators.
-
-## Governance Continuity
-
-The primary maintainer for WasmAgent is [@telleroutlook](https://github.com/telleroutlook). Report urgent issues in the relevant project repository; if there is no response within 7 days, escalate by opening an [issue in `WasmAgent/.github`](https://github.com/WasmAgent/.github/issues) and tagging [@telleroutlook](https://github.com/telleroutlook). Core repositories — `wasmagent-js`, `wasmagent-protocol`, and `agentbom` — are actively maintained, while `symkernel` and `wasmagent-train-replay` are experimental Research / Preview projects that receive best-effort updates.
+Core repositories — `wasmagent-js`, `wasmagent-protocol`, and `agentbom` — are actively maintained. `symkernel` and `wasmagent-train-replay` are experimental Research / Preview projects and receive best-effort updates.
 
 ## Maintainers wanted
 
-We are looking for maintainers across several focus areas. Open to
-part-time and async contribution; commit access is granted after a
-sustained track record.
+We welcome sustained, async contributions across the stack. Commit access follows demonstrated contribution history.
 
-- **Runtime** — `wasmagent-js`, AEP, MCP gateway/attestation, capability manifests
-- **Runtime (Python)** — `wasmagent-py`, Python agent runtime and symkernel adapter
-- **Gateway** — `wasmagent-proxy`, Proxy-Wasm evidence engine (Rust, Envoy/Istio/Kong)
-- **Verification (Research / Preview)** — `symkernel`, cel-go rules, wazero sandbox, Z3 SMT integration (Go)
-- **Pipelines** — `trace-pipeline` / `evomerge` (measurement trust, admission, training audit)
-- **Training evidence (Research / Preview)** — `wasmagent-train-replay`, PyTorch Flight Recorder, PROV-DM, GPU training causal graphs
-- **Trust tooling** — `agentbom` (`@wasmagent/agentbom-core`, `@wasmagent/agentbom-cli`; migrated from archived `agent-trust-infra`); `@wasmagent/mcp-posture` now in `wasmagent-js`; Trust Passport spec → `wasmagent-protocol`; Trust Passport product → `open-agent-audit`
-- **Audit product** — `open-agent-audit` / Trustavo (evidence reports, Cloudflare Workers)
-- **Evaluation** — `fresharena` (dynamic, verifiable, adversarial evaluation; paper preparation)
-- **Adapters** — OpenTelemetry GenAI, Langfuse, LangSmith ingestion
-- **Regulatory profiles** — OWASP Agentic Top 10, NIST AI RMF, ISO/IEC 42001, EU AI Act Annex IV
-- **DevRel & docs** — quickstart guides, integration walkthroughs, sample reports
+| Area | Repositories / focus |
+| --- | --- |
+| **Runtime** | `wasmagent-js` · AEP · MCP gateway / attestation · capability manifests |
+| **Runtime · Python** | planned `wasmagent-py` · Python runtime · symkernel adapter |
+| **Gateway** | `wasmagent-proxy` · Rust · Proxy-Wasm · Envoy / Istio / Kong |
+| **Verification** | `symkernel` · cel-go · wazero · Z3 SMT · Research / Preview |
+| **Pipelines** | `trace-pipeline` / `evomerge` · measurement trust · training admission |
+| **Training evidence** | `wasmagent-train-replay` · Flight Recorder · PROV-DM · GPU causal graphs |
+| **Trust tooling** | `agentbom` · MCP Posture · Trust Passport contracts |
+| **Audit product** | `open-agent-audit` / Trustavo · evidence reports · Workers |
+| **Evaluation** | `fresharena` · verifiable adversarial evaluation |
+| **Adapters** | OpenTelemetry GenAI · Langfuse · LangSmith ingestion |
+| **Regulatory profiles** | OWASP agent security guidance · NIST AI RMF · ISO/IEC 42001 · EU AI Act Annex IV |
+| **DevRel & docs** | quickstarts · integration walkthroughs · sample reports |
 
-Interested? Open an issue titled `maintainer: <area>` in the relevant
-repository, or start a GitHub Discussion in the project home repository.
+Interested? Open an issue titled `maintainer: <area>` in the relevant repository, or start a GitHub Discussion in the project home repository.
 
 ## Ledgers & registries
 
-Public ledgers and shared docs live in this repository so they belong to the
-org, not any single product.
+These organization-level records live in `.github` so they belong to the public project rather than to any single product:
 
-- [RFC registry](../docs/RFC/README.md) — org-level design decisions that span multiple repositories
-- [Claims registry](../claims/public-claims.yml) — org claims mapped to evidence and review status
+- [RFC registry](../docs/RFC/README.md) — cross-repository design decisions
+- [Claims registry](../claims/public-claims.yml) — public claims mapped to evidence and review status
 - [Release ledger](../releases/public-release-ledger.yml) — public releases across repositories
 - [Media & posts](../media/posts.yml) — talks, posts, and appearances
-- [Project index](../docs/project-index.json) — machine-readable source of truth for the project list
-- [Roadmap](../docs/roadmap.md) — living roadmap mirroring the public repo list
+- [Project index](../docs/project-index.json) — machine-readable project source of truth
+- [Roadmap](../docs/roadmap.md) — living roadmap aligned with the public repository set
 
-## Disclaimer
+---
 
-Repositories in this organization produce **technical evidence** and
-research tooling. They do not provide legal advice, regulatory
-certification, or compliance determinations.
+### Disclaimer
+
+Repositories in this organization produce **technical evidence** and research tooling. They do not provide legal advice, regulatory certification, or compliance determinations.
