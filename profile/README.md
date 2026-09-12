@@ -9,14 +9,20 @@
 ## One map: how the four names fit together
 
 ```mermaid
-flowchart TD
-    W["**WasmAgent** · the GitHub org"] --> O["**OpenAgentAudit** · open audit spec & product"]
-    O --> T["**Trustavo** · commercial deployment layer"]
-    W --> B["**AgentBOM** · independent spec & CLI"]
-    click W href "https://github.com/WasmAgent" _blank
-    click O href "https://github.com/WasmAgent/open-agent-audit" _blank
-    click T href "https://trustavo.com" _blank
-    click B href "https://github.com/WasmAgent/agentbom" _blank
+flowchart LR
+    W(["<b>WasmAgent</b><br/><sub>the GitHub org</sub>"]):::org
+    O(["<b>OpenAgentAudit</b><br/><sub>open audit spec & product</sub>"]):::audit
+    T(["<b>Trustavo</b><br/><sub>commercial deployment</sub>"]):::commercial
+    B(["<b>AgentBOM</b><br/><sub>independent spec & CLI</sub>"]):::bom
+
+    W --> O
+    W --> B
+    O --> T
+
+    classDef org fill:#0969da,stroke:#0969da,color:#ffffff,stroke-width:2px
+    classDef audit fill:#8250df,stroke:#8250df,color:#ffffff,stroke-width:2px
+    classDef commercial fill:#bf3989,stroke:#bf3989,color:#ffffff,stroke-width:2px
+    classDef bom fill:#1a7f37,stroke:#1a7f37,color:#ffffff,stroke-width:2px
 ```
 
 One line each — what it is, who it is for, where to find it:
