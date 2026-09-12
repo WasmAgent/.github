@@ -10,10 +10,10 @@
 
 ```mermaid
 flowchart LR
-    W(["<b>WasmAgent</b><br/><sub>the GitHub org</sub>"]):::org
-    O(["<b>OpenAgentAudit</b><br/><sub>open audit spec & product</sub>"]):::audit
-    T(["<b>Trustavo</b><br/><sub>commercial deployment</sub>"]):::commercial
-    B(["<b>AgentBOM</b><br/><sub>independent spec & CLI</sub>"]):::bom
+    W["WasmAgent<br/>the GitHub org"]:::org
+    O["OpenAgentAudit<br/>open audit spec & product"]:::audit
+    T["Trustavo<br/>commercial deployment"]:::commercial
+    B["AgentBOM<br/>independent spec & CLI"]:::bom
 
     W --> O
     W --> B
