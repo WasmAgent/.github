@@ -1,0 +1,29 @@
+name: Org Compatibility
+
+# This repository (governance/orchestration) calls its own pinned reusable
+# compatibility workflow on contract-sensitive pull requests, so the gate that
+# protects consumers is itself exercised pre-merge (N2-P1-06).
+#
+# The reusable workflow reference is immutable (full commit SHA). Update it
+# deliberately when the reusable workflow changes.
+
+on:
+  pull_request:
+    paths:
+      - "scripts/org-contract/**"
+      - "policies/**"
+      - "golden-path/**"
+      - "attestations/**"
+      - ".github/workflows/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  org-compat:
+    name: Org compatibility (.github)
+    uses: WasmAgent/.github/.github/workflows/reusable-compat-check.yml@13bcca67098052c9591353127fac39800cd9876c
+    with:
+      repo: .github
+      candidate_sha: ${{ github.event.pull_request.head.sha || github.sha }}
