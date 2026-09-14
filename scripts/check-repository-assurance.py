@@ -141,10 +141,12 @@ class Scanner:
         return 1 if gating_fails else 0
 
 
-def scan_local(root: Path, policy: dict, advisory: set[str]) -> Scanner:
+def scan_local(root: Path, policy: dict, advisory: set[str], only_repo: str | None = None) -> Scanner:
     s = Scanner(policy, advisory)
     for cls, repos in policy["classes"].items():
         for repo in repos:
+            if only_repo is not None and repo != only_repo:
+                continue
             d = root / repo
             if not d.is_dir():
                 s.record(repo, f"checkout present ({cls})", False, "missing under --root")
@@ -199,13 +201,14 @@ def main() -> int:
     ap.add_argument("--root", help="directory containing checked-out repos")
     ap.add_argument("--remote", help="GitHub org to scan via API")
     ap.add_argument("--include-frozen", action="store_true", help="treat frozen-core failures as gating")
+    ap.add_argument("--only-repo", help="scan only this repository (must appear in the policy)")
     args = ap.parse_args()
 
     policy = load_policy(Path(args.policy))
     advisory = set() if args.include_frozen else set(policy["classes"]["frozen_core"])
 
     if args.root:
-        s = scan_local(Path(args.root), policy, advisory)
+        s = scan_local(Path(args.root), policy, advisory, args.only_repo)
     elif args.remote:
         token = os.environ.get("GITHUB_TOKEN", "")
         if not token:

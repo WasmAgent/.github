@@ -1,0 +1,16 @@
+{
+  "format": "wasmagent-org-compat-matrix/v1",
+  "comment": "Per-repo pre-merge compatibility target executed by the reusable workflow (.github/workflows/reusable-compat-check.yml). Every gated non-core repo must appear here so contract-sensitive PRs fail closed.",
+  "targets": {
+    "open-agent-audit": { "kind": "consumer" },
+    "agentbom": { "kind": "consumer" },
+    "bscode": { "kind": "consumer" },
+    "symkernel": { "kind": "schemas", "command": "make check-schemas" },
+    "agent-golden-path": {
+      "kind": "e2e",
+      "install": "bun install --frozen-lockfile",
+      "command": "bun run test:e2e:certified"
+    },
+    ".github": { "kind": "gov" }
+  }
+}
