@@ -1,7 +1,7 @@
 name: Org Contract Compatibility
 
-# Org Gates O1-O4 (see policies/repository-assurance.yml and the
-# non-core alignment repair plan). Replaces the former STUB-only checks.
+# Org Gates O1-O4 (see policies/repository-assurance.yml and the non-core
+# alignment repair plan). Replaces the former STUB-only checks.
 #
 # O1 — repository assurance: every non-core repo satisfies the supply-chain
 #      baseline (immutable action refs, permissions, lockfiles, no @latest).
@@ -10,9 +10,16 @@ name: Org Contract Compatibility
 #      schemas are byte-identical; the org stack lock is internally consistent.
 # O3 — Golden Path E2E: the runnable reference app passes its exact-stack
 #      vectors at the revision pinned in the org stack lock.
-# O4 — release provenance: publishing/deploying repos carry a full provenance
-#      envelope (immutable refs, frozen install, tests before publish, exact
-#      source SHA, OIDC provenance, artifact digest, no placeholder evidence).
+# O4 — release provenance: publishing/deploying repos carry a structured
+#      release/deploy provenance envelope (workflow DAG validation).
+#
+# Every gate resolves the revision it tests from golden-path/versions.lock.json
+# via scripts/org-contract/checkout-pinned.sh, checks out that exact SHA and
+# asserts HEAD == pin. No stack attestation gate may use an implicit main.
+#
+# A final attestation job (v2) binds every pinned repo SHA, its committed lock
+# hash and the gates exercised, and fails when a gate-consumed repo is not
+# pinned.
 
 on:
   schedule:
@@ -24,6 +31,7 @@ on:
       - "policies/**"
       - "scripts/**"
       - "golden-path/versions.lock.json"
+      - "attestations/**"
       - ".github/workflows/org-contract-compatibility.yml"
 
 permissions:
@@ -33,21 +41,39 @@ env:
   PROTOCOL_PKG: "@wasmagent/protocol@0.1.10"
 
 jobs:
+  o0-script-tests:
+    name: "O0: gate script unit tests"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+      - name: Run org-contract script tests
+        run: node --test scripts/org-contract/*.test.mjs
+
   o1-repository-assurance:
     name: "O1: repository assurance"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
 
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+
       - name: Include this repository in the scan set
         run: |
           mkdir -p scan
           rsync -a --exclude scan "$GITHUB_WORKSPACE/" scan/.github/
 
-      - name: Clone non-core repositories (shallow)
+      - name: Clone non-core repositories at their pinned SHAs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          for repo in open-agent-audit bscode agent-golden-path agentbom fresharena symkernel wasmagent-train-replay; do
-            git clone --depth 1 "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/WasmAgent/${repo}.git" "scan/${repo}"
+          set -euo pipefail
+          for repo in $(node scripts/org-contract/stack-lock.mjs --repos); do
+            scripts/org-contract/checkout-pinned.sh "$repo" "scan/${repo}"
           done
 
       - name: Run assurance scanner
@@ -76,14 +102,18 @@ jobs:
           cd /tmp/contract-gate
           node "$GITHUB_WORKSPACE/scripts/org-contract/validate-fixtures.mjs"
 
-      # ORG-CD-01: vendored schema bytes must equal the canonical package bytes.
+      # ORG-CD-01: vendored schema bytes must equal the canonical package bytes,
+      # at the exact symkernel revision pinned in the org stack lock.
       - name: symkernel vendored schema drift gate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git clone --depth 1 "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/WasmAgent/symkernel.git" /tmp/symkernel
+          set -euo pipefail
+          scripts/org-contract/checkout-pinned.sh symkernel /tmp/symkernel
           make -C /tmp/symkernel check-schemas
 
-      # versions.lock.json must carry the certified tuple exactly, and every
-      # pinned package must resolve on the public registry.
+      # versions.lock.json must carry the certified tuple exactly, pin every
+      # gated non-core repo, and resolve every pinned package on the registry.
       - name: Org stack lock consistency
         run: node scripts/org-contract/check-stack-lock.mjs
 
@@ -93,20 +123,21 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
 
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
         with:
           bun-version: "1.3.14"
 
-      - name: Run certified-stack E2E in agent-golden-path
+      - name: Run certified-stack E2E in agent-golden-path at its pinned SHA
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          # O3: run the exact repository revision recorded in the org stack
-          # lock — never a moving main. A missing/invalid pin is a hard fail.
-          GOLDEN_SHA=$(node -e "const l=require('./golden-path/versions.lock.json'); const s=l.non_core['agent-golden-path']; if(!/^[0-9a-f]{40}$/.test(s)){console.error('agent-golden-path not pinned in versions.lock.json');process.exit(1)} process.stdout.write(s)")
-          echo "Running agent-golden-path @ ${GOLDEN_SHA} (from versions.lock.json)"
-          git clone "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/WasmAgent/agent-golden-path.git" /tmp/agent-golden-path
+          scripts/org-contract/checkout-pinned.sh agent-golden-path /tmp/agent-golden-path
           cd /tmp/agent-golden-path
-          git checkout --quiet "$GOLDEN_SHA"
           bun install --frozen-lockfile
           bun run test:e2e:certified
 
@@ -116,11 +147,55 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
 
-      - name: Clone publishing/deploying repositories (shallow)
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+
+      - name: Clone publishing/deploying repositories at their pinned SHAs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
           for repo in open-agent-audit agentbom bscode; do
-            git clone --depth 1 "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/WasmAgent/${repo}.git" "scan/${repo}"
+            scripts/org-contract/checkout-pinned.sh "$repo" "scan/${repo}"
           done
 
       - name: Run release provenance gate
         run: node scripts/org-contract/check-release-provenance.mjs --root scan
+
+  o-attestation:
+    name: "O5: exact-tuple attestation (v2)"
+    needs: [o0-script-tests, o1-repository-assurance, o2-contract-compatibility, o3-golden-path-e2e, o4-release-provenance]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+
+      - name: Clone every pinned non-core repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          for repo in $(node scripts/org-contract/stack-lock.mjs --repos); do
+            scripts/org-contract/checkout-pinned.sh "$repo" "scan/${repo}"
+          done
+
+      - name: Generate exact-tuple attestation (fails on missing ownership)
+        run: |
+          node scripts/org-contract/generate-attestation.mjs \
+            --root scan \
+            --out attestations/org-stack-current.json \
+            --gate-sha "${{ github.sha }}" \
+            --run-id "${{ github.run_id }}"
+
+      - name: Summarize attestation
+        run: cat attestations/org-stack-current.json
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: org-stack-attestation
+          path: attestations/org-stack-current.json
+          retention-days: 90
