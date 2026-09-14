@@ -2,7 +2,7 @@
   "format": "wasmagent-org-stack-attestation/v1",
   "core_target": "aep-certified-2026-09-13-03",
   "tested_repositories": {
-    "agent-golden-path": "2e3ed47490edabd07c2b765d294daf9e05134f93"
+    "agent-golden-path": "4df017ab2b0df21e95e320019bc2521df61d6cc0"
   },
   "tested_packages": {
     "@wasmagent/aep": "2.9.0",
@@ -11,9 +11,9 @@
   "lock_hashes": {
     "golden-path/versions.lock.json": "31281e680a5cfec7462bc82990d9118b48cabfab08a405bd1ed9075072fdcb17",
     "open-agent-audit/bun.lock": "f88f881217a9b9230f83990d2de4035919c9f58a51648ce74cfe36a5a8032092",
-    "bscode/bun.lock": "4898ff8f5cde77e7258bb0a3436079620e1f6db9d5df4e529a96e0ee83a256a5",
-    "agent-golden-path/bun.lock": "54bb43ae93c63bb21d74ed602b96628df1e37bde9ae467daef80f97f16608ae8",
-    "agentbom/bun.lock": "abbf681166813a9e509f301c02ee5c2526255f9b36411afdf7ed39d92e390f66",
+    "bscode/bun.lock": "1e07cca565e35751cb4814280ca4999fd7a97df414aff03526e7b289ca22f057",
+    "agent-golden-path/bun.lock": "abc2dd7c34178ca5f5e8e93f4fca3cb1ecc9541e598195a8bd6d979b1bce6c5c",
+    "agentbom/bun.lock": "10b975b6e3f835bd8b05949e07c4babdd7f68fe5027adee0b34e273cc7dc158c",
     "symkernel/schemas/protocol.lock.json": "77e9fbf9d71735bb169978be1842500778cbe35e8011c96e8c37faab67d28e9c",
     "wasmagent-train-replay/uv.lock": "ce03372742aa56f6e6b8f222a72238e6d157fbf379d3a6593610ac0369c9b38e",
     "fresharena/bun.lock": "133129dffa61dc2df24b530c1e7fc9877b214ba4a365d40d270247e2c651f953"
