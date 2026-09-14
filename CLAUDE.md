@@ -71,15 +71,19 @@ for each repo's own CI.
 - [x] `docs/repository-boundaries.md` — org boundary policy doc
 - [x] `golden-path/README.md` — Golden Path entry point
 - [x] `golden-path/versions.lock.json` — machine-readable certified stack lock
-- [ ] `golden-path/scripts/` — bootstrap, run-agent, verify-aep, audit, admit, demo stubs
-- [x] `.github/workflows/org-contract-compatibility.yml` — Org Gates O1/O2/O3 (real checks, no STUB)
+- [x] `golden-path/scripts/` — `bootstrap.sh`, `demo.sh` local helpers
+- [x] `.github/workflows/org-contract-compatibility.yml` — Org Gates O1/O2/O3/O4 (real checks, no STUB)
+- [x] `policies/repository-assurance.yml` + `scripts/check-repository-assurance.py` — O1 scanner
+- [x] `attestations/org-stack-current.json` — internal org stack attestation
+- [x] `releases/placeholder-trust-artifact-audit.yml` — P0-01(D) retroactive audit record
 
 ### P1 — Golden Path v1 (30 days)
-- [ ] `golden-path/docker-compose.yml` — one-command local demo
-- [ ] `golden-path/tests/golden-path.test.ts` — automated integration test
-- [ ] `golden-path/fixtures/` — safe-call.json, malicious-call.json
-- [ ] `golden-path/expected/` — aep.json, audit-report.json, admission-decision.json
-- [ ] `profile/README.md` updated to reference Golden Path
+- [x] `golden-path/docker-compose.yml` — one-command local demo
+- [x] `golden-path/tests/golden-path.test.ts` — fixture/expected-vector checks
+- [x] `golden-path/fixtures/` — safe-call.json, malicious-call.json
+- [x] `golden-path/expected/` — aep.json, audit-report.json, admission-decision.json
+- [x] `profile/README.md` references the Golden Path
+- [ ] Runnable E2E lives in `agent-golden-path` (Org Gate O3 runs it at the pinned SHA)
 
 ### P2 — Org metrics (60 days)
 - [ ] Weekly KPI tracking (Golden Path pass/fail, external users, npm downloads)

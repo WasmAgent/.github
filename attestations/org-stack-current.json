@@ -8,7 +8,16 @@
     "@wasmagent/aep": "2.9.0",
     "@wasmagent/protocol": "0.1.10"
   },
-  "lock_hashes": {},
+  "lock_hashes": {
+    "golden-path/versions.lock.json": "31281e680a5cfec7462bc82990d9118b48cabfab08a405bd1ed9075072fdcb17",
+    "open-agent-audit/bun.lock": "f88f881217a9b9230f83990d2de4035919c9f58a51648ce74cfe36a5a8032092",
+    "bscode/bun.lock": "4898ff8f5cde77e7258bb0a3436079620e1f6db9d5df4e529a96e0ee83a256a5",
+    "agent-golden-path/bun.lock": "54bb43ae93c63bb21d74ed602b96628df1e37bde9ae467daef80f97f16608ae8",
+    "agentbom/bun.lock": "abbf681166813a9e509f301c02ee5c2526255f9b36411afdf7ed39d92e390f66",
+    "symkernel/schemas/protocol.lock.json": "77e9fbf9d71735bb169978be1842500778cbe35e8011c96e8c37faab67d28e9c",
+    "wasmagent-train-replay/uv.lock": "ce03372742aa56f6e6b8f222a72238e6d157fbf379d3a6593610ac0369c9b38e",
+    "fresharena/bun.lock": "133129dffa61dc2df24b530c1e7fc9877b214ba4a365d40d270247e2c651f953"
+  },
   "org_gate_run": 34802370854,
   "verdicts": {
     "workflow_supply_chain": "pass",
@@ -16,5 +25,5 @@
     "golden_path": "pass",
     "release_provenance": "pending"
   },
-  "notes": "Internal WasmAgent attestation \u2014 not third-party certification. O1/O2/O3 pass on gate run 34802370854 with branch protection + required status checks enforced on all eight non-core main branches. release_provenance (O4) flips to pass once a publishing repo executes its full provenance envelope (frozen install + tests + digest + attestation) against the certified stack."
+  "notes": "Internal WasmAgent attestation \u2014 not third-party certification. O1/O2/O3 pass on gate run 34802370854 with branch protection + required status checks enforced on all eight non-core main branches. O4 (release provenance) is implemented (scripts/org-contract/check-release-provenance.mjs, job o4-release-provenance) and locally verified against open-agent-audit, agentbom, and bscode; it remains 'pending' here until the scheduled Org Gate workflow records a passing O4 run id. lock_hashes are sha256 of each repo's committed lock at the audit snapshot."
 }

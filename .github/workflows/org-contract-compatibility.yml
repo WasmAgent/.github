@@ -1,6 +1,6 @@
 name: Org Contract Compatibility
 
-# Org Gates O1-O3 (see policies/repository-assurance.yml and the
+# Org Gates O1-O4 (see policies/repository-assurance.yml and the
 # non-core alignment repair plan). Replaces the former STUB-only checks.
 #
 # O1 — repository assurance: every non-core repo satisfies the supply-chain
@@ -9,7 +9,10 @@ name: Org Contract Compatibility
 #      @wasmagent/protocol package validate; semantic-negatives fail; vendored
 #      schemas are byte-identical; the org stack lock is internally consistent.
 # O3 — Golden Path E2E: the runnable reference app passes its exact-stack
-#      vectors (Protect → Record → Audit → Admit, positive + negative).
+#      vectors at the revision pinned in the org stack lock.
+# O4 — release provenance: publishing/deploying repos carry a full provenance
+#      envelope (immutable refs, frozen install, tests before publish, exact
+#      source SHA, OIDC provenance, artifact digest, no placeholder evidence).
 
 on:
   schedule:
@@ -19,7 +22,7 @@ on:
     branches: [main]
     paths:
       - "policies/**"
-      - "scripts/check-repository-assurance.py"
+      - "scripts/**"
       - "golden-path/versions.lock.json"
       - ".github/workflows/org-contract-compatibility.yml"
 
@@ -96,7 +99,28 @@ jobs:
 
       - name: Run certified-stack E2E in agent-golden-path
         run: |
-          git clone --depth 1 "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/WasmAgent/agent-golden-path.git" /tmp/agent-golden-path
+          set -euo pipefail
+          # O3: run the exact repository revision recorded in the org stack
+          # lock — never a moving main. A missing/invalid pin is a hard fail.
+          GOLDEN_SHA=$(node -e "const l=require('./golden-path/versions.lock.json'); const s=l.non_core['agent-golden-path']; if(!/^[0-9a-f]{40}$/.test(s)){console.error('agent-golden-path not pinned in versions.lock.json');process.exit(1)} process.stdout.write(s)")
+          echo "Running agent-golden-path @ ${GOLDEN_SHA} (from versions.lock.json)"
+          git clone "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/WasmAgent/agent-golden-path.git" /tmp/agent-golden-path
           cd /tmp/agent-golden-path
+          git checkout --quiet "$GOLDEN_SHA"
           bun install --frozen-lockfile
           bun run test:e2e:certified
+
+  o4-release-provenance:
+    name: "O4: release provenance"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Clone publishing/deploying repositories (shallow)
+        run: |
+          for repo in open-agent-audit agentbom bscode; do
+            git clone --depth 1 "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/WasmAgent/${repo}.git" "scan/${repo}"
+          done
+
+      - name: Run release provenance gate
+        run: node scripts/org-contract/check-release-provenance.mjs --root scan

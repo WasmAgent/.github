@@ -3,7 +3,12 @@
 Per-repo maturity, contract stability, and intended use.
 Mirrors the status blocks in each repo's README. Update both when status changes.
 
-Last updated: 2026-08-01
+Machine-readable single source of truth for the project list is
+[`docs/project-index.json`](project-index.json) (consumed by `profile/README.md`
+and `docs/roadmap.md`). This matrix is the human-readable maturity axis; it must
+stay consistent with that registry and with each repo's README.
+
+Last updated: 2026-09-14
 
 | Repository | Status | Contract stability | Recommended for | Not recommended for |
 |---|---|---|---|---|

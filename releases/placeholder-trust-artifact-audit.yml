@@ -1,0 +1,45 @@
+# P0-01(D) — placeholder trust-artifact remediation ledger.
+#
+# The former `generate-trust-artifacts.yml` created placeholder AgentBOM /
+# MCP Posture / Trust Passport files and uploaded them to GitHub releases.
+# That false-assurance publication path was removed in commit ad033db
+# ("stop publishing placeholder trust artifacts") and O1/O2/O4 now guard it.
+#
+# This ledger records the required retroactive audit of already-published
+# release assets.
+schema_version: 1
+org: WasmAgent
+audit_date: 2026-09-14
+generator_marker_removed: "wasmagent-ops/generators (pending implementation)"
+obsolete_schema_host: "https://wasmagent.github.io/agent-trust-infra/"
+asset_name_patterns:
+  - "agentbom-*.json"
+  - "mcp-posture-*.json"
+  - "trust-passport-*.json"
+
+# Repositories whose releases were scanned for matching assets.
+repositories_scanned:
+  - .github
+  - open-agent-audit
+  - bscode
+  - agent-golden-path
+  - agentbom
+  - wasmagent-js
+  - trace-pipeline
+
+# Result: no affected public release assets were found.
+findings: []
+
+result:
+  verdict: clean
+  summary: >-
+    No GitHub release in the scanned WasmAgent repositories carried an
+    agentbom-*.json, mcp-posture-*.json, or trust-passport-*.json asset
+    produced by the placeholder generator. `.github` itself has no releases,
+    and the placeholder workflow only triggered on release events for
+    `.github`. No retraction, correction, or obsolete-marking was required.
+  remediation_action: none_required
+  prevention:
+    - "generate-trust-artifacts.yml is workflow_dispatch-only and cannot upload to releases."
+    - "Org Gate O4 fails any release/deploy surface containing placeholder evidence markers."
+    - "Org Gate O1 requires immutable action refs and frozen installs on all non-core repos."
