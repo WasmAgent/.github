@@ -1,0 +1,43 @@
+{
+  "$schema": "https://wasmagent.github.io/schemas/mesh-control-plane-1.json",
+  "meshFormat": "MeshControlPlane",
+  "specVersion": "1.0",
+  "metadata": {
+    "generated": "2026-08-02T00:00:00Z",
+    "repository": "WasmAgent/wasmagent-ops",
+    "release": "v1.0.0",
+    "generator": "wasmagent-ops/federation (test fixture)"
+  },
+  "clusters": [
+    {
+      "name": "us-east-1",
+      "region": "us-east-1",
+      "controlPlaneUrl": "https://mesh.us-east-1.wasmagent.dev",
+      "attestationDomain": "cluster.us-east-1.mesh.wasmagent.dev"
+    },
+    {
+      "name": "eu-west-1",
+      "region": "eu-west-1",
+      "controlPlaneUrl": "https://mesh.eu-west-1.wasmagent.dev",
+      "attestationDomain": "cluster.eu-west-1.mesh.wasmagent.dev"
+    },
+    {
+      "name": "ap-southeast-1",
+      "region": "ap-southeast-1",
+      "controlPlaneUrl": "https://mesh.ap-southeast-1.wasmagent.dev",
+      "attestationDomain": "cluster.ap-southeast-1.mesh.wasmagent.dev"
+    }
+  ],
+  "syncConfig": {
+    "mode": "bidirectional",
+    "intervalSeconds": 60,
+    "conflictPolicy": "last-writer-wins",
+    "syncArtifacts": ["agentboms", "trust-passports", "aep-evidence"]
+  },
+  "attestation": {
+    "crossDomain": true,
+    "verificationMode": "verify-on-sync",
+    "trustRoots": ["urn:wasmagent:trust-root:v1"],
+    "requireSignedEvidence": true
+  }
+}

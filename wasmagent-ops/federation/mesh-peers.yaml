@@ -1,0 +1,48 @@
+# wasmagent-ops/federation/mesh-peers.yaml
+#
+# Canonical peer mesh configuration for the wasmagent-ops federation control
+# plane. Consumed by:
+#
+#   wasmagent-mesh sync --peers mesh-peers.yaml
+#
+# The control plane synchronizes trust artifacts (AgentBOMs, Trust Passports,
+# signed AEP evidence) across all participating clusters and verifies
+# cross-domain attestation before admitting synced evidence into the local
+# audit ledger.
+apiVersion: mesh.wasmagent.dev/v1
+kind: MeshPeers
+metadata:
+  name: wasmagent-global-mesh
+  namespace: wasmagent-ops
+  description: >-
+    Multi-cluster agent mesh peers for cross-domain attestation
+    synchronization and continuous trust artifact propagation.
+clusters:
+  - name: us-east-1
+    region: us-east-1
+    controlPlane: https://mesh.us-east-1.wasmagent.dev
+    attestationDomain: cluster.us-east-1.mesh.wasmagent.dev
+  - name: eu-west-1
+    region: eu-west-1
+    controlPlane: https://mesh.eu-west-1.wasmagent.dev
+    attestationDomain: cluster.eu-west-1.mesh.wasmagent.dev
+  - name: ap-southeast-1
+    region: ap-southeast-1
+    controlPlane: https://mesh.ap-southeast-1.wasmagent.dev
+    attestationDomain: cluster.ap-southeast-1.mesh.wasmagent.dev
+sync:
+  mode: bidirectional
+  intervalSeconds: 60
+  conflictPolicy: last-writer-wins
+  include:
+    - agentboms
+    - trust-passports
+    - aep-evidence
+  exclude:
+    - secrets
+attestation:
+  crossDomain: true
+  verificationMode: verify-on-sync
+  trustRoots:
+    - urn:wasmagent:trust-root:v1
+  requireSignedEvidence: true
