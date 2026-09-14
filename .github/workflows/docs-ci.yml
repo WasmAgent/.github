@@ -46,13 +46,3 @@ jobs:
           fail: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  generate-trust-artifacts-on-release:
-    name: Generate trust artifacts on release (SCAFFOLD — not for release publication)
-    # Placeholder scaffold only — does NOT upload to GitHub releases.
-    if: github.event_name == 'workflow_dispatch'
-    needs: [lint-markdown, check-links]
-    uses: ./.github/workflows/generate-trust-artifacts.yml
-    secrets: inherit
-    with:
-      release_tag: ${{ github.event.release.tag_name }}
