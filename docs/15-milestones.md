@@ -4,7 +4,7 @@
 
 - [ ] `agentbom/`: Ship reference implementation for all three artifact types (AgentBOM, MCP Posture, Trust Passport)
 - [ ] `agentbom/cli`: CLI emits valid AgentBOM JSON for any agent run (`agentbom --run-id <id> --output agentbom.json`)
-- [ ] `agentbom/`: MCP Posture verification passes against sample agent manifest (`verify-posture --manifest examples/manifest.yaml`)
+- [x] `agentbom/`: MCP Posture verification passes against sample agent manifest (`verify-posture --manifest examples/manifest.yaml`)
 - [ ] `agentbom/`: Trust Passport export includes signed AEP events (`passport export --format json --include-aep`)
 - [ ] `docs/`: Publish trust artifact spec docs with JSON schema validation (`docs/trust-artifacts.md` with embedded schema)
 - [ ] `tests/`: Integration test suite passes for all three artifact types (`npm run test:trust-artifacts`)
