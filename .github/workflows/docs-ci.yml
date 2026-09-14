@@ -14,9 +14,9 @@ jobs:
     name: Lint Markdown
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - name: markdownlint
-        uses: DavidAnson/markdownlint-cli2-action@v16
+        uses: DavidAnson/markdownlint-cli2-action@b4c9feab76d8025d1e83c653fa3990936df0e6c8
         with:
           globs: "**/*.md"
           config: ".markdownlint-cli2.jsonc"
@@ -25,7 +25,7 @@ jobs:
     name: Check Documentation Links
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
       - name: Lychee link checker
         # Excluded URLs resolve correctly for humans but reject automated checks,
         # so they are false positives for the link checker:
@@ -33,7 +33,7 @@ jobs:
         #     npmjs.com returns 403 to non-browser user agents.
         #   - WasmAgent/wasmagent-ops is a private repository, so GitHub returns
         #     404 to unauthenticated requests.
-        uses: lycheeverse/lychee-action@v2
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8
         with:
           args: |
             --verbose
