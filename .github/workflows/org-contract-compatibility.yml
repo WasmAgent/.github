@@ -158,7 +158,7 @@ jobs:
           set -euo pipefail
           mapfile -t lines < <(node scripts/org-contract/consumers.mjs --tsv)
           for line in "${lines[@]}"; do
-            IFS=$'\t' read -r repo build install command packages <<< "$line"
+            IFS='|' read -r repo build install command packages <<< "$line"
             echo "::group::${repo} pinned consumer"
             scripts/org-contract/checkout-pinned.sh "$repo" "/tmp/consumers/${repo}"
             cd "/tmp/consumers/${repo}"
