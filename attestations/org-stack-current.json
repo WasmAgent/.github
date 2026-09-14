@@ -18,12 +18,12 @@
     "wasmagent-train-replay/uv.lock": "ce03372742aa56f6e6b8f222a72238e6d157fbf379d3a6593610ac0369c9b38e",
     "fresharena/bun.lock": "133129dffa61dc2df24b530c1e7fc9877b214ba4a365d40d270247e2c651f953"
   },
-  "org_gate_run": 34802370854,
+  "org_gate_run": 34807899337,
   "verdicts": {
     "workflow_supply_chain": "pass",
     "contract_compatibility": "pass",
     "golden_path": "pass",
-    "release_provenance": "pending"
+    "release_provenance": "pass"
   },
-  "notes": "Internal WasmAgent attestation \u2014 not third-party certification. O1/O2/O3 pass on gate run 34802370854 with branch protection + required status checks enforced on all eight non-core main branches. O4 (release provenance) is implemented (scripts/org-contract/check-release-provenance.mjs, job o4-release-provenance) and locally verified against open-agent-audit, agentbom, and bscode; it remains 'pending' here until the scheduled Org Gate workflow records a passing O4 run id. lock_hashes are sha256 of each repo's committed lock at the audit snapshot."
+  "notes": "Internal WasmAgent attestation \u2014 not third-party certification. O1/O2/O3/O4 all pass on org gate run 34807899337 (O1 repository assurance, O2 contract compatibility, O3 Golden Path exact-stack E2E, O4 release provenance) with branch protection + required status checks enforced on all eight non-core main branches. lock_hashes are sha256 of each repo's committed lock at the audit snapshot."
 }
