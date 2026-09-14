@@ -15,13 +15,19 @@
     "@wasmagent/protocol": "0.1.10"
   },
   "non_core": {
-    "agent-golden-path": "4df017ab2b0df21e95e320019bc2521df61d6cc0"
+    "open-agent-audit": "74b60fb38aba303bb8ae9a40f1333d8834b0e1c1",
+    "bscode": "68e779aad983f976b84d06f0a7d62d80ecbcb52f",
+    "agent-golden-path": "4df017ab2b0df21e95e320019bc2521df61d6cc0",
+    "agentbom": "5d25ff78456e120b264f87bd5d3371cd4529b5d2",
+    "fresharena": "53f2251d126049d38b3a07f54a009dbbdc0119c6",
+    "symkernel": "e7cf0cb33b0585241955dbb2da514a2a066a5714",
+    "wasmagent-train-replay": "da56520a5861031f5473200fd45ccdef83124178"
   },
-  "non_core_status": "agent-golden-path verified via Org Gate O3 exact-stack E2E (gate run 34808573384); remaining non-core repos are added after their exact-tuple gate passes",
-  "verified_by": 34808573384,
+  "non_core_status": "Exact non-core tuple. Every Org Gate resolves the repo revision from this lock, checks out the pinned SHA and asserts HEAD == pin (N2-P1-03/04); no gate may use an implicit main.",
+  "verified_by": null,
   "notes": [
     "Core SHAs are the Gate C certified tuple (run 34760116414, verdict pass).",
-    "non_core entries are added only after the exact tuple test passes for that repo.",
+    "non_core entries are full 40-hex SHAs observed at audit snapshot 2026-09-14; the next Org Gate run re-verifies them as an exact tuple and writes a v2 attestation.",
     "The daily Golden Path latest-package canary is intentionally non-certifying and must never rewrite this lock."
   ]
 }

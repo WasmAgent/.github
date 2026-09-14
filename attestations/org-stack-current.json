@@ -1,29 +1,69 @@
 {
-  "format": "wasmagent-org-stack-attestation/v1",
+  "format": "wasmagent-org-stack-attestation/v2",
+  "gate_implementation_sha": "pending-next-gate-run",
   "core_target": "aep-certified-2026-09-13-03",
-  "tested_repositories": {
-    "agent-golden-path": "4df017ab2b0df21e95e320019bc2521df61d6cc0"
+  "certified_core": {
+    "wasmagent-protocol": "35320c567ba02ae30ba441f488952954dd66a4cc",
+    "wasmagent-js": "bb71077cbd13051c05e17195d11d16efd0d1c572",
+    "wasmagent-proxy": "4b4bde3b2e06eb62b7910cb3f379d75288cc4db1",
+    "trace-pipeline": "5820bf811302a1e202b762792cac6ef44e833ad6"
   },
   "tested_packages": {
     "@wasmagent/aep": "2.9.0",
     "@wasmagent/protocol": "0.1.10"
   },
-  "lock_hashes": {
-    "golden-path/versions.lock.json": "31281e680a5cfec7462bc82990d9118b48cabfab08a405bd1ed9075072fdcb17",
-    "open-agent-audit/bun.lock": "f88f881217a9b9230f83990d2de4035919c9f58a51648ce74cfe36a5a8032092",
-    "bscode/bun.lock": "1e07cca565e35751cb4814280ca4999fd7a97df414aff03526e7b289ca22f057",
-    "agent-golden-path/bun.lock": "abc2dd7c34178ca5f5e8e93f4fca3cb1ecc9541e598195a8bd6d979b1bce6c5c",
-    "agentbom/bun.lock": "10b975b6e3f835bd8b05949e07c4babdd7f68fe5027adee0b34e273cc7dc158c",
-    "symkernel/schemas/protocol.lock.json": "77e9fbf9d71735bb169978be1842500778cbe35e8011c96e8c37faab67d28e9c",
-    "wasmagent-train-replay/uv.lock": "ce03372742aa56f6e6b8f222a72238e6d157fbf379d3a6593610ac0369c9b38e",
-    "fresharena/bun.lock": "133129dffa61dc2df24b530c1e7fc9877b214ba4a365d40d270247e2c651f953"
+  "repositories": {
+    "agent-golden-path": {
+      "sha": "4df017ab2b0df21e95e320019bc2521df61d6cc0",
+      "lockfile": "bun.lock",
+      "lock_sha256": "abc2dd7c34178ca5f5e8e93f4fca3cb1ecc9541e598195a8bd6d979b1bce6c5c",
+      "gates_exercised": ["O1", "O3"]
+    },
+    "agentbom": {
+      "sha": "5d25ff78456e120b264f87bd5d3371cd4529b5d2",
+      "lockfile": "bun.lock",
+      "lock_sha256": "10b975b6e3f835bd8b05949e07c4babdd7f68fe5027adee0b34e273cc7dc158c",
+      "gates_exercised": ["O1", "O2", "O4"]
+    },
+    "bscode": {
+      "sha": "68e779aad983f976b84d06f0a7d62d80ecbcb52f",
+      "lockfile": "bun.lock",
+      "lock_sha256": "1e07cca565e35751cb4814280ca4999fd7a97df414aff03526e7b289ca22f057",
+      "gates_exercised": ["O1", "O2", "O4"]
+    },
+    "fresharena": {
+      "sha": "53f2251d126049d38b3a07f54a009dbbdc0119c6",
+      "lockfile": "bun.lock",
+      "lock_sha256": "133129dffa61dc2df24b530c1e7fc9877b214ba4a365d40d270247e2c651f953",
+      "gates_exercised": ["O1"]
+    },
+    "open-agent-audit": {
+      "sha": "74b60fb38aba303bb8ae9a40f1333d8834b0e1c1",
+      "lockfile": "bun.lock",
+      "lock_sha256": "f88f881217a9b9230f83990d2de4035919c9f58a51648ce74cfe36a5a8032092",
+      "gates_exercised": ["O1", "O2", "O4"]
+    },
+    "symkernel": {
+      "sha": "e7cf0cb33b0585241955dbb2da514a2a066a5714",
+      "lockfile": "schemas/protocol.lock.json",
+      "lock_sha256": "77e9fbf9d71735bb169978be1842500778cbe35e8011c96e8c37faab67d28e9c",
+      "gates_exercised": ["O1", "O2"]
+    },
+    "wasmagent-train-replay": {
+      "sha": "da56520a5861031f5473200fd45ccdef83124178",
+      "lockfile": "uv.lock",
+      "lock_sha256": "ce03372742aa56f6e6b8f222a72238e6d157fbf379d3a6593610ac0369c9b38e",
+      "gates_exercised": ["O1"]
+    }
   },
-  "org_gate_run": 34808573384,
+  "org_gate_run": null,
   "verdicts": {
-    "workflow_supply_chain": "pass",
-    "contract_compatibility": "pass",
-    "golden_path": "pass",
-    "release_provenance": "pass"
+    "workflow_supply_chain": "pending_rerun",
+    "contract_compatibility": "pending_rerun",
+    "golden_path": "pending_rerun",
+    "release_provenance": "pending_rerun",
+    "release_workflow_static_policy": "pending_rerun"
   },
-  "notes": "Internal WasmAgent attestation \u2014 not third-party certification. O1/O2/O3/O4 all pass on org gate run 34808573384 (O1 repository assurance, O2 contract compatibility, O3 Golden Path exact-stack E2E against the re-pinned agent-golden-path revision, O4 release provenance) with branch protection + required status checks enforced on all eight non-core main branches. lock_hashes are sha256 of each repo's committed lock at the audit snapshot."
+  "generated_at": "2026-09-14T00:00:00.000Z",
+  "notes": "Internal WasmAgent attestation — not third-party certification. This v2 record binds the exact non-core tuple pinned in golden-path/versions.lock.json (sha + committed lock hash + gates exercised). Verdicts are pending_rerun: the O5 job in .github/workflows/org-contract-compatibility.yml regenerates this file with real per-run verdicts and the gate implementation SHA on the next successful gate run. release_workflow_static_policy reflects structured workflow-graph validation, not runtime deployment evidence; it is not called release_provenance."
 }
