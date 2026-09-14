@@ -57,9 +57,10 @@ allow_dynamic_payload:
     workflows:
       - canary.yml
   .github:
-    reason: "O2 gate installs one-off validator tooling (ajv + pinned protocol package) into a temp dir; not a project dependency install"
+    reason: "O2/O4 gates install one-off validator tooling (ajv + pinned protocol package + yaml parser) into a temp dir; not a project dependency install"
     workflows:
       - org-contract-compatibility.yml
+      - reusable-compat-check.yml
 
 required_lockfiles:
   bun: bun.lock
