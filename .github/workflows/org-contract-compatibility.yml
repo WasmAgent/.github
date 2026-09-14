@@ -36,9 +36,13 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
 
-      - name: Clone non-core repositories (shallow)
+      - name: Include this repository in the scan set
         run: |
           mkdir -p scan
+          rsync -a --exclude scan "$GITHUB_WORKSPACE/" scan/.github/
+
+      - name: Clone non-core repositories (shallow)
+        run: |
           for repo in open-agent-audit bscode agent-golden-path agentbom fresharena symkernel wasmagent-train-replay; do
             git clone --depth 1 "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/WasmAgent/${repo}.git" "scan/${repo}"
           done
