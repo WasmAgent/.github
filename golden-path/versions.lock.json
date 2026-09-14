@@ -13,9 +13,11 @@
     "@wasmagent/aep": "2.9.0",
     "@wasmagent/protocol": "0.1.10"
   },
-  "non_core": {},
-  "non_core_status": "pending exact-tuple testing (Org Gate O2/O3) — do not fill tested SHAs until gates pass",
-  "verified_by": null,
+  "non_core": {
+    "agent-golden-path": "2e3ed47490edabd07c2b765d294daf9e05134f93"
+  },
+  "non_core_status": "agent-golden-path verified via Org Gate O3 exact-stack E2E (gate run 34801906888); remaining non-core repos are added after their exact-tuple gate passes",
+  "verified_by": 34801906888,
   "notes": [
     "Core SHAs are the Gate C certified tuple (run 34760116414, verdict pass).",
     "non_core entries are added only after the exact tuple test passes for that repo.",
