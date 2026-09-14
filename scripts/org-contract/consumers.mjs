@@ -2,7 +2,7 @@
 // Consumer manifest loader for Org Gate O2b.
 //
 // Usage:
-//   consumers.mjs --tsv           repo \t install \t command \t packages(csv)
+//   consumers.mjs --tsv           repo | build | install | command | packages(csv)
 //   consumers.mjs --repos         one repo per line
 //   consumers.mjs --excluded      one excluded repo per line
 
@@ -22,10 +22,18 @@ function main(argv) {
   const [flag] = argv;
   const consumers = loadConsumers();
   if (flag === "--tsv") {
+    // Fields are separated by "|" (a non-whitespace delimiter) so that an empty
+    // field such as an empty `build` is preserved by `IFS='|' read`. A tab
+    // delimiter would be collapsed by the shell, shifting every later field.
     for (const c of consumers) {
-      process.stdout.write(
-        [c.repo, c.build ?? "", c.install, c.command, (c.packages ?? []).join(",")].join("\t") + "\n",
-      );
+      const fields = [c.repo, c.build ?? "", c.install, c.command, (c.packages ?? []).join(",")];
+      for (const field of fields) {
+        if (field.includes("|")) {
+          console.error(`consumers.mjs: field contains the '|' delimiter: ${JSON.stringify(field)}`);
+          return 1;
+        }
+      }
+      process.stdout.write(fields.join("|") + "\n");
     }
     return 0;
   }
