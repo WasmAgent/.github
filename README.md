@@ -37,3 +37,5 @@ references are never orphaned when content moves between repos. Prefer the
   `https://github.com/WasmAgent/.github/blob/main/releases/public-release-ledger.yml`
 - Media & posts:
   `https://github.com/WasmAgent/.github/blob/main/media/posts.yml`
+
+<!-- n4 verify irrelevant-path required-summary behavior -->
