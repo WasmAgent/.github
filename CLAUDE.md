@@ -65,14 +65,14 @@ for each repo's own CI.
 ### P0 — Foundation (now)
 - [x] Repository boundary policy written into each repo's CLAUDE.md
 - [x] Maturity status added to each repo's README
-- [ ] `CLAUDE.md` created (this file)
-- [ ] `docs/org-contract-map.md` — schema ownership table
-- [ ] `docs/maturity-matrix.md` — per-repo maturity matrix
-- [ ] `docs/repository-boundaries.md` — org boundary policy doc
-- [ ] `golden-path/README.md` — Golden Path entry point
+- [x] `CLAUDE.md` created (this file)
+- [x] `docs/org-contract-map.md` — schema ownership table (AEP v0.5 current truth)
+- [x] `docs/maturity-matrix.md` — per-repo maturity matrix
+- [x] `docs/repository-boundaries.md` — org boundary policy doc
+- [x] `golden-path/README.md` — Golden Path entry point
 - [x] `golden-path/versions.lock.json` — machine-readable certified stack lock
 - [ ] `golden-path/scripts/` — bootstrap, run-agent, verify-aep, audit, admit, demo stubs
-- [ ] `.github/workflows/org-contract-compatibility.yml` — cross-repo contract tests
+- [x] `.github/workflows/org-contract-compatibility.yml` — Org Gates O1/O2/O3 (real checks, no STUB)
 
 ### P1 — Golden Path v1 (30 days)
 - [ ] `golden-path/docker-compose.yml` — one-command local demo

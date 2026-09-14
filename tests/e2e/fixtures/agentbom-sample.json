@@ -1,5 +1,5 @@
 {
-  "$schema": "https://wasmagent.github.io/agent-trust-infra/schemas/agentbom-1.json",
+  "$schema": "https://wasmagent.dev/schemas/agentbom/v0.1.schema.json",
   "bomFormat": "AgentBOM",
   "specVersion": "1.0",
   "metadata": {

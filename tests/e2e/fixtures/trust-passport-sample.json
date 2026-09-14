@@ -1,5 +1,5 @@
 {
-  "$schema": "https://wasmagent.github.io/agent-trust-infra/schemas/trust-passport-1.json",
+  "$schema": "https://wasmagent.dev/schemas/trust-passport/v0.1.schema.json",
   "passportFormat": "TrustPassport",
   "specVersion": "1.0",
   "metadata": {
@@ -14,8 +14,14 @@
     "timestamp": "2026-07-07T00:00:00Z"
   },
   "posture": {
-    "declaredTools": ["read_file", "write_file"],
-    "observedCapabilities": ["file-system", "network"],
+    "declaredTools": [
+      "read_file",
+      "write_file"
+    ],
+    "observedCapabilities": [
+      "file-system",
+      "network"
+    ],
     "complianceStatus": "compliant"
   },
   "evidence": [

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://wasmagent.github.io/agent-trust-infra/schemas/mcp-posture-1.json",
+  "$schema": "https://wasmagent.dev/schemas/mcp-posture/v0.1.schema.json",
   "postureFormat": "MCPPosture",
   "specVersion": "1.0",
   "metadata": {
@@ -12,7 +12,10 @@
     {
       "name": "filesystem-server",
       "endpoint": "stdio",
-      "capabilities": ["read", "write"]
+      "capabilities": [
+        "read",
+        "write"
+      ]
     }
   ],
   "declaredTools": [
@@ -28,8 +31,15 @@
     }
   ],
   "capabilities": {
-    "allowedOperations": ["read", "write", "execute"],
-    "restrictedPaths": ["/etc", "/usr/bin"],
+    "allowedOperations": [
+      "read",
+      "write",
+      "execute"
+    ],
+    "restrictedPaths": [
+      "/etc",
+      "/usr/bin"
+    ],
     "auditLevel": "full"
   }
 }

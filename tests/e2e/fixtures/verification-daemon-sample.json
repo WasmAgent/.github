@@ -1,5 +1,5 @@
 {
-  "$schema": "https://wasmagent.github.io/agent-trust-infra/schemas/verification-daemon-1.json",
+  "$schema": "https://wasmagent.dev/schemas/verification-daemon/v0.1.schema.json",
   "daemonFormat": "VerificationDaemon",
   "specVersion": "1.0",
   "metadata": {
