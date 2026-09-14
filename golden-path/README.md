@@ -14,26 +14,41 @@ If this demo runs end-to-end, the cross-repo contracts are compatible.
 [4/4] Trace admitted / rejected by pipeline            (trace-pipeline)
 ```
 
-## Quick start (target — not yet functional)
+## Quick start
+
+The runnable implementation lives in
+[`agent-golden-path`](https://github.com/WasmAgent/agent-golden-path). The
+`.github` copy is the **orchestration + exact-stack lock + expected vectors**
+only:
 
 ```bash
-git clone https://github.com/WasmAgent/.github
-cd .github/golden-path
-docker compose up --build
-./scripts/demo.sh
+git clone https://github.com/WasmAgent/agent-golden-path
+cd agent-golden-path
+bun install --frozen-lockfile
+bun run test:e2e:certified
 ```
 
-Or via CLI (future):
+Org Gate O3 runs that same certified-stack E2E at the exact revision pinned in
+[`versions.lock.json`](versions.lock.json).
 
-```bash
-npx @wasmagent/cli demo trust-loop
-```
+## Ownership boundary (P2-02)
+
+Do not maintain two independent implementations of the Golden Path.
+
+| Concern | Owner |
+|---|---|
+| Exact stack lock (`versions.lock.json`), expected vectors, orchestration metadata, org attestations | **`.github/golden-path/`** |
+| Runnable reference app, real E2E implementation, user-facing demo | **[`agent-golden-path`](https://github.com/WasmAgent/agent-golden-path)** |
+
+`.github` owns the certified tuple and the gate; `agent-golden-path` owns the
+executable artifact that the gate exercises.
 
 ## Status
 
-🚧 **Scaffolded — partially runnable.** The stack lock (`versions.lock.json`) is real; the E2E implementation lives in [`agent-golden-path`](https://github.com/WasmAgent/agent-golden-path) and is exercised by Org Gate O3.
-
-Tracked in: WasmAgent/.github issue [#103](https://github.com/WasmAgent/.github/issues/103)
+The stack lock (`versions.lock.json`) is real and pins the certified core SHAs
+plus the tested `agent-golden-path` revision. The E2E implementation is
+exercised by Org Gate O3. `docker-compose.yml` and the shell scripts under
+`scripts/` are thin local conveniences and are not part of the certified gate.
 
 ## Repository contributions
 
@@ -52,20 +67,18 @@ Tracked in: WasmAgent/.github issue [#103](https://github.com/WasmAgent/.github/
 ```
 golden-path/
   README.md           — this file
-  versions.lock.json  — machine-readable pinned stack (certified core tuple)
-  docker-compose.yml  — (stub) one-command local stack
+  versions.lock.json  — machine-readable pinned stack (certified core tuple + tested non-core SHA)
+  docker-compose.yml  — local convenience stack for manual inspection
   scripts/
-    bootstrap.sh      — (stub) install deps and pull images
-    run-agent.sh      — (stub) run a bscode agent
-    verify-aep.sh     — (stub) verify the signed AEP record
-    audit.sh          — (stub) generate audit report
-    admit.sh          — (stub) run admission decision
-    demo.sh           — (stub) full end-to-end run
+    bootstrap.sh      — local dependency/image bootstrap helper
+    demo.sh           — local end-to-end demo wrapper
   fixtures/
-    safe-call.json    — example safe MCP tool call
-    malicious-call.json — example malicious MCP tool call
+    safe-call.json        — example safe MCP tool call
+    malicious-call.json   — example malicious MCP tool call
   expected/
-    aep.json          — (placeholder) expected AEP structure
-    audit-report.json — (placeholder) expected audit report structure
-    admission-decision.json — (placeholder) expected admission decision
+    aep.json              — expected AEP structure
+    audit-report.json     — expected audit report structure
+    admission-decision.json — expected admission decision
+  tests/
+    golden-path.test.ts   — fixture/expected-vector sanity checks
 ```
