@@ -1,50 +1,98 @@
 name: Org Contract Compatibility
 
+# Org Gates O1-O3 (see policies/repository-assurance.yml and the
+# non-core alignment repair plan). Replaces the former STUB-only checks.
+#
+# O1 — repository assurance: every non-core repo satisfies the supply-chain
+#      baseline (immutable action refs, permissions, lockfiles, no @latest).
+# O2 — cross-repo contract compatibility: canonical fixtures from the pinned
+#      @wasmagent/protocol package validate; semantic-negatives fail; vendored
+#      schemas are byte-identical; the org stack lock is internally consistent.
+# O3 — Golden Path E2E: the runnable reference app passes its exact-stack
+#      vectors (Protect → Record → Audit → Admit, positive + negative).
+
 on:
   schedule:
-    - cron: "0 6 * * 1"   # every Monday 06:00 UTC
+    - cron: "0 6 * * 1" # every Monday 06:00 UTC
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "policies/**"
+      - "scripts/check-repository-assurance.py"
+      - "golden-path/versions.lock.json"
+      - ".github/workflows/org-contract-compatibility.yml"
+
+permissions:
+  contents: read
+
+env:
+  PROTOCOL_PKG: "@wasmagent/protocol@0.1.10"
 
 jobs:
-  contract-check:
-    name: Cross-repo schema compatibility
+  o1-repository-assurance:
+    name: "O1: repository assurance"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
 
-      - name: Install Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+      - name: Clone non-core repositories (shallow)
+        run: |
+          mkdir -p scan
+          for repo in open-agent-audit bscode agent-golden-path agentbom fresharena symkernel wasmagent-train-replay; do
+            git clone --depth 1 "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/WasmAgent/${repo}.git" "scan/${repo}"
+          done
+
+      - name: Run assurance scanner
+        run: python3 scripts/check-repository-assurance.py --root scan
+
+  o2-contract-compatibility:
+    name: "O2: cross-repo contract compatibility"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: "22"
 
-      - name: Install bun
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
-
-      # ── Placeholder checks ──
-      # Replace each TODO with a real cross-repo contract test once
-      # the Golden Path is runnable (track: WasmAgent/.github#103)
-
-      - name: TODO — verify wasmagent-js AEP fixture is accepted by open-agent-audit
+      - name: Install canonical protocol package + validator
         run: |
-          echo "STUB: not yet implemented"
-          echo "Goal: @wasmagent/aep fixture → @openagentaudit/adapters → valid"
+          mkdir -p /tmp/contract-gate && cd /tmp/contract-gate
+          npm init -y >/dev/null
+          npm install --no-audit --no-fund "$PROTOCOL_PKG" ajv@8 ajv-formats@3
 
-      - name: TODO — verify AEP fixture is accepted by trace-pipeline
+      # ORG-CD-03 / ORG-CD-04: canonical valid fixtures PASS, semantic-invalid
+      # fixtures FAIL. Nothing may silently normalize invalid to valid.
+      - name: Validate canonical fixtures against canonical schemas
         run: |
-          echo "STUB: not yet implemented"
-          echo "Goal: @wasmagent/aep fixture → evomerge validate-aep → pass"
+          cd /tmp/contract-gate
+          node "$GITHUB_WORKSPACE/scripts/org-contract/validate-fixtures.mjs"
 
-      - name: TODO — verify bscode rollout fixture accepted by open-agent-audit adapter
+      # ORG-CD-01: vendored schema bytes must equal the canonical package bytes.
+      - name: symkernel vendored schema drift gate
         run: |
-          echo "STUB: not yet implemented"
-          echo "Goal: bscode rollout-wire/v1 → @openagentaudit/adapters bscode → valid"
+          git clone --depth 1 "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/WasmAgent/symkernel.git" /tmp/symkernel
+          make -C /tmp/symkernel check-schemas
 
-      - name: TODO — verify agent-trust-infra conformance fixtures pass validators
-        run: |
-          echo "STUB: not yet implemented"
-          echo "Goal: agent-trust-infra fixture → @wasmagent/agentbom-core validator → pass"
+      # versions.lock.json must carry the certified tuple exactly, and every
+      # pinned package must resolve on the public registry.
+      - name: Org stack lock consistency
+        run: node scripts/org-contract/check-stack-lock.mjs
 
-      - name: TODO — verify versions.lock packages resolve
+  o3-golden-path-e2e:
+    name: "O3: Golden Path E2E (exact stack)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+        with:
+          bun-version: "1.3.14"
+
+      - name: Run certified-stack E2E in agent-golden-path
         run: |
-          echo "STUB: checking versions.lock"
-          cat golden-path/versions.lock
+          git clone --depth 1 "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/WasmAgent/agent-golden-path.git" /tmp/agent-golden-path
+          cd /tmp/agent-golden-path
+          bun install --frozen-lockfile
+          bun run test:e2e:certified

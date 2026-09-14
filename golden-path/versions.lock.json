@@ -1,0 +1,24 @@
+{
+  "format": "wasmagent-org-stack-lock/v1",
+  "aep_certified_target": "aep-certified-2026-09-13-03",
+  "signing_profile_id": "aep-dsse-ed25519-decoded-body-v1",
+  "aep_schema_family": "aep/v0.5",
+  "core": {
+    "wasmagent-protocol": "35320c567ba02ae30ba441f488952954dd66a4cc",
+    "wasmagent-js": "bb71077cbd13051c05e17195d11d16efd0d1c572",
+    "wasmagent-proxy": "4b4bde3b2e06eb62b7910cb3f379d75288cc4db1",
+    "trace-pipeline": "5820bf811302a1e202b762792cac6ef44e833ad6"
+  },
+  "packages": {
+    "@wasmagent/aep": "2.9.0",
+    "@wasmagent/protocol": "0.1.10"
+  },
+  "non_core": {},
+  "non_core_status": "pending exact-tuple testing (Org Gate O2/O3) — do not fill tested SHAs until gates pass",
+  "verified_by": null,
+  "notes": [
+    "Core SHAs are the Gate C certified tuple (run 34760116414, verdict pass).",
+    "non_core entries are added only after the exact tuple test passes for that repo.",
+    "The daily Golden Path latest-package canary is intentionally non-certifying and must never rewrite this lock."
+  ]
+}

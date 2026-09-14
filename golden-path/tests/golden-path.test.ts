@@ -11,5 +11,5 @@ describe("Golden Path: Protect → Record → Audit → Admit", () => {
   it.todo("[4/4] Admission decision returned from trace-pipeline");
 
   it.todo("end-to-end: demo.sh exits 0 within 15 minutes");
-  it.todo("versions.lock: all pinned versions resolve to published packages");
+  it.todo("versions.lock.json: all pinned versions resolve to published packages");
 });

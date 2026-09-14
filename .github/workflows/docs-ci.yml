@@ -9,6 +9,9 @@ on:
     types: [created, published]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   lint-markdown:
     name: Lint Markdown

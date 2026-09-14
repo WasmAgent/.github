@@ -1,6 +1,6 @@
 # Golden Path — docker-compose stub
 # Target: one-command local demo for Protect→Record→Audit→Admit
-# Status: NOT YET FUNCTIONAL — update versions.lock and service configs when ready
+# Status: NOT YET FUNCTIONAL — update versions.lock.json and service configs when ready
 
 version: "3.9"
 

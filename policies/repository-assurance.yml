@@ -1,0 +1,73 @@
+# WasmAgent repository assurance policy
+#
+# Source of truth for the org-wide repository assurance baseline.
+# Scanned by scripts/check-repository-assurance.py (Org Gate O1).
+#
+# Classes:
+#   frozen_core      — certified reference baseline. Do not modify without a
+#                      new reproducible invariant failure against the exact
+#                      certified tuple.
+#   governance       — production-facing / governance / integration repos.
+#                      Full assurance envelope required.
+#   research_preview — research repos. Reproducibility + safe workflows
+#                      required; production SLA / release machinery not
+#                      required merely for alignment.
+#
+# Every executable workflow in every repository MUST:
+#   - pin third-party actions to a full 40-hex commit SHA
+#     (optionally annotated: owner/action@<sha> # vX.Y.Z)
+#   - declare top-level permissions (least privilege; contents: read default)
+#   - not use @latest tool installs or bun-version: latest in required CI
+#   - commit a dependency lockfile for its package ecosystem
+#
+# allow_dynamic_refs: intentional exceptions (e.g. Golden Path latest-package
+# canary). Even allowlisted repos must still pin runner Actions and the Bun
+# runtime; the allowlist covers payload resolution only, never action refs.
+
+format: wasmagent-repository-assurance/v1
+
+classes:
+  frozen_core:
+    - wasmagent-protocol
+    - wasmagent-js
+    - wasmagent-proxy
+    - trace-pipeline
+
+  governance_production:
+    - .github
+    - open-agent-audit
+    - bscode
+    - agent-golden-path
+    - agentbom
+
+  research_preview:
+    - fresharena
+    - symkernel
+    - wasmagent-train-replay
+
+# Repos where payload-level dynamic dependency resolution is intentional
+# (canary lanes). Action refs and toolchain pins still apply to these repos.
+allow_dynamic_payload:
+  agent-golden-path:
+    reason: "GP-3 — daily latest-package canary is intentional and non-certifying"
+    workflows:
+      - canary.yml
+  bscode:
+    reason: "BS-5 — latest-published canary lane is intentional and non-certifying"
+    workflows:
+      - canary.yml
+  .github:
+    reason: "O2 gate installs one-off validator tooling (ajv + pinned protocol package) into a temp dir; not a project dependency install"
+    workflows:
+      - org-contract-compatibility.yml
+
+required_lockfiles:
+  bun: bun.lock
+  npm: package-lock.json
+  python-uv: uv.lock
+  go: go.sum
+
+forbidden_patterns:
+  - "@latest"          # unpinned tool install in required CI
+  - "bun-version: latest"
+  - "npm install"      # unfrozen install; use npm ci / bun install --frozen-lockfile

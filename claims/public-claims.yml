@@ -39,12 +39,14 @@ claims:
   - id: WA-C-0003
     domain: trust
     claim: >-
-      agent-trust-infra gives every agent run a machine-readable identity and
-      policy posture through AgentBOM, MCP Posture, and Trust Passport artifacts
-      with reference implementation and CLI. An EU AI Act Annex IV compliance
-      mapping is in draft, covering 20 of 29 Annex IV sub-items.
+      agentbom (successor to the archived agent-trust-infra, archived 2026-07-29)
+      gives every agent run a machine-readable identity and policy posture
+      through AgentBOM, MCP Posture, and Trust Passport artifacts with reference
+      implementation and CLI. An EU AI Act Annex IV compliance mapping is in
+      draft, covering 20 of 29 Annex IV sub-items.
     evidence:
-      repo: agent-trust-infra
+      repo: agentbom
+      supersedes: agent-trust-infra
       artifacts:
         - AgentBOM spec + validator
         - MCP Posture spec + MCP server decorator

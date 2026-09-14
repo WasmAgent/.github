@@ -4,7 +4,17 @@ Canonical ownership of all cross-repository schemas, protocols, and trust artifa
 Update this file when ownership changes. This is the authoritative reference —
 individual repo CLAUDE.md files should agree with this table.
 
-Last updated: 2026-07-30
+Last updated: 2026-09-14
+
+## Current AEP truth
+
+- **Current AEP schema family: `aep/v0.5`.** Legacy versions (`aep/v0.1`–`aep/v0.4`)
+  remain readable for compatibility but must never be emitted as current truth.
+- **Current signed conformance profile: DSSE only** (`aep-dsse-ed25519-decoded-body-v1`).
+- Current certified target: `aep-certified-2026-09-13-03`
+  (Gate C run 34760116414, verdict pass). Do not hardcode a moving `main` as certified truth.
+- Package versions at the certified SHAs: `@wasmagent/aep 2.9.0`, `@wasmagent/protocol 0.1.10`.
+- Machine-readable lock: [`golden-path/versions.lock.json`](../golden-path/versions.lock.json).
 
 ## Single source of truth
 
@@ -26,8 +36,8 @@ but the schema JSON itself lives only in `wasmagent-protocol`.
 
 | Schema / Artifact | Canonical source | Version | Domain steward | Consumers |
 |---|---|---|---|---|
-| AEP record (`aep-record`) | `wasmagent-protocol` | `aep/v0.2` | `wasmagent-js` | `wasmagent-js`, `wasmagent-proxy`, `trace-pipeline`, `wasmagent-train-replay`, `open-agent-audit` |
-| Evidence envelope (`evidence-envelope`) | `wasmagent-protocol` | `aep/v0.1` | `wasmagent-js` | `wasmagent-js`, `wasmagent-proxy`, `trace-pipeline`, `open-agent-audit` |
+| AEP record (`aep-record`) | `wasmagent-protocol` | `aep/v0.5` | `wasmagent-js` | `wasmagent-js`, `wasmagent-proxy`, `trace-pipeline`, `open-agent-audit` |
+| Evidence envelope (`evidence-envelope`) | `wasmagent-protocol` | `aep/v0.5` | `wasmagent-js` | `wasmagent-js`, `wasmagent-proxy`, `trace-pipeline`, `open-agent-audit` |
 | `ConstraintIR` (`constraint-ir`) | `wasmagent-protocol` | `compliance/v1` | `symkernel` | `wasmagent-js`, `symkernel`, `trace-pipeline` |
 | `ConstraintViolation` (`constraint-violation`) | `wasmagent-protocol` | `compliance/v1` | `symkernel` | `wasmagent-js`, `symkernel`, `trace-pipeline` |
 | `RepairTrace` (`repair-trace`) | `wasmagent-protocol` | `compliance/v1` | `wasmagent-js` | `wasmagent-js`, `trace-pipeline` |
