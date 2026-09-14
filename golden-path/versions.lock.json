@@ -15,7 +15,7 @@
     "@wasmagent/protocol": "0.1.10"
   },
   "non_core": {
-    "open-agent-audit": "2596ed6007177fc1e01ed2c808f3aabd42025194",
+    "open-agent-audit": "f65a4fce8191ce1d971ce4e0f9af87ffd6b80560",
     "bscode": "3efd6e8b268aa2ac340df76fc5d803bcd0b561af",
     "agent-golden-path": "7bca37f0912bf193046aa8ba6a5f6cd59da1298a",
     "agentbom": "ab17b2f19250e6bf2d45f76426cf4dc0469177b2",
