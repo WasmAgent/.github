@@ -63,8 +63,8 @@ export function buildAttestation({ lock, root, gateSha, runId, verdicts, generat
       workflow_supply_chain: "pass",
       contract_compatibility: "pass",
       golden_path: "pass",
-      release_provenance: "pass",
       release_workflow_static_policy: "pass",
+      release_provenance: "not_run",
     },
     generated_at: generatedAt,
     notes:

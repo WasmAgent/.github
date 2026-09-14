@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wasmagent.github.io/schemas/release-provenance.schema.json",
+  "title": "WasmAgent release/deploy provenance artifact",
+  "description": "Runtime evidence emitted by a real publish/deploy (or dry-run). Validated by scripts/org-contract/check-release-provenance.mjs --provenance. Static workflow-graph checks alone are named release_workflow_static_policy, not release_provenance.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "format",
+    "source_sha",
+    "workflow_sha",
+    "lock_sha256",
+    "toolchain",
+    "artifact_digest",
+    "test_run_ids",
+    "publish_destination",
+    "outcome"
+  ],
+  "properties": {
+    "format": { "const": "wasmagent-release-provenance/v1" },
+    "source_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "workflow_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "lock_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "toolchain": { "type": "string", "minLength": 1 },
+    "artifact_digest": {
+      "type": "string",
+      "minLength": 1,
+      "description": "sha256:<hex> or an npm integrity value (sha512-...)."
+    },
+    "test_run_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "publish_destination": { "type": "string", "minLength": 1 },
+    "outcome": { "enum": ["published", "deployed", "dry-run", "skipped", "failed"] },
+    "bundle_digest": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Deploy only: digest of the deployed bundle/worker, not just bun.lock."
+    }
+  }
+}
