@@ -61,8 +61,8 @@
     "workflow_supply_chain": "pending_rerun",
     "contract_compatibility": "pending_rerun",
     "golden_path": "pending_rerun",
-    "release_provenance": "pending_rerun",
-    "release_workflow_static_policy": "pending_rerun"
+    "release_workflow_static_policy": "pending_rerun",
+    "release_provenance": "not_run"
   },
   "generated_at": "2026-09-14T00:00:00.000Z",
   "notes": "Internal WasmAgent attestation — not third-party certification. This v2 record binds the exact non-core tuple pinned in golden-path/versions.lock.json (sha + committed lock hash + gates exercised). Verdicts are pending_rerun: the O5 job in .github/workflows/org-contract-compatibility.yml regenerates this file with real per-run verdicts and the gate implementation SHA on the next successful gate run. release_workflow_static_policy reflects structured workflow-graph validation, not runtime deployment evidence; it is not called release_provenance."

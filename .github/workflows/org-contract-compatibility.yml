@@ -12,8 +12,10 @@ name: Org Contract Compatibility
 #       at its exact pinned SHA against the pinned canonical package versions.
 # O3 — Golden Path E2E: the runnable reference app passes its exact-stack
 #      vectors at the revision pinned in the org stack lock.
-# O4 — release provenance: publishing/deploying repos carry a structured
-#      release/deploy provenance envelope (workflow DAG validation).
+# O4 — release workflow provenance policy: structured YAML DAG validation of
+#      the release/deploy workflows (no substring checks). Static evidence is
+#      reported as release_workflow_static_policy; runtime release_provenance
+#      requires a relayed provenance artifact (see provenance.schema.json).
 #
 # Every gate resolves the revision it tests from golden-path/versions.lock.json
 # via scripts/org-contract/checkout-pinned.sh, checks out that exact SHA and
@@ -51,7 +53,16 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: "22"
+      # Gate scripts use the `yaml` parser via createRequire; install it where
+      # NODE_PATH can find it (npm install is allowlisted for this workflow).
+      - name: Install gate script dependencies
+        run: |
+          mkdir -p /tmp/gate-deps && cd /tmp/gate-deps
+          npm init -y >/dev/null
+          npm install --no-audit --no-fund yaml@2
       - name: Run org-contract script tests
+        env:
+          NODE_PATH: /tmp/gate-deps/node_modules
         run: node --test scripts/org-contract/*.test.mjs
 
   o1-repository-assurance:
@@ -210,7 +221,18 @@ jobs:
             scripts/org-contract/checkout-pinned.sh "$repo" "scan/${repo}"
           done
 
-      - name: Run release provenance gate
+      - name: Install gate script dependencies
+        run: |
+          mkdir -p /tmp/gate-deps && cd /tmp/gate-deps
+          npm init -y >/dev/null
+          npm install --no-audit --no-fund yaml@2
+
+      # Structured workflow-graph validation. This is release_workflow_static_policy,
+      # NOT runtime release_provenance; the latter needs a relayed provenance
+      # artifact validated with --provenance.
+      - name: Run release provenance gate (structured DAG)
+        env:
+          NODE_PATH: /tmp/gate-deps/node_modules
         run: node scripts/org-contract/check-release-provenance.mjs --root scan
 
   o-attestation:
