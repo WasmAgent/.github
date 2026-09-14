@@ -15,7 +15,7 @@
     "@wasmagent/protocol": "0.1.10"
   },
   "non_core": {
-    "open-agent-audit": "e5674c6c16cda5ebe3555a88fe31f9526ec9df21",
+    "open-agent-audit": "45ca3d742767199c0deb9b99dc55986afe52d128",
     "bscode": "5ed8e4215d18e37f430a25c768daca6615851b22",
     "agent-golden-path": "a6fd8b24a958cfc3c3e0a0214951401bc8562fef",
     "agentbom": "b639b64ac57184247e43006f7c19488b775e9f42",
@@ -27,7 +27,7 @@
   "verified_by": null,
   "notes": [
     "Core SHAs are the Gate C certified tuple (run 34760116414, verdict pass).",
-    "non_core entries are the repaired main heads after the fourth-round repair wave (2026-09-14, N4-P1-01/-03/-04); the next Org Gate run re-verifies them as an exact tuple and writes a v2 attestation (N3-P1-05).",
+    "non_core entries are the repaired main heads after the fifth-round Passport tenant-authority repair (2026-09-14, N5-P0-01/-P1-01/-P2-01); the next Org Gate run re-verifies them as an exact tuple and writes a v2 attestation (N3-P1-05).",
     "The daily Golden Path latest-package canary is intentionally non-certifying and must never rewrite this lock."
   ]
 }
