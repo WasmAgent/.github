@@ -105,6 +105,7 @@ jobs:
 
       - name: Candidate governance unit tests (additive evidence)
         if: inputs.repo == '.github'
+        working-directory: candidate
         env:
           NODE_PATH: /tmp/gate-deps/node_modules
-        run: node --test candidate/scripts/org-contract/*.test.mjs
+        run: node --test scripts/org-contract/*.test.mjs
