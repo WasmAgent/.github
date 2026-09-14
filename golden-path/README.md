@@ -31,7 +31,7 @@ npx @wasmagent/cli demo trust-loop
 
 ## Status
 
-🚧 **Scaffolded — not yet runnable.** Scripts are stubs; `versions.lock` pins are placeholders.
+🚧 **Scaffolded — partially runnable.** The stack lock (`versions.lock.json`) is real; the E2E implementation lives in [`agent-golden-path`](https://github.com/WasmAgent/agent-golden-path) and is exercised by Org Gate O3.
 
 Tracked in: WasmAgent/.github issue [#103](https://github.com/WasmAgent/.github/issues/103)
 
@@ -52,7 +52,7 @@ Tracked in: WasmAgent/.github issue [#103](https://github.com/WasmAgent/.github/
 ```
 golden-path/
   README.md           — this file
-  versions.lock       — pinned compatible versions across repos
+  versions.lock.json  — machine-readable pinned stack (certified core tuple)
   docker-compose.yml  — (stub) one-command local stack
   scripts/
     bootstrap.sh      — (stub) install deps and pull images

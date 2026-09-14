@@ -36,7 +36,7 @@ owned by the organization rather than any single product repo.
 | Capability | Owner |
 |---|---|
 | Runtime code, AEP emitter, MCP firewall | `wasmagent-js` |
-| AgentBOM / MCP Posture specifications | `agent-trust-infra` |
+| AgentBOM / MCP Posture specifications | `agentbom` |
 | Trust Passport specification and product | `open-agent-audit` (`@openagentaudit/passport`) |
 | Enterprise audit reports, regulatory mapping, Trustavo | `open-agent-audit` |
 | Evidence admission, training data pipeline | `trace-pipeline` |
@@ -70,7 +70,7 @@ for each repo's own CI.
 - [ ] `docs/maturity-matrix.md` — per-repo maturity matrix
 - [ ] `docs/repository-boundaries.md` — org boundary policy doc
 - [ ] `golden-path/README.md` — Golden Path entry point
-- [ ] `golden-path/versions.lock` — pinned compatible versions
+- [x] `golden-path/versions.lock.json` — machine-readable certified stack lock
 - [ ] `golden-path/scripts/` — bootstrap, run-agent, verify-aep, audit, admit, demo stubs
 - [ ] `.github/workflows/org-contract-compatibility.yml` — cross-repo contract tests
 

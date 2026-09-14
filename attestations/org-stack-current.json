@@ -1,0 +1,18 @@
+{
+  "format": "wasmagent-org-stack-attestation/v1",
+  "core_target": "aep-certified-2026-09-13-03",
+  "tested_repositories": {},
+  "tested_packages": {
+    "@wasmagent/aep": "2.9.0",
+    "@wasmagent/protocol": "0.1.10"
+  },
+  "lock_hashes": {},
+  "org_gate_run": 0,
+  "verdicts": {
+    "workflow_supply_chain": "pending",
+    "contract_compatibility": "pending",
+    "golden_path": "pending",
+    "release_provenance": "pending"
+  },
+  "notes": "Internal WasmAgent attestation — not third-party certification. Verdicts flip from pending to pass only when the corresponding Org Gate (O1-O4) passes against the exact certified tuple."
+}
