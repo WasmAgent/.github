@@ -6,24 +6,67 @@ name: Org Compatibility
 #
 # The reusable workflow reference is immutable (full commit SHA). Update it
 # deliberately when the reusable workflow changes.
+#
+# Required-check architecture (N3-P1-03): the workflow triggers on every pull
+# request (no workflow-level `paths:` filter, which would leave the required
+# check Expected/Pending forever). Relevance is detected in a lightweight job,
+# the heavy cross-repo gate runs only when relevant, and a final summary job
+# always emits the stable required check "Org compatibility (.github)".
 
 on:
   pull_request:
-    paths:
-      - "scripts/org-contract/**"
-      - "policies/**"
-      - "golden-path/**"
-      - "attestations/**"
-      - ".github/workflows/**"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Detect contract-sensitive changes
+    runs-on: ubuntu-latest
+    outputs:
+      relevant: ${{ steps.detect.outputs.relevant }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - id: detect
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "relevant=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          base="origin/${{ github.base_ref }}"
+          git fetch --no-tags origin "${{ github.base_ref }}" >/dev/null 2>&1 || true
+          if git diff --name-only "$base"...HEAD | grep -qE '^(scripts/org-contract/|policies/|golden-path/|attestations/|\.github/workflows/)'; then
+            echo "relevant=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "relevant=false" >> "$GITHUB_OUTPUT"
+          fi
+
   org-compat:
-    name: Org compatibility (.github)
-    uses: WasmAgent/.github/.github/workflows/reusable-compat-check.yml@13bcca67098052c9591353127fac39800cd9876c
+    name: Org compat (.github, internal)
+    needs: changes
+    if: needs.changes.outputs.relevant == 'true'
+    uses: WasmAgent/.github/.github/workflows/reusable-compat-check.yml@18108baeaf17b3a55b82af97c69c76e53d9b19aa
     with:
       repo: .github
       candidate_sha: ${{ github.event.pull_request.head.sha || github.sha }}
+
+  org-compat-summary:
+    name: Org compatibility (.github)
+    needs: [changes, org-compat]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Evaluate compatibility result
+        run: |
+          set -euo pipefail
+          result="${{ needs.org-compat.result }}"
+          echo "Detected relevance: ${{ needs.changes.outputs.relevant }}"
+          echo "Org compat result: ${result}"
+          if [ "${result}" = "failure" ] || [ "${result}" = "cancelled" ]; then
+            echo "::error::org compatibility did not pass (${result})"
+            exit 1
+          fi

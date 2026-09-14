@@ -162,7 +162,8 @@ jobs:
             echo "::group::${repo} pinned consumer"
             scripts/org-contract/checkout-pinned.sh "$repo" "/tmp/consumers/${repo}"
             cd "/tmp/consumers/${repo}"
-            if [ -n "$build" ]; then eval "$build"; fi
+            # Clean-checkout order (N3-P1-02): frozen install first, then assert
+            # the resolved canonical versions, then build, then consumer tests.
             eval "$install"
             if [ -n "$packages" ]; then
               IFS=',' read -ra pkgs <<< "$packages"
@@ -176,6 +177,7 @@ jobs:
                 echo "OK ${repo}: ${pkg}@${actual}"
               done
             fi
+            if [ -n "$build" ]; then eval "$build"; fi
             eval "$command"
             cd "$GITHUB_WORKSPACE"
             echo "::endgroup::"
