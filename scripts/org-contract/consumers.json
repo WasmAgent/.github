@@ -7,8 +7,8 @@
       "build": "bun run build",
       "install": "bun install --frozen-lockfile",
       "command": "bun test packages/adapters",
-      "packages": [],
-      "note": "AEP adapters (aep-v0_2, canonical-drift) consume canonical aep/v0.5 records."
+      "packages": ["@wasmagent/protocol"],
+      "note": "AEP adapters (aep-v0_2, canonical-drift) consume canonical aep/v0.5 records; O2b asserts the org-locked @wasmagent/protocol version resolves on OAA's tested path (N3-P1-09)."
     },
     {
       "repo": "agentbom",

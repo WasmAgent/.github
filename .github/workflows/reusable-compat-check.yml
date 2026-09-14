@@ -34,9 +34,22 @@ jobs:
       - name: Checkout org gate implementation at the pinned workflow SHA
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
-          repository: WasmAgent/.github
-          ref: ${{ github.job_workflow_sha }}
+          # Reusable-job identity, not the caller-associated `github` context:
+          # github.job_workflow_sha resolves empty on cross-repo callers and
+          # silently falls back to the default branch (N3-P1-01).
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
           path: .org
+
+      - name: Assert org gate checkout matches the reusable workflow SHA
+        run: |
+          set -euo pipefail
+          actual="$(git -C .org rev-parse HEAD)"
+          expected="${{ job.workflow_sha }}"
+          if [ "$actual" != "$expected" ]; then
+            echo "::error::org gate HEAD ${actual} != workflow SHA ${expected}"
+            exit 1
+          fi
 
       - name: Checkout candidate revision
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -77,3 +90,21 @@ jobs:
             --repo "${{ inputs.repo }}" \
             --candidate candidate \
             --org .org
+
+      # Governance self-compatibility must inspect the candidate tree with the
+      # trusted O1 scanner, not merely the candidate's own tests (N3-P1-04).
+      - name: Trusted O1 assurance scan of the governance candidate
+        if: inputs.repo == '.github'
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/gov-scan
+          rm -rf /tmp/gov-scan/.github
+          cp -a candidate /tmp/gov-scan/.github
+          rm -rf /tmp/gov-scan/.github/.git
+          python3 .org/scripts/check-repository-assurance.py --root /tmp/gov-scan --only-repo .github
+
+      - name: Candidate governance unit tests (additive evidence)
+        if: inputs.repo == '.github'
+        env:
+          NODE_PATH: /tmp/gate-deps/node_modules
+        run: node --test candidate/scripts/org-contract/*.test.mjs

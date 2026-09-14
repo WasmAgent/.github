@@ -16,6 +16,7 @@ import { fileURLToPath } from "node:url";
 import { loadConsumers } from "./consumers.mjs";
 import { loadMatrix } from "./compat-matrix.mjs";
 import { loadStackLock, ownershipProblems } from "./stack-lock.mjs";
+import { inspectGovernanceCandidate } from "./gov-checks.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_ORG_ROOT = resolve(HERE, "..", "..");
@@ -89,7 +90,9 @@ function main(argv) {
       console.error(`FAIL ${args.repo}: matrix says consumer but no consumer entry exists`);
       return 1;
     }
-    if (entry.build) run(entry.build, candidate);
+    // Clean-checkout order (N3-P1-02): a cold GitHub checkout has no
+    // node_modules, so install frozen first, assert resolved versions, then
+    // build, then run the consumer's own tests.
     run(entry.install, candidate);
     for (const pkg of entry.packages ?? []) {
       const installed = readJson(join(candidate, "node_modules", pkg, "package.json")).version;
@@ -100,6 +103,7 @@ function main(argv) {
       }
       console.log(`PASS ${args.repo}: ${pkg}@${installed}`);
     }
+    if (entry.build) run(entry.build, candidate);
     run(entry.command, candidate);
     console.log(`PASS ${args.repo}: consumer entry point`);
   } else if (target.kind === "schemas") {
@@ -110,7 +114,14 @@ function main(argv) {
     run(target.command, candidate);
     console.log(`PASS ${args.repo}: exact-stack E2E`);
   } else if (target.kind === "gov") {
-    console.log(`PASS ${args.repo}: governance repo (static checks only)`);
+    // Inspect the candidate governance tree with the *trusted* validators
+    // instead of trusting the candidate's own tests (N3-P1-04).
+    const problems = inspectGovernanceCandidate(candidate);
+    if (problems.length) {
+      for (const p of problems) console.error(`FAIL ${args.repo}: ${p}`);
+      return 1;
+    }
+    console.log(`PASS ${args.repo}: candidate governance tree inspected`);
   } else {
     console.error(`FAIL ${args.repo}: unknown compat kind ${target.kind}`);
     return 1;
