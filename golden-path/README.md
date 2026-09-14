@@ -43,6 +43,23 @@ Do not maintain two independent implementations of the Golden Path.
 `.github` owns the certified tuple and the gate; `agent-golden-path` owns the
 executable artifact that the gate exercises.
 
+## Evidence layers (scope precision, N2-P2-01)
+
+Do not read O3 as a proof of the full certified core stack at runtime:
+
+| Layer | What it proves |
+|---|---|
+| **Gate C** | the exact core-four conformance tuple — `wasmagent-protocol`, `wasmagent-js`, `wasmagent-proxy`, `trace-pipeline` at the certified SHAs |
+| **O3** | the exact application/package integration path built **on top of** that core baseline |
+
+The current O3 E2E is primarily the JS / `open-agent-audit` package integration.
+It does **not** invoke the `wasmagent-proxy` native Rust verifier or the
+`trace-pipeline` runtime. A full-stack O3 would have to invoke Proxy and Trace at
+their pinned SHAs explicitly.
+
+Trace admission is **not** mandatory for external LF #92 — this is internal org
+assurance only.
+
 ## Status
 
 The stack lock (`versions.lock.json`) is real and pins the certified core SHAs
@@ -67,7 +84,7 @@ exercised by Org Gate O3. `docker-compose.yml` and the shell scripts under
 ```
 golden-path/
   README.md           — this file
-  versions.lock.json  — machine-readable pinned stack (certified core tuple + tested non-core SHA)
+  versions.lock.json  — machine-readable pinned stack (certified core tuple + exact non-core tuple)
   docker-compose.yml  — local convenience stack for manual inspection
   scripts/
     bootstrap.sh      — local dependency/image bootstrap helper
