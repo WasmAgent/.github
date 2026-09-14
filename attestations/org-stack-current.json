@@ -9,12 +9,12 @@
     "@wasmagent/protocol": "0.1.10"
   },
   "lock_hashes": {},
-  "org_gate_run": 34801906888,
+  "org_gate_run": 34802370854,
   "verdicts": {
     "workflow_supply_chain": "pass",
     "contract_compatibility": "pass",
     "golden_path": "pass",
     "release_provenance": "pending"
   },
-  "notes": "Internal WasmAgent attestation — not third-party certification. O1/O2/O3 pass on gate run 34801906888. release_provenance (O4) flips to pass once a publishing repo executes its full provenance envelope (frozen install + tests + digest + attestation) against the certified stack."
+  "notes": "Internal WasmAgent attestation \u2014 not third-party certification. O1/O2/O3 pass on gate run 34802370854 with branch protection + required status checks enforced on all eight non-core main branches. release_provenance (O4) flips to pass once a publishing repo executes its full provenance envelope (frozen install + tests + digest + attestation) against the certified stack."
 }
