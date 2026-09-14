@@ -10,8 +10,11 @@ name: Org Contract Compatibility
 #       schemas are byte-identical; the org stack lock is internally consistent.
 # O2b — consumer compatibility: each consumer repo's own real entry point runs
 #       at its exact pinned SHA against the pinned canonical package versions.
-# O3 — Golden Path E2E: the runnable reference app passes its exact-stack
-#      vectors at the revision pinned in the org stack lock.
+# O3 — Golden Path (application/package integration): the runnable reference app
+#      passes its exact-stack vectors at the revision pinned in the org stack
+#      lock. Scope is the JS/OAA integration path on top of the certified core
+#      baseline — it does not invoke the proxy native Rust verifier or the
+#      trace-pipeline runtime (see golden-path/README.md, N2-P2-01).
 # O4 — release workflow provenance policy: structured YAML DAG validation of
 #      the release/deploy workflows (no substring checks). Static evidence is
 #      reported as release_workflow_static_policy; runtime release_provenance
