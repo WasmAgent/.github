@@ -1,0 +1,40 @@
+{
+  "format": "wasmagent-org-consumers/v1",
+  "comment": "Real consumer entry points executed by Org Gate O2b at each repo's exact pinned SHA. The central gate only orchestrates: it checks out the pin, runs the repo's own build + frozen install, asserts the pinned canonical package versions, and executes the repo's own test command.",
+  "consumers": [
+    {
+      "repo": "open-agent-audit",
+      "build": "bun run build",
+      "install": "bun install --frozen-lockfile",
+      "command": "bun test packages/adapters",
+      "packages": [],
+      "note": "AEP adapters (aep-v0_2, canonical-drift) consume canonical aep/v0.5 records."
+    },
+    {
+      "repo": "agentbom",
+      "build": "bun run build",
+      "install": "bun install --frozen-lockfile",
+      "command": "bun test packages/agentbom-core/src/canonical-contract.test.ts",
+      "packages": ["@wasmagent/aep", "@wasmagent/protocol"],
+      "note": "AgentBOM core validates against the canonical protocol contract."
+    },
+    {
+      "repo": "bscode",
+      "build": "",
+      "install": "bun install --frozen-lockfile",
+      "command": "bun --filter @bscode/worker test",
+      "packages": ["@wasmagent/aep"],
+      "note": "bscode rollout parser/runtime consumes AEP."
+    }
+  ],
+  "excluded": [
+    {
+      "repo": "wasmagent-train-replay",
+      "reason": "TR-2 removed wasmagent-protocol — the repo never imported it (AEPRecord/EpochEvidenceBundle are repo-local types). Not an AEP consumer; covered by O1 only."
+    },
+    {
+      "repo": "symkernel",
+      "reason": "Vendored-schema byte integrity is O2a drift checking, not runtime consumer execution."
+    }
+  ]
+}
