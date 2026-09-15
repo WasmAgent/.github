@@ -1,0 +1,26 @@
+schema_version: 1
+last_reviewed: "2026-09-15"
+_comment: "Evidence-grounded MCP Top 10 coverage. Labels are per-dimension (prevent/detect/evidence/recover); no overall strong label unless every dimension is evidenced. Dimensions: none | partial | supported | evidenced"
+rows:
+  - risk: MCP01 (token/storage hygiene)
+    coverage: { prevention: supported, detection: partial, evidence: partial, recovery: none }
+    artifacts: ["wasmagent-js/packages/mcp-gateway"]
+    limitations: ["storage hygiene depends on deployment key management"]
+  - risk: MCP02 (tool injection)
+    coverage: { prevention: partial, detection: partial, evidence: supported, recovery: partial }
+    artifacts: ["wasmagent-js/packages/mcp-gateway", "wasmagent-js/packages/aep"]
+    limitations: ["injection detection is heuristic; evidence proves what flowed, not what was attempted"]
+  - risk: MCP03 (rag/poisoning)
+    coverage: { prevention: none, detection: none, evidence: partial, recovery: none }
+    artifacts: ["wasmagent-js/packages/aep"]
+    limitations: ["AEP can evidence retrieval events but does not validate content sources"]
+  - risk: MCP05 (privilege compromise / excessive agency)
+    coverage: { prevention: supported, detection: partial, evidence: supported, recovery: partial }
+    artifacts: ["wasmagent-js/packages/capability-compiler", "wasmagent-js/packages/mcp-gateway"]
+    limitations: ["policy quality is deployment-defined"]
+  - risk: MCP08 (rising agent tools referencing priors)
+    coverage: { prevention: none, detection: none, evidence: supported, recovery: none }
+    artifacts: ["wasmagent-protocol/conformance/aep", "docs/adr/ADR-python-aep-scope.md"]
+    limitations: ["capture completeness is not self-certified; requires an independent witness"]
+external_status:
+  owasp_contribution: open   # evidence/external-validation.json EXT-OWASP-0001
