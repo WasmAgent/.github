@@ -1,0 +1,77 @@
+schema_version: 1
+last_reviewed: "2026-09-15"
+human_axis: docs/maturity-matrix.md
+packages:
+  # wasmagent-js (repo: Beta)
+  - package: core
+    repo: wasmagent-js
+    maturity: stable
+    contract: stable
+  - package: mcp-gateway
+    repo: wasmagent-js
+    maturity: stable
+    contract: stable
+  - package: compliance
+    repo: wasmagent-js
+    maturity: beta
+    contract: evolving
+  - package: attestation
+    repo: wasmagent-js
+    maturity: beta
+    contract: evolving
+  # open-agent-audit (repo: Beta)
+  - package: schema
+    repo: open-agent-audit
+    maturity: stable
+    contract: stable
+  - package: core
+    repo: open-agent-audit
+    maturity: stable
+    contract: stable
+  - package: adapters
+    repo: open-agent-audit
+    maturity: stable
+    contract: stable
+  - package: passport
+    repo: open-agent-audit
+    maturity: beta
+    contract: evolving
+  - package: worker
+    repo: open-agent-audit
+    maturity: alpha
+    contract: evolving
+  # agentbom (repo: Beta)
+  - package: core
+    repo: agentbom
+    maturity: stable
+    contract: stable
+  - package: agentbom-cli
+    repo: agentbom
+    maturity: stable
+    contract: stable
+  - package: autogen
+    repo: agentbom
+    maturity: beta
+    contract: evolving
+  - package: langchain
+    repo: agentbom
+    maturity: beta
+    contract: evolving
+  - package: llamaindex
+    repo: agentbom
+    maturity: beta
+    contract: evolving
+  # bscode (repo: Reference Workload)
+  - package: evidence-export-api
+    repo: bscode
+    maturity: stable
+    contract: stable
+  - package: bench-v0-tasks
+    repo: bscode
+    maturity: beta
+    contract: evolving
+  # agent-golden-path (repo: Reference Workload)
+  - package: e2e-chain-test
+    repo: agent-golden-path
+    maturity: stable
+    contract: stable
