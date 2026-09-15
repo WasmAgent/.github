@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "last_reviewed": "2026-09-15",
+  "_comment": "Machine-readable ledger of external evidence about WasmAgent artifacts. Distinct evidence_type values carry distinct claim ceilings; formal_certification is never inferred from organization affiliation and requires explicit certificate fields. Consumed by scripts/validate-external-evidence.py (EXT-01..07).",
+  "records": [
+    {
+      "id": "EXT-AEP-0001",
+      "subject": "AEP",
+      "venue": {
+        "org": "Agent-Authority-Conformance",
+        "repo": "aps-conformance-suite",
+        "issue": 92,
+        "pull_request": 94,
+        "affiliation": "LF Decentralized Trust lab"
+      },
+      "evidence_type": "independent_layered_run",
+      "state": "pending_merge",
+      "tested_target": "aep-certified-2026-09-13-03",
+      "layers": {
+        "js_native_record": "reproduced",
+        "js_native_chain": "reproduced",
+        "rust_native_dsse": "reproduced",
+        "lab_semantic": "reproduced_author_produced",
+        "python_native_verifier": "not_present"
+      },
+      "result_summary": {
+        "semantic_targets": "28/28 matched",
+        "dsse_fixtures": "9 exercised",
+        "cross_language_positive": "both directions reproduced"
+      },
+      "claim_ceiling": "Independent layered run reproduced the stated JS/Rust and semantic corpus behavior for the pinned component tuple.",
+      "prohibited_claims": [
+        "certified_by_linux_foundation",
+        "lf_endorsed",
+        "formally_certified",
+        "independent_python_native_verifier"
+      ],
+      "anchors": {
+        "issue_url": "https://github.com/Agent-Authority-Conformance/aps-conformance-suite/issues/92",
+        "pr_url": "https://github.com/Agent-Authority-Conformance/aps-conformance-suite/pull/94"
+      },
+      "limitations": [
+        "PR #94 must merge before this becomes a landed external record.",
+        "LAB-SEMANTIC is Mode B / author-produced.",
+        "This is not an end-to-end certification."
+      ]
+    },
+    {
+      "id": "EXT-OWASP-0001",
+      "subject": "AEP / MCP08",
+      "venue": {
+        "org": "OWASP",
+        "repo": "www-project-mcp-top-10",
+        "issue": 44,
+        "pull_request": 50
+      },
+      "evidence_type": "upstream_contribution",
+      "state": "open",
+      "claim_ceiling": "WasmAgent contributors are participating in public OWASP MCP Top 10 control-language and implementation-reference discussions.",
+      "prohibited_claims": [
+        "owasp_certified",
+        "owasp_endorsed",
+        "linux_foundation_tested_via_owasp",
+        "accepted_standard"
+      ],
+      "anchors": {
+        "issue_url": "https://github.com/OWASP/www-project-mcp-top-10/issues/44",
+        "pr_url": "https://github.com/OWASP/www-project-mcp-top-10/pull/50"
+      },
+      "limitations": [
+        "An open issue/PR in an OWASP project is a public contribution under discussion, not testing, certification, or endorsement.",
+        "OWASP issue #44 is a reference-implementation proposal (VAL); WasmAgent artifacts are referenced as prior art, not adopted."
+      ]
+    }
+  ]
+}
