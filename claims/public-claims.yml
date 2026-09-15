@@ -1,11 +1,21 @@
 # WasmAgent public claims registry.
 # Each entry maps an org-made claim to its supporting evidence and review
 # status. This is a public ledger: edit in place only with merged evidence.
+#
+# claim_class (enforced by scripts/validate-public-claims.py):
+#   internal_supported      org-internal evidence only (default)
+#   externally_observed     an external party observed the artifact (ref required)
+#   independently_reproduced an external party reproduced published behavior (ref required)
+#   formally_certified      a certification body issued a certificate (ref + cert fields required)
+# Endorsement/certification wording (the phrases listed in the validator's
+# FORBIDDEN_PATTERNS) is blocked by the same validator;
+# allowlist: claims/claim-overreach-allowlist.json.
 schema_version: 1
 org: WasmAgent
 last_reviewed: 2026-09-12
 claims:
   - id: WA-C-0001
+    claim_class: internal_supported
     domain: runtime
     claim: >-
       wasmagent-js v1.x sandboxes agent tools across multiple WASM kernels
@@ -22,6 +32,7 @@ claims:
     status: supported
     recorded: 2026-07-16
   - id: WA-C-0002
+    claim_class: internal_supported
     domain: evidence
     claim: >-
       trace-pipeline (evomerge) admits training data only from runs whose
@@ -37,6 +48,7 @@ claims:
     status: supported
     recorded: 2026-07-16
   - id: WA-C-0003
+    claim_class: internal_supported
     domain: trust
     claim: >-
       agentbom (successor to the archived agent-trust-infra, archived 2026-07-29)
@@ -56,6 +68,7 @@ claims:
     status: supported
     recorded: 2026-07-16
   - id: WA-C-0004
+    claim_class: internal_supported
     domain: audit
     claim: >-
       open-agent-audit renders the full evidence chain into enterprise-readable
@@ -71,6 +84,7 @@ claims:
     status: supported
     recorded: 2026-07-16
   - id: WA-C-0005
+    claim_class: internal_supported
     domain: evaluation
     claim: >-
       fresharena evaluates coding agents with dynamic, verifiable, adversarial

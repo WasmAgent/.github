@@ -1,0 +1,4 @@
+{
+  "_comment": "Allowlist for claim-overreach phrase guards. Each entry: {phrase, file, justification, approved_evidence}. Empty by default \u2014 adding an entry requires a certification-grade evidence link.",
+  "allowlist": []
+}
