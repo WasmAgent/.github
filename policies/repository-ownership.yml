@@ -1,0 +1,67 @@
+# Repository ownership policy — WasmAgent organization
+#
+# Governance source for the ownership firewall (scripts/check-repository-ownership.py,
+# enforced by .github/workflows/ownership-guard.yml).
+#
+# Org policy: every capability has ONE primary owner; shared schemas have one
+# canonical source; repositories integrate through versioned contracts;
+# duplicated cross-repository capability requires architecture review.
+#
+# The .github repository holds organization governance and integration ONLY —
+# it is never the home of a product runtime implementation.
+
+canonical_owners:
+  cross_repo_schemas: WasmAgent/wasmagent-protocol
+  agentbom_runtime: WasmAgent/agentbom
+  mcp_posture_runtime: WasmAgent/agentbom
+  trust_passport_runtime: WasmAgent/open-agent-audit
+
+# Product-runtime source extensions. A CHANGED file with one of these
+# extensions that is NOT under an allowlisted path is a violation.
+runtime_source_extensions:
+  - .ts
+  - .tsx
+  - .js
+  - .mjs
+  - .cjs
+  - .py
+  - .go
+  - .rs
+
+# Paths inside .github where code is allowed (governance tooling, integration
+# harnesses, org-level CI). Everything else is governed by the canonical
+# owners above.
+allowed_code_paths:
+  - scripts/
+  - tests/
+  - golden-path/
+  - fixtures/
+  - policies/
+  - docs/
+  - claims/
+  - attestations/
+  - evidence/
+  - profile/
+  - assets/
+  - media/
+  - pkg/
+  - .github/workflows/
+
+# Vendored/integration mirrors that pre-date this policy are grandfathered:
+# NEW product-runtime files inside them still violate; existing files do not.
+grandfathered_dirs:
+  - agentbom/
+  - wasmagent-js/
+  - trace-pipeline/
+  - wasmagent/
+  - schemas/
+
+# Archived schema anchors — retired hosting, must not be referenced by any
+# repository file (OWN-04).
+archived_schema_anchors:
+  - wasmagent.github.io/agent-trust-infra
+
+violation_message: >
+  Product runtime code cannot land in WasmAgent/.github. Canonical owner for
+  capability '{capability}': {owner}. Re-specify against the current
+  wasmagent-protocol schemas and implement in the owner repository.
