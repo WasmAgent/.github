@@ -79,11 +79,24 @@ def check_changed(paths: list[str], policy: dict) -> list[str]:
     return violations
 
 
+# Files that legitimately QUOTE the anchors as definitions (the policy
+# document itself, this checker) are exempt from OWN-04 — otherwise the
+# policy trips on its own vocabulary.
+ANCHOR_DEFINITION_FILES = {
+    str(POLICY),
+    str(Path(__file__).resolve()),
+}
+
+
 def check_anchor_content(paths: list[str], policy: dict) -> list[str]:
     """OWN-04 — no archived agent-trust-infra schema anchors, in any file."""
     violations: list[str] = []
     anchors = policy.get("archived_schema_anchors", [])
     for path in paths:
+        resolved = str(Path(path.strip()).resolve())
+        if resolved in ANCHOR_DEFINITION_FILES:
+            continue
+        path = path.strip()
         path = path.strip()
         if not path:
             continue
