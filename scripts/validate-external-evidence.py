@@ -36,8 +36,8 @@ import re
 import sys
 from urllib.parse import urlparse
 
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LEDGER_PATH = os.path.join(REPO_ROOT, "evidence", "external-validation.json")
+DEFAULT_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+LEDGER_PATH = os.path.join(DEFAULT_REPO_ROOT, "evidence", "external-validation.json")
 
 EVIDENCE_TYPES = {
     "external_observation",
@@ -129,13 +129,29 @@ def validate_record(record: dict, failures: list[str]) -> None:
                   f"layer '{key}' cannot be both author-produced and independent")
 
 
+def repo_root_from_args(argv: list[str]) -> str:
+    """--repo-root lets a TRUSTED (pinned) copy of this validator inspect a
+    candidate checkout's data without executing candidate code."""
+    root = DEFAULT_REPO_ROOT
+    i = 0
+    while i < len(argv):
+        if argv[i] == "--repo-root":
+            root = os.path.abspath(argv[i + 1])
+            i += 2
+        else:
+            i += 1
+    return root
+
+
 def main() -> int:
+    repo_root = repo_root_from_args(sys.argv[1:])
+    ledger_path = os.path.join(repo_root, "evidence", "external-validation.json")
     failures: list[str] = []
     try:
-        with open(LEDGER_PATH, encoding="utf-8") as handle:
+        with open(ledger_path, encoding="utf-8") as handle:
             ledger = json.load(handle)
     except (OSError, json.JSONDecodeError) as error:
-        print(f"EXT-00 [ledger]: cannot parse {LEDGER_PATH}: {error}")
+        print(f"EXT-00 [ledger]: cannot parse {ledger_path}: {error}")
         return 1
 
     check(failures, "ledger", "EXT-01", ledger.get("schema_version") == 1,
