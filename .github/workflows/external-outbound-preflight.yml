@@ -3,16 +3,24 @@ name: External Outbound Preflight
 # Technical preflight gate for substantive external messages (package/version
 # announcements, install/run commands handed to external users, CI/conformance/
 # provenance status claims, corrections). This workflow can only ever produce
-# TECHNICALLY_READY or HOLD; it can never post anything externally.
+# a technical verdict (TECHNICALLY_READY) or HOLD; it can never post anything
+# externally.
 #
-# Required-check architecture (mirrors org-compat.yml, N3-P1-03) with one
-# hardening on top: the relevance decision is NOT trusted from the candidate
-# tree. The candidate-side `changes` job only decides whether the expensive
-# inner job runs (an optimization); the summary job RECOMPUTES relevance from
-# the detector loaded from origin/main (default-branch-owned, never the
-# candidate) over the objective git diff file list, and feeds that result to
-# the pinned immutable evaluator. A candidate cannot weaken the gate by
-# editing the detector, its path list, or its own changes job.
+# Required-check architecture (mirrors org-compat.yml, N3-P1-03) with two
+# hardenings on top:
+#
+# 1. Trust-boundary split: the authority job validates the claim ledgers in a
+#    pristine workspace BEFORE anything external executes, and the replay job
+#    (which installs and runs record-named packages) is chained after it. The
+#    validator additionally snapshots the ledger files before replay and
+#    fails closed if an executed bin mutates them — no TOCTOU from external
+#    code back into the audited trust authority.
+# 2. Trusted relevance: the summary job recomputes relevance from the
+#    detector loaded from origin/main (never the candidate tree) over the
+#    objective git diff file list, and the pinned immutable evaluator
+#    consumes only that recomputation.
+#
+# All checkouts run with persist-credentials: false.
 
 on:
   pull_request:
@@ -41,19 +49,46 @@ jobs:
           fi
           base="origin/${{ github.base_ref }}"
           git fetch --no-tags origin "${{ github.base_ref }}" >/dev/null 2>&1 || true
-          if git diff --name-only "$base"...HEAD | grep -qE '^(evidence/external-outbound/|schemas/external-outbound-preflight\.schema\.json|scripts/external-outbound-preflight|scripts/external-outbound/|scripts/verify-external-outbound-preflight\.mjs|\.github/workflows/external-outbound-preflight\.yml|claims/public-claims\.yml|evidence/external-validation\.json|scripts/validate-public-claims\.py|scripts/validate-external-evidence\.py)'; then
+          if git diff --name-only "$base"...HEAD | grep -qE '^(evidence/external-outbound/|schemas/external-outbound-preflight\.schema\.json|scripts/external-outbound-preflight|scripts/external-outbound/|scripts/verify-external-outbound-preflight\.mjs|\.github/workflows/external-outbound-preflight\.yml|claims/public-claims\.yml|claims/claim-overreach-allowlist\.json|evidence/external-validation\.json|scripts/validate-public-claims\.py|scripts/validate-external-evidence\.py)'; then
             echo "relevant=true" >> "$GITHUB_OUTPUT"
           else
             echo "relevant=false" >> "$GITHUB_OUTPUT"
           fi
 
-  outbound-preflight:
-    name: Outbound preflight (live primary-source verification)
+  # Authority validation FIRST, in a pristine workspace: the claim ledgers
+  # are validated before any record-named external package is installed or
+  # executed anywhere in this workflow.
+  outbound-authority:
+    name: Outbound authority (claim ledgers, pristine workspace)
     needs: changes
     if: needs.changes.outputs.relevant == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.x'
+      - name: Install PyYAML
+        run: python -m pip install --disable-pip-version-check pyyaml
+      - name: External evidence ledger (EXT-01..07)
+        run: python3 scripts/validate-external-evidence.py
+      - name: Public claims firewall
+        run: python3 scripts/validate-public-claims.py
+
+  # Replay job: installs and RUNS record-named external packages. Chained
+  # after the authority job; it never re-validates the ledgers afterwards —
+  # the validator snapshots them before replay and fails closed on mutation.
+  outbound-preflight:
+    name: Outbound preflight (live primary-source verification)
+    needs: [changes, outbound-authority]
+    if: needs.changes.outputs.relevant == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
@@ -65,21 +100,13 @@ jobs:
 
       # Live verification of every record against real primary sources:
       # registry metadata, clean-install of the PUBLISHED artifact (secrets
-      # scrubbed, --ignore-scripts, bin allowlist), exact command replay with
-      # semantic source binding, final GitHub state, claim_refs.
+      # scrubbed, --ignore-scripts / wheel-only, bin allowlist), exact command
+      # replay with semantic source binding, ledger mutation guard, final
+      # GitHub state, claim_refs.
       - name: Verify outbound records against primary sources
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/verify-external-outbound-preflight.mjs
-
-      # The outbound validator treats these two ledgers as its claim
-      # authority — they are inside the gate's trust chain, so their own
-      # validators run here too.
-      - name: External evidence ledger (EXT-01..07)
-        run: python3 scripts/validate-external-evidence.py
-
-      - name: Public claims firewall
-        run: python3 scripts/validate-public-claims.py
 
   outbound-preflight-summary:
     name: External outbound preflight (.github)
@@ -100,6 +127,7 @@ jobs:
         with:
           ref: main
           path: .gate
+          persist-credentials: false
 
       - name: Recompute relevance from the default-branch-owned detector
         id: relevance

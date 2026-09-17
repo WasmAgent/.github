@@ -56,7 +56,10 @@ gate the default branch says must run.
 ## Ledger dependency
 
 The validator reads `claims/public-claims.yml`,
-`claims/claim-overreach-allowlist.json` and
+`claims/claim-overreach-allowlist.json`, `evidence/external-validation.json`,
+`media/posts.yml` and `releases/public-release-ledger.yml` as claim-bearing
+surfaces (the firewall scans `claims/`, `docs/`, `profile/`, `evidence/`,
+`media/`, `releases/`, `README.md` and `ORG-FOCUS-2026Q3.md`), and
 `evidence/external-validation.json` as its claim authority, and the
 public-claims firewall scans `claims/`, `docs/`, `profile/`, `evidence/`,
 `README.md` and `ORG-FOCUS-2026Q3.md`. All of these surfaces are inside the
@@ -64,7 +67,13 @@ gate's relevance scope (both detectors), the ledger validators run inside
 the gate's inner job, and — independently of this gate —
 `Validate claims + overreach guard` is a branch-protection required context
 on its own: the claim firewall is its own security property and must not
-depend on the outbound gate for enforcement.
+depend on the outbound gate for enforcement. Allowlist entries are
+exceptions to the certification-wording ban and therefore require REAL
+certification evidence: `approved_evidence` must be a structured
+external-validation record id whose record is a MERGED `formal_certification`
+with complete certificate fields. The ledger currently contains no
+formal_certification record — so today, ANY allowlist entry fails the
+firewall, by design.
 
 ## State machine
 
@@ -80,8 +89,14 @@ primary sources means **HOLD** — never "pick an interpretation", never
 
 ## Correction threshold
 
-An external correction requires **at least two MACHINE-VERIFIED primary
-sources** — each carrying `verified_by` pointing at a DISTINCT, PASSING
+Every record must carry `outbound_message.content` — the EXACT draft it
+authorizes (optionally pinned by `sha256`). The validator scans that draft
+against the `prohibited_claims` of every referenced evidence record; hitting
+one is `HOLD: CLAIM_CEILING_EXCEEDED`. Artifact source refs MUST carry the
+ecosystem prefix (`npm:` / `pypi:`) — a bare `pkg@ver` is not verifiable and
+cannot be used to re-canonicalize an already-counted source. Replay ids must
+be unique. An external correction requires **at least two MACHINE-VERIFIED
+primary sources** — each carrying `verified_by` pointing at a DISTINCT, PASSING
 structured check that **semantically verifies that exact source** (same
 artifact ecosystem+name+version, same repository+release run, same
 repository+PR — a passing check for a different artifact never counts), and
@@ -110,13 +125,19 @@ correction.
   `npm_bin_exists`, `npm_exec`, `pypi_metadata`, `pypi_clean_install`,
   `github_release_run`, `github_pr_state`, `github_issue_comment_exists`,
   `claim_ref`). The record never carries shell for the validator to execute.
-- Replay execution isolation: install/run child processes get a
-  secrets-scrubbed environment (no `*TOKEN` / `*SECRET` / `*PASSWORD` /
-  `*KEY`), npm clean-installs run `--ignore-scripts` unless a package is on
-  the reviewed `INSTALL_SCRIPTS_ALLOWLIST` (empty by default; a data record
-  can never open it), every executed `npm_exec` command must call a bin the
-  target package actually declares on the registry (`argv[0]` allowlist),
-  PyPI clean-installs are wheel-only (`--only-binary=:all: --no-deps` — an
+- Replay execution isolation: the workflow splits **authority validation**
+  (claim ledgers, pristine workspace, runs FIRST) from the **replay job**
+  (installs and executes record-named packages), the replay job is chained
+  after the authority job and never re-reads the ledgers afterwards, the
+  validator snapshots the ledger files before replay and **fails closed if
+  an executed bin mutates them** (no TOCTOU into the audited authority),
+  install/run child processes get a secrets-scrubbed environment (no
+  `*TOKEN` / `*SECRET` / `*PASSWORD` / `*KEY`), npm clean-installs run
+  `--ignore-scripts` unless a package is on the reviewed
+  `INSTALL_SCRIPTS_ALLOWLIST` (empty by default; a data record can never
+  open it), every executed `npm_exec` command must call a bin the target
+  package actually declares on the registry (`argv[0]` allowlist), PyPI
+  clean-installs are wheel-only (`--only-binary=:all: --no-deps` — an
   sdist-only version HOLDs for manual review instead of executing its build
   backend), and all workflow checkouts run with `persist-credentials: false`.
 - `claim_refs` must resolve inside the existing ledgers; anything pointing

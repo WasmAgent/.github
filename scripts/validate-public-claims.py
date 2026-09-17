@@ -27,12 +27,25 @@ import sys
 
 import yaml
 
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CLAIMS_PATH = os.path.join(REPO_ROOT, "claims", "public-claims.yml")
-EVIDENCE_PATH = os.path.join(REPO_ROOT, "evidence", "external-validation.json")
-ALLOWLIST_PATH = os.path.join(REPO_ROOT, "claims", "claim-overreach-allowlist.json")
-SCAN_DIRS = ("claims", "docs", "profile", "evidence")
+DEFAULT_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SCAN_DIRS = ("claims", "docs", "profile", "evidence", "media", "releases")
 SCAN_FILES = ("README.md", "ORG-FOCUS-2026Q3.md")
+
+CERT_FIELDS = ("certifying_body", "certificate_id", "certificate_url", "scope", "valid_from")
+
+
+def repo_root_from_args(argv: list[str]) -> str:
+    """--repo-root lets a TRUSTED (pinned) copy of this validator inspect a
+    candidate checkout's data without executing candidate code."""
+    root = DEFAULT_REPO_ROOT
+    i = 0
+    while i < len(argv):
+        if argv[i] == "--repo-root":
+            root = os.path.abspath(argv[i + 1])
+            i += 2
+        else:
+            i += 1
+    return root
 SCAN_SUFFIXES = (".md", ".yml", ".yaml", ".json")
 
 CLASSES = {"internal_supported", "externally_observed", "independently_reproduced", "formally_certified"}
@@ -57,9 +70,9 @@ def load_json(path: str):
         return json.load(handle)
 
 
-def iter_repo_files():
+def iter_repo_files(repo_root: str):
     for directory in SCAN_DIRS:
-        base = os.path.join(REPO_ROOT, directory)
+        base = os.path.join(repo_root, directory)
         if not os.path.isdir(base):
             continue
         for root, _dirs, files in os.walk(base):
@@ -67,17 +80,21 @@ def iter_repo_files():
                 if name.endswith(SCAN_SUFFIXES):
                     yield os.path.join(root, name)
     for name in SCAN_FILES:
-        path = os.path.join(REPO_ROOT, name)
+        path = os.path.join(repo_root, name)
         if os.path.isfile(path):
             yield path
 
 
 def main() -> int:
+    repo_root = repo_root_from_args(sys.argv[1:])
+    claims_path = os.path.join(repo_root, "claims", "public-claims.yml")
+    evidence_path = os.path.join(repo_root, "evidence", "external-validation.json")
+    allowlist_path = os.path.join(repo_root, "claims", "claim-overreach-allowlist.json")
     failures: list[str] = []
     try:
-        registry = yaml.safe_load(open(CLAIMS_PATH, encoding="utf-8"))
+        registry = yaml.safe_load(open(claims_path, encoding="utf-8"))
     except Exception as error:  # noqa: BLE001 - report and fail closed
-        print(f"claims: cannot parse {CLAIMS_PATH}: {error}")
+        print(f"claims: cannot parse {claims_path}: {error}")
         return 1
 
     if registry.get("schema_version") != 1:
@@ -87,8 +104,8 @@ def main() -> int:
         failures.append("claims: claims array must not be empty")
 
     evidence_ids: dict[str, dict] = {}
-    if os.path.isfile(EVIDENCE_PATH):
-        for record in load_json(EVIDENCE_PATH).get("records", []):
+    if os.path.isfile(evidence_path):
+        for record in load_json(evidence_path).get("records", []):
             evidence_ids[record.get("id")] = record
 
     seen: set[str] = set()
@@ -128,21 +145,52 @@ def main() -> int:
                 )
 
     # --- overreach wording guard ---
-    allowlist_entries = load_json(ALLOWLIST_PATH).get("allowlist", []) if os.path.isfile(ALLOWLIST_PATH) else []
+    # Allowlist entries are exceptions to the certification/endorsement
+    # wording ban and therefore require REAL certification evidence:
+    # approved_evidence must be a structured external-validation record id
+    # whose record is a MERGED formal_certification with complete certificate
+    # fields. Anything else (free text, a non-certification record, an
+    # unlanded record) fails — the ledger currently contains no
+    # formal_certification record, so any allowlist entry fails today.
+    allowlist_entries = load_json(allowlist_path).get("allowlist", []) if os.path.isfile(allowlist_path) else []
     for entry in allowlist_entries:
-        if not entry.get("approved_evidence"):
+        label = f"'{entry.get('phrase')}' in {entry.get('file')}"
+        evidence_id = entry.get("approved_evidence")
+        record = evidence_ids.get(evidence_id) if isinstance(evidence_id, str) else None
+        if record is None:
             failures.append(
-                f"allowlist: entry for '{entry.get('phrase')}' in {entry.get('file')} "
-                "lacks approved_evidence — an allowlist entry without certification-grade "
-                "evidence is itself overreach"
+                f"allowlist: entry for {label} has approved_evidence {evidence_id!r} which is "
+                "not a record in evidence/external-validation.json — allowlist entries "
+                "require a structured certification-grade evidence id"
+            )
+            continue
+        if record.get("evidence_type") != "formal_certification":
+            failures.append(
+                f"allowlist: entry for {label} cites {evidence_id} with evidence_type "
+                f"'{record.get('evidence_type')}' — only formal_certification records can "
+                "back a wording exception"
+            )
+            continue
+        if record.get("state") != "merged":
+            failures.append(
+                f"allowlist: entry for {label} cites {evidence_id} with state "
+                f"'{record.get('state')}' — only merged certification records can "
+                "back a wording exception"
+            )
+            continue
+        missing_fields = [f for f in CERT_FIELDS if not record.get(f)]
+        if missing_fields:
+            failures.append(
+                f"allowlist: entry for {label} cites {evidence_id} which lacks "
+                f"certificate field(s): {', '.join(missing_fields)}"
             )
 
     allowed_hits = {(e.get("file"), e.get("phrase", "").lower()) for e in allowlist_entries}
     import re
 
     patterns = [re.compile(pattern, re.IGNORECASE) for pattern in FORBIDDEN_PATTERNS]
-    for path in iter_repo_files():
-        rel = os.path.relpath(path, REPO_ROOT).replace(os.sep, "/")
+    for path in iter_repo_files(repo_root):
+        rel = os.path.relpath(path, repo_root).replace(os.sep, "/")
         try:
             text = open(path, encoding="utf-8").read()
         except (OSError, UnicodeDecodeError):
