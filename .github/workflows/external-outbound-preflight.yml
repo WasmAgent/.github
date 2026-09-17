@@ -31,6 +31,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
+          persist-credentials: false
       - id: detect
         run: |
           set -euo pipefail
@@ -90,6 +91,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       # Default-branch-owned detector: loaded from origin/main, never from the
       # candidate tree, so a candidate cannot weaken relevance.
@@ -132,6 +134,7 @@ jobs:
           repository: WasmAgent/.github
           ref: ca2067cda59a58dc67a824ff6e4a0c58c5addf95
           path: .org
+          persist-credentials: false
       - name: Evaluate preflight result (fail closed)
         run: |
           set -euo pipefail

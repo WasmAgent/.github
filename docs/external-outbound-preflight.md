@@ -55,12 +55,16 @@ gate the default branch says must run.
 
 ## Ledger dependency
 
-The validator reads `claims/public-claims.yml` and
-`evidence/external-validation.json` as its claim authority. Both files — and
-their validators (`scripts/validate-public-claims.py`,
-`scripts/validate-external-evidence.py`) — are inside the gate's relevance
-scope, and the ledger validators run inside the gate's inner job. Weakening
-the ledgers can no longer bypass the outbound gate.
+The validator reads `claims/public-claims.yml`,
+`claims/claim-overreach-allowlist.json` and
+`evidence/external-validation.json` as its claim authority, and the
+public-claims firewall scans `claims/`, `docs/`, `profile/`, `evidence/`,
+`README.md` and `ORG-FOCUS-2026Q3.md`. All of these surfaces are inside the
+gate's relevance scope (both detectors), the ledger validators run inside
+the gate's inner job, and — independently of this gate —
+`Validate claims + overreach guard` is a branch-protection required context
+on its own: the claim firewall is its own security property and must not
+depend on the outbound gate for enforcement.
 
 ## State machine
 
@@ -79,9 +83,12 @@ primary sources means **HOLD** — never "pick an interpretation", never
 An external correction requires **at least two MACHINE-VERIFIED primary
 sources** — each carrying `verified_by` pointing at a DISTINCT, PASSING
 structured check that **semantically verifies that exact source** (same
-artifact ecosystem+name+version, same release run, same PR — a passing check
-for a different artifact never counts) — of which at least one is
-**final-state evidence**. Final-state status is DERIVED from the source kind
+artifact ecosystem+name+version, same repository+release run, same
+repository+PR — a passing check for a different artifact never counts), and
+the two sources must also be **logically distinct claims**: duplicating one
+source with a second check does not count (different evidence modalities of
+the same artifact — e.g. registry metadata + clean-install replay — do) —
+of which at least one is **final-state evidence**. Final-state status is DERIVED from the source kind
 (registry metadata, published artifact, clean-install replay, final
 release/PR state) plus a passing bound check; a `final_state: true` flag in
 the record has no power. `human_inference` and `release_log` sources are
@@ -107,8 +114,11 @@ correction.
   secrets-scrubbed environment (no `*TOKEN` / `*SECRET` / `*PASSWORD` /
   `*KEY`), npm clean-installs run `--ignore-scripts` unless a package is on
   the reviewed `INSTALL_SCRIPTS_ALLOWLIST` (empty by default; a data record
-  can never open it), and every executed `npm_exec` command must call a bin
-  the target package actually declares on the registry (`argv[0]` allowlist).
+  can never open it), every executed `npm_exec` command must call a bin the
+  target package actually declares on the registry (`argv[0]` allowlist),
+  PyPI clean-installs are wheel-only (`--only-binary=:all: --no-deps` — an
+  sdist-only version HOLDs for manual review instead of executing its build
+  backend), and all workflow checkouts run with `persist-credentials: false`.
 - `claim_refs` must resolve inside the existing ledgers; anything pointing
   outside them is `HOLD: CLAIM_CEILING_EXCEEDED`.
 - Known contradictions must be recorded and resolved by a named passing
