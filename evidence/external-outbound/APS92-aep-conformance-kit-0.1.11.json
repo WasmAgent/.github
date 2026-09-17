@@ -16,7 +16,9 @@
       "package": "@wasmagent/protocol",
       "version": "0.1.11",
       "expect": {
-        "bin": { "wasmagent-protocol": "bin/cli.js" }
+        "bin": {
+          "wasmagent-protocol": "bin/cli.js"
+        }
       }
     },
     {
@@ -30,25 +32,29 @@
       "kind": "github_release_run",
       "ref": "35188712433",
       "statement": "v0.1.11 tag release workflow: preflight, build, npm publish, PyPI publish all succeeded",
-      "final_state": true
+      "final_state": true,
+      "verified_by": "release-run"
     },
     {
       "kind": "registry_metadata",
       "ref": "npm:@wasmagent/protocol@0.1.11",
       "statement": "registry serves 0.1.11 with bin mapping wasmagent-protocol -> bin/cli.js",
-      "final_state": true
+      "final_state": true,
+      "verified_by": "npm-metadata"
     },
     {
       "kind": "registry_metadata",
       "ref": "pypi:wasmagent-protocol@0.1.11",
       "statement": "PyPI serves wasmagent-protocol 0.1.11 wheel + sdist",
-      "final_state": true
+      "final_state": true,
+      "verified_by": "pypi-metadata"
     },
     {
       "kind": "clean_install_replay",
       "ref": "clean-install replay of the exact commands the message gives external users (npm and PyPI)",
       "statement": "npx wasmagent-protocol aep-conformance path | self-check reproduce 30/30 with the NOT-independent notice from the published artifacts",
-      "final_state": true
+      "final_state": true,
+      "verified_by": "npm-self-check"
     }
   ],
   "command_replays": [
@@ -74,17 +80,30 @@
       "id": "npm-path",
       "kind": "npm_exec",
       "requires": "npm-install",
-      "argv": ["wasmagent-protocol", "aep-conformance", "path"],
+      "argv": [
+        "wasmagent-protocol",
+        "aep-conformance",
+        "path"
+      ],
       "expect_exit": 0,
-      "expect_stdout_contains": ["conformance/aep"]
+      "expect_stdout_contains": [
+        "conformance/aep"
+      ]
     },
     {
       "id": "npm-self-check",
       "kind": "npm_exec",
       "requires": "npm-install",
-      "argv": ["wasmagent-protocol", "aep-conformance", "self-check"],
+      "argv": [
+        "wasmagent-protocol",
+        "aep-conformance",
+        "self-check"
+      ],
       "expect_exit": 0,
-      "expect_stdout_contains": ["30/30", "NOT independent semantic verification"]
+      "expect_stdout_contains": [
+        "30/30",
+        "NOT independent semantic verification"
+      ]
     },
     {
       "id": "pypi-metadata",

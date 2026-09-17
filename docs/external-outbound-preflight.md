@@ -31,11 +31,15 @@ release success     != command replay
 machine ready       != human approval
 ```
 
-- The machine computes at most **TECHNICALLY_READY**.
-- **EXTERNAL_READY** requires explicit human approval recorded in the record
-  (`human_approval.approved = true` with a non-bot `reviewed_by`).
+- The machine computes at most **TECHNICALLY_READY**. It never outputs
+  `EXTERNAL_READY` — at most it reports `HUMAN_APPROVAL_RECORDED` when the
+  record carries an approval from an acceptable non-bot `reviewed_by`. A JSON
+  field can never by itself prove that a human approved anything.
+- The final **EXTERNAL_READY** designation is a human action outside this
+  validator.
 - No bot or workflow may auto-post external comments based only on
-  TECHNICALLY_READY — even an approved record is posted manually, by a human.
+  TECHNICALLY_READY — even an approval-recorded post is posted manually, by
+  a human.
 
 ## State machine
 
@@ -51,12 +55,15 @@ primary sources means **HOLD** — never "pick an interpretation", never
 
 ## Correction threshold
 
-An external correction requires **at least two primary sources**, of which
-at least one is **final-state evidence** (registry metadata, the actual
-published artifact, an exact clean-install command replay, or the final
-merged/release state). A single warning line, a commit message, a PR body,
-or an inference — human or AI — is never sufficient to trigger an external
-correction.
+An external correction requires **at least two MACHINE-VERIFIED primary
+sources** — each carrying `verified_by` pointing at a DISTINCT, PASSING
+structured check — of which at least one is **final-state evidence**
+(registry metadata, the actual published artifact, an exact clean-install
+command replay, or the final merged/release state). `human_inference` and
+`release_log` sources are recorded honestly but are never machine-verifiable
+and never count toward the threshold. A single warning line, a commit
+message, a PR body, or an inference — human or AI — is never sufficient to
+trigger an external correction.
 
 ## Mechanics
 
@@ -71,6 +78,12 @@ correction.
   `npm_bin_exists`, `npm_exec`, `pypi_metadata`, `pypi_clean_install`,
   `github_release_run`, `github_pr_state`, `github_issue_comment_exists`,
   `claim_ref`). The record never carries shell for the validator to execute.
+- Replay execution isolation: install/run child processes get a
+  secrets-scrubbed environment (no `*TOKEN` / `*SECRET` / `*PASSWORD` /
+  `*KEY`), npm clean-installs run `--ignore-scripts` unless a package is on
+  the reviewed `INSTALL_SCRIPTS_ALLOWLIST` (empty by default; a data record
+  can never open it), and every executed `npm_exec` command must call a bin
+  the target package actually declares on the registry (`argv[0]` allowlist).
 - `claim_refs` must resolve inside the existing ledgers; anything pointing
   outside them is `HOLD: CLAIM_CEILING_EXCEEDED`.
 - Known contradictions must be recorded and resolved by a named passing

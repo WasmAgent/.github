@@ -90,6 +90,46 @@ function structuralProblems(record) {
 // Adapters (each returns {ok, detail}; never throws).
 // ---------------------------------------------------------------------------
 
+/**
+ * Secrets never reach the child processes that install/run record-named
+ * packages: any env var whose name looks like a credential is stripped.
+ * (gh calls need GH_TOKEN and are made with the unscrubbed process env.)
+ */
+export function sanitizeEnv(env = process.env) {
+  const out = {};
+  for (const [k, v] of Object.entries(env)) {
+    if (/(TOKEN|SECRET|PASSWORD|KEY)$/i.test(k)) continue;
+    out[k] = v;
+  }
+  return out;
+}
+
+/**
+ * Packages on this list are allowed to run npm install scripts during the
+ * clean-install replay. Empty by default and extended only by reviewed PR —
+ * a data record can never open this door.
+ */
+export const INSTALL_SCRIPTS_ALLOWLIST = new Set();
+
+function npmInstallArgs(spec) {
+  const args = ["install", spec];
+  const name = spec.startsWith("@") ? `@${spec.split("/")[1].split("@")[0]}` : spec.split("@")[0];
+  if (!INSTALL_SCRIPTS_ALLOWLIST.has(name)) args.push("--ignore-scripts");
+  return args;
+}
+
+/**
+ * Executed replay commands must call a binary the target package actually
+ * exposes: argv[0] must be one of the bin names the registry metadata
+ * declares for that exact package@version. This keeps "structured checks
+ * only" true at the executable level, not just the invocation level.
+ */
+export function execBinAllowlisted(argv, binKeys) {
+  const head = argv?.[0];
+  if (typeof head !== "string" || head.length === 0) return false;
+  return binKeys.includes(head);
+}
+
 function sh(cmd, args, opts = {}) {
   try {
     return {
@@ -178,7 +218,24 @@ function gatherCheckResults(record) {
   results.set("__artifacts__", { ok: artifactsOk, artifacts: artifactConflicts });
 
   // --- structured replays ----------------------------------------------------
-  const envs = new Map(); // replay id -> installed environment dir
+  // envs: replay id -> { dir, spec } of the clean environment (and the exact
+  // package@version installed into it, for bin allowlisting).
+  const envs = new Map();
+  const binCache = new Map();
+  const registryBinKeys = (spec) => {
+    if (binCache.has(spec)) return binCache.get(spec);
+    const metaR = npmView(spec, "--json");
+    let keys = [];
+    try {
+      const bin = metaR.ok ? (JSON.parse(metaR.stdout || "null")?.bin ?? null) : null;
+      keys = bin ? Object.keys(bin) : [];
+    } catch {
+      keys = [];
+    }
+    binCache.set(spec, keys);
+    return keys;
+  };
+  const childEnv = sanitizeEnv();
   for (const replay of record.command_replays ?? []) {
     switch (replay.kind) {
       case "npm_metadata": {
@@ -189,18 +246,19 @@ function gatherCheckResults(record) {
       case "npm_clean_install": {
         const dir = mkdtempSync(join(tmpdir(), "aep-outbound-"));
         writePkgJson(dir);
-        const r = sh("npm", ["install", `${replay.package}@${replay.version}`], { cwd: dir });
-        envs.set(replay.id, dir);
+        const spec = `${replay.package}@${replay.version}`;
+        const r = sh("npm", npmInstallArgs(spec), { cwd: dir, env: childEnv });
+        envs.set(replay.id, { dir, spec });
         set(replay.id, r.ok, r.detail);
         break;
       }
       case "npm_bin_exists": {
-        const dir = envs.get(replay.requires);
-        if (!dir) {
+        const env = envs.get(replay.requires);
+        if (!env) {
           set(replay.id, false, `requires missing clean-install ${replay.requires}`);
           break;
         }
-        const bin = join(dir, "node_modules", ".bin", replay.bin_name);
+        const bin = join(env.dir, "node_modules", ".bin", replay.bin_name);
         let ok = false;
         try {
           ok = statSync(bin).isFile();
@@ -211,15 +269,26 @@ function gatherCheckResults(record) {
         break;
       }
       case "npm_exec": {
-        const dir = envs.get(replay.requires);
-        if (!dir) {
+        const env = envs.get(replay.requires);
+        if (!env) {
           set(replay.id, false, `requires missing clean-install ${replay.requires}`);
+          break;
+        }
+        // Executable-level allowlist: argv[0] must be a bin the target
+        // package actually exposes on the registry.
+        const binKeys = registryBinKeys(env.spec);
+        if (!execBinAllowlisted(replay.argv, binKeys)) {
+          set(
+            replay.id,
+            false,
+            `argv[0] ${JSON.stringify(replay.argv?.[0] ?? null)} is not a bin declared by ${env.spec} (declared: ${JSON.stringify(binKeys)})`,
+          );
           break;
         }
         const args = ["--no-install", ...(replay.argv ?? [])];
         let r;
         try {
-          const out = execFileSync("npx", args, { cwd: dir, encoding: "utf8" });
+          const out = execFileSync("npx", args, { cwd: env.dir, encoding: "utf8", env: childEnv });
           r = { ok: true, stdout: out, status: 0 };
         } catch (err) {
           r = { ok: false, stdout: err.stdout ?? "", status: err.status ?? 1 };
@@ -237,9 +306,9 @@ function gatherCheckResults(record) {
       case "pypi_clean_install": {
         const dir = mkdtempSync(join(tmpdir(), "aep-outbound-py-"));
         const venv = join(dir, "venv");
-        let r = sh("python3", ["-m", "venv", venv]);
-        if (r.ok) r = sh(join(venv, "bin", "pip"), ["install", `${replay.package}==${replay.version}`]);
-        envs.set(replay.id, venv);
+        let r = sh("python3", ["-m", "venv", venv], { env: childEnv });
+        if (r.ok) r = sh(join(venv, "bin", "pip"), ["install", `${replay.package}==${replay.version}`], { env: childEnv });
+        envs.set(replay.id, { dir: venv, spec: `${replay.package}==${replay.version}` });
         set(replay.id, r.ok, r.detail);
         break;
       }
@@ -394,4 +463,8 @@ function main(argv) {
   return exit;
 }
 
-process.exit(main(process.argv.slice(2)));
+// Only auto-run when invoked as the CLI (importing this module — e.g. from
+// the hostile regression tests — must not execute anything).
+if (import.meta.url === `file://${process.argv[1]}`) {
+  process.exit(main(process.argv.slice(2)));
+}
