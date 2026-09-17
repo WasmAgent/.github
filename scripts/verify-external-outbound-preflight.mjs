@@ -32,12 +32,21 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { evaluatePreflight } from "./external-outbound-preflight-core.mjs";
 
-const REPO_ROOT = new URL("..", import.meta.url).pathname;
-const EVIDENCE_DIR = join(REPO_ROOT, "evidence", "external-outbound");
-const LEDGER_FILES = {
-  "public-claims": join(REPO_ROOT, "claims", "public-claims.yml"),
-  "external-validation": join(REPO_ROOT, "evidence", "external-validation.json"),
-};
+// Default: the verifier's own repository. `--repo-root <dir>` overrides ALL
+// data paths (records, ledgers) so a PINNED immutable copy of this verifier
+// can inspect a candidate checkout's DATA without executing candidate code —
+// candidate tree = DATA, immutable merged SHA = VERIFIER + CORE.
+const VERIFIER_ROOT = new URL("..", import.meta.url).pathname;
+
+function resolvePaths(repoRoot) {
+  return {
+    evidenceDir: join(repoRoot, "evidence", "external-outbound"),
+    ledgerFiles: {
+      "public-claims": join(repoRoot, "claims", "public-claims.yml"),
+      "external-validation": join(repoRoot, "evidence", "external-validation.json"),
+    },
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Structural validation (stdlib subset of the JSON Schema contract).
@@ -119,6 +128,12 @@ export function structuralProblems(record) {
       push(!seenReplayIds.has(r.id), `duplicate replay id: ${r.id}`);
       seenReplayIds.add(r.id);
     }
+    if (r?.expect_state !== undefined && !["merged", "open", "closed"].includes(r.expect_state)) {
+      push(false, `replay ${r.id}: expect_state must be merged|open|closed`);
+    }
+    if (r?.install?.selector !== undefined && !["exact", "latest"].includes(r.install.selector)) {
+      push(false, `replay ${r.id}: install.selector must be exact|latest`);
+    }
   }
   return problems;
 }
@@ -147,6 +162,21 @@ export function sanitizeEnv(env = process.env) {
  * a data record can never open this door.
  */
 export const INSTALL_SCRIPTS_ALLOWLIST = new Set();
+
+/**
+ * Version actually installed under node_modules (scoped-package aware) —
+ * used to verify "latest" install selectors land on the declared version.
+ */
+function readInstalledVersion(projectDir, pkgName) {
+  const rel = pkgName.startsWith("@")
+    ? join("node_modules", ...pkgName.split("/"), "package.json")
+    : join("node_modules", pkgName, "package.json");
+  try {
+    return JSON.parse(readFileSync(join(projectDir, rel), "utf8")).version ?? "";
+  } catch {
+    return "";
+  }
+}
 
 function npmInstallArgs(spec) {
   const args = ["install", spec];
@@ -283,10 +313,26 @@ function gatherCheckResults(record) {
       case "npm_clean_install": {
         const dir = mkdtempSync(join(tmpdir(), "aep-outbound-"));
         writePkgJson(dir);
-        const spec = `${replay.package}@${replay.version}`;
+        // Install selector: "exact" (default) pins the declared version;
+        // "latest" installs EXACTLY what an unversioned user command would
+        // get today, and must land on the version the record declares — if
+        // the registry has moved on, the replay fails and the record must be
+        // re-verified (the draft's "latest" and the machine replay may never
+        // silently diverge).
+        const selector = replay.install?.selector ?? "exact";
+        const spec = selector === "latest" ? replay.package : `${replay.package}@${replay.version}`;
         const r = sh("npm", npmInstallArgs(spec), { cwd: dir, env: childEnv });
-        envs.set(replay.id, { dir, spec });
-        set(replay.id, r.ok, r.detail);
+        let detail = r.detail;
+        let ok = r.ok;
+        if (ok) {
+          const installed = readInstalledVersion(dir, replay.package);
+          if (installed !== replay.version) {
+            ok = false;
+            detail = `install selector "${selector}" resolved to ${replay.package}@${installed}, but the record declares ${replay.version} — re-verify the record against the new release`;
+          }
+        }
+        envs.set(replay.id, { dir, spec: `${replay.package}@${replay.version}` });
+        set(replay.id, ok, detail);
         break;
       }
       case "npm_bin_exists": {
@@ -344,6 +390,8 @@ function gatherCheckResults(record) {
         const dir = mkdtempSync(join(tmpdir(), "aep-outbound-py-"));
         const venv = join(dir, "venv");
         let r = sh("python3", ["-m", "venv", venv], { env: childEnv });
+        const selector = replay.install?.selector ?? "exact";
+        const pipSpec = selector === "latest" ? replay.package : `${replay.package}==${replay.version}`;
         if (r.ok) {
           // Wheel-only, no dependency resolution: a version that ships only an
           // sdist would execute its build backend here — refuse instead (the
@@ -351,12 +399,59 @@ function gatherCheckResults(record) {
           // candidate-named code).
           r = sh(
             join(venv, "bin", "pip"),
-            ["install", "--only-binary=:all:", "--no-deps", `${replay.package}==${replay.version}`],
+            ["install", "--only-binary=:all:", "--no-deps", pipSpec],
             { env: childEnv },
           );
         }
-        envs.set(replay.id, { dir: venv, spec: `${replay.package}==${replay.version}` });
-        set(replay.id, r.ok, r.detail);
+        let detail = r.detail;
+        let ok = r.ok;
+        if (ok) {
+          const show = sh(join(venv, "bin", "pip"), ["show", replay.package], { env: childEnv });
+          const installed = show.ok ? (show.stdout.match(/^Version:\s*(.+)$/m)?.[1] ?? "").trim() : "";
+          if (installed !== replay.version) {
+            ok = false;
+            detail = `install selector "${selector}" resolved to ${replay.package}==${installed}, but the record declares ${replay.version} — re-verify the record against the new release`;
+          }
+        }
+        envs.set(replay.id, { dir: venv, binDir: join(venv, "bin"), spec: `${replay.package}==${replay.version}`, cwd: dir });
+        set(replay.id, ok, detail);
+        break;
+      }
+      case "pypi_exec": {
+        // Runs the console entry point the installed wheel materialized in
+        // the venv: argv[0] must exist as an executable there (the PyPI
+        // analog of the npm bin allowlist — installed-artifact-level, not
+        // record-declared).
+        const env = envs.get(replay.requires);
+        if (!env?.binDir) {
+          set(replay.id, false, `requires missing pypi_clean_install ${replay.requires}`);
+          break;
+        }
+        const bin = join(env.binDir, replay.argv?.[0] ?? "");
+        let binOk = false;
+        try {
+          binOk = statSync(bin).isFile();
+        } catch {
+          binOk = false;
+        }
+        if (!binOk) {
+          set(replay.id, false, `argv[0] ${JSON.stringify(replay.argv?.[0] ?? null)} is not an executable installed by ${env.spec}`);
+          break;
+        }
+        let r;
+        try {
+          const out = execFileSync(bin, (replay.argv ?? []).slice(1), {
+            cwd: env.cwd,
+            encoding: "utf8",
+            env: childEnv,
+          });
+          r = { ok: true, stdout: out, status: 0 };
+        } catch (err) {
+          r = { ok: false, stdout: err.stdout ?? "", status: err.status ?? 1 };
+        }
+        const exitOk = r.status === (replay.expect_exit ?? 0);
+        const contains = (replay.expect_stdout_contains ?? []).every((x) => r.stdout.includes(x));
+        set(replay.id, exitOk && contains, exitOk && contains ? undefined : `exit=${r.status}, stdout=${JSON.stringify(r.stdout.slice(0, 400))}`);
         break;
       }
       case "github_release_run": {
@@ -369,8 +464,12 @@ function gatherCheckResults(record) {
       case "github_pr_state": {
         const repo = replay.repository ?? record.target.repository;
         const r = ghApi(`/repos/${repo}/pulls/${replay.pr_number}`);
-        const merged = r.ok ? r.json?.merged === true : false;
-        set(replay.id, r.ok && (replay.expect_state ?? "merged") === "merged" ? merged : r.ok, r.ok ? `merged=${merged}` : r.detail);
+        // Exact three-state semantics: merged | open | closed. The previous
+        // logic passed ANY successful API response for non-merged
+        // expectations.
+        const actual = r.ok ? (r.json?.merged === true ? "merged" : r.json?.state ?? "unknown") : null;
+        const expected = replay.expect_state ?? "merged";
+        set(replay.id, r.ok && actual === expected, r.ok ? `pr state=${actual}` : r.detail);
         break;
       }
       case "github_issue_comment_exists": {
@@ -408,11 +507,11 @@ function writePkgJson(dir) {
 // Ledger index for claim_refs.
 // ---------------------------------------------------------------------------
 
-function loadLedgerIndex() {
+function loadLedgerIndex(ledgerFiles) {
   const claimIdsByLedger = new Map();
   // external-validation.json: plain JSON.
   try {
-    const ledger = JSON.parse(readFileSync(LEDGER_FILES["external-validation"], "utf8"));
+    const ledger = JSON.parse(readFileSync(ledgerFiles["external-validation"], "utf8"));
     claimIdsByLedger.set(
       "external-validation",
       new Set((ledger.records ?? []).map((r) => r.id)),
@@ -424,7 +523,7 @@ function loadLedgerIndex() {
   // owns its deep grammar; we only need id existence).
   const ids = new Set();
   try {
-    const text = readFileSync(LEDGER_FILES["public-claims"], "utf8");
+    const text = readFileSync(ledgerFiles["public-claims"], "utf8");
     for (const m of text.matchAll(/^\s*-\s*id:\s*(\S+)/gm)) ids.add(m[1]);
   } catch {
     // leave empty
@@ -434,7 +533,7 @@ function loadLedgerIndex() {
   // the exact outbound draft is audited against.
   const prohibitedByExtId = new Map();
   try {
-    const ledger = JSON.parse(readFileSync(LEDGER_FILES["external-validation"], "utf8"));
+    const ledger = JSON.parse(readFileSync(ledgerFiles["external-validation"], "utf8"));
     for (const r of ledger.records ?? []) {
       prohibitedByExtId.set(r.id, (r.prohibited_claims ?? []).map(String));
     }
@@ -450,17 +549,17 @@ function loadLedgerIndex() {
  * the workspace must not be able to retroactively change what was audited —
  * and the mutation itself is a fail-closed HOLD.
  */
-function snapshotLedgers() {
+function snapshotLedgers(ledgerFiles) {
   const snapshots = new Map();
-  for (const [ledger, path] of Object.entries(LEDGER_FILES)) {
+  for (const [ledger, path] of Object.entries(ledgerFiles)) {
     if (existsSync(path)) snapshots.set(ledger, readFileSync(path, "utf8"));
   }
   return snapshots;
 }
 
-function ledgersUnmutated(snapshots) {
+function ledgersUnmutated(ledgerFiles, snapshots) {
   const problems = [];
-  for (const [ledger, path] of Object.entries(LEDGER_FILES)) {
+  for (const [ledger, path] of Object.entries(ledgerFiles)) {
     const before = snapshots.get(ledger);
     const after = existsSync(path) ? readFileSync(path, "utf8") : null;
     if (before !== after) {
@@ -474,13 +573,8 @@ function ledgersUnmutated(snapshots) {
 // Driver.
 // ---------------------------------------------------------------------------
 
-function verifyRecord(path) {
-  let record;
-  try {
-    record = JSON.parse(readFileSync(path, "utf8"));
-  } catch (err) {
-    return { status: "HOLD", exitCode: 1, lines: [`HOLD: SCHEMA_INVALID — ${path}: ${err.message}`] };
-  }
+function verifyRecord(item, paths) {
+  const { path, record } = item;
 
   const problems = structuralProblems(record);
   if (problems.length) {
@@ -493,12 +587,12 @@ function verifyRecord(path) {
   // index BEFORE any external executable from the record runs. The replayed
   // bins must not be able to influence what is audited, and any workspace
   // mutation they cause is itself a fail-closed HOLD.
-  const ledgerIndex = loadLedgerIndex();
-  const ledgerSnapshots = snapshotLedgers();
+  const ledgerIndex = loadLedgerIndex(paths.ledgerFiles);
+  const ledgerSnapshots = snapshotLedgers(paths.ledgerFiles);
 
   const checkResults = gatherCheckResults(record);
 
-  const mutationProblems = ledgersUnmutated(ledgerSnapshots);
+  const mutationProblems = ledgersUnmutated(paths.ledgerFiles, ledgerSnapshots);
   for (const p of mutationProblems) {
     checkResults.set(`__authority_integrity__`, { ok: false, detail: p });
   }
@@ -526,25 +620,49 @@ function verifyRecord(path) {
 }
 
 function main(argv) {
-  let paths;
-  if (argv[0]) {
-    paths = [argv[0]];
-  } else if (existsSync(EVIDENCE_DIR)) {
-    paths = readdirSync(EVIDENCE_DIR)
+  // --repo-root: inspect a CANDIDATE checkout's data from a pinned, immutable
+  // copy of this verifier (candidate tree = DATA, merged SHA = VERIFIER).
+  let repoRoot = VERIFIER_ROOT;
+  const rest = [];
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === "--repo-root") repoRoot = argv[++i];
+    else rest.push(argv[i]);
+  }
+  const paths = resolvePaths(repoRoot);
+
+  let files;
+  if (rest[0]) {
+    files = [rest[0]];
+  } else if (existsSync(paths.evidenceDir)) {
+    files = readdirSync(paths.evidenceDir)
       .filter((f) => f.endsWith(".json"))
-      .map((f) => join(EVIDENCE_DIR, f));
+      .map((f) => join(paths.evidenceDir, f));
   } else {
     console.log("no external-outbound records — nothing to verify");
     return 0;
   }
-  if (paths.length === 0) {
+  if (files.length === 0) {
     console.log("no external-outbound records — nothing to verify");
     return 0;
   }
 
-  let exit = 0;
-  for (const p of paths) {
-    const r = verifyRecord(p);
+  // Multi-record freeze: read and parse EVERY record before any replay runs.
+  // Otherwise the external bin executed for record #1 could rewrite record
+  // #2 before it is parsed.
+  const frozen = [];
+  let freezeFailure = false;
+  for (const p of files) {
+    try {
+      frozen.push({ path: p, record: JSON.parse(readFileSync(p, "utf8")) });
+    } catch (err) {
+      console.log(`HOLD: SCHEMA_INVALID — ${p}: ${err.message}`);
+      freezeFailure = true;
+    }
+  }
+
+  let exit = freezeFailure ? 1 : 0;
+  for (const item of frozen) {
+    const r = verifyRecord(item, paths);
     for (const line of r.lines) console.log(line);
     if (r.exitCode !== 0) exit = 1;
   }

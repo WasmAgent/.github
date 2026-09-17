@@ -153,6 +153,19 @@ def main() -> int:
     # unlanded record) fails — the ledger currently contains no
     # formal_certification record, so any allowlist entry fails today.
     allowlist_entries = load_json(allowlist_path).get("allowlist", []) if os.path.isfile(allowlist_path) else []
+    # HARD DISABLE: the ledger's formal_certification records are candidate
+    # DATA — self-declared. Until the first certification has been verified
+    # against primary sources (manual verification -> new trusted validator
+    # rule -> trusted pin bump), the allowlist must remain EMPTY. The
+    # per-entry checks below are kept for that future, but nothing passes
+    # today.
+    if allowlist_entries:
+        failures.append(
+            "allowlist: certification-allowlist entries are HARD-DISABLED — the ledger "
+            "contains no independently verified formal certification, and self-declared "
+            "candidate records cannot open the wording ban; requires manual primary-source "
+            "verification plus a trusted validator rule and pin bump"
+        )
     for entry in allowlist_entries:
         label = f"'{entry.get('phrase')}' in {entry.get('file')}"
         evidence_id = entry.get("approved_evidence")

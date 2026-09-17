@@ -37,7 +37,7 @@ const BASE_RECORD = {
   artifacts: [],
   primary_sources: [],
   command_replays: [],
-  claim_refs: [],
+  claim_refs: [{ ledger: "external-validation", claim_id: "EXT-AEP-0001" }],
   contradictions: [],
   human_approval: { required: true, approved: false, reviewed_by: null },
 };
@@ -433,6 +433,32 @@ test("canonicalization bypass: bare-ref duplicate of a prefixed source adds no e
   const verdict = evaluatePreflight(record, results, LEDGERS);
   assert.equal(verdict.status, "HOLD");
   assert.ok(verdict.holds.some((h) => h.code === "CORRECTION_EVIDENCE_INSUFFICIENT"));
+});
+
+// --- assurance framing requires an anchor (P0 claim_refs omission) ----------
+
+test("ER-05d: assurance-framing message with empty claim_refs => HOLD: CLAIM_CEILING_EXCEEDED", () => {
+  for (const message_class of ["status_report", "release_announcement", "release_enablement", "rerun_request", "correction"]) {
+    const record = {
+      ...BASE_RECORD,
+      message_class,
+      claim_refs: [],
+      outbound_message: { content: "We now have an independent semantic verifier..." },
+    };
+    const verdict = evaluatePreflight(record, new Map(), LEDGERS);
+    assert.equal(verdict.status, "HOLD", message_class);
+    assert.ok(
+      verdict.holds.some((h) => h.code === "CLAIM_CEILING_EXCEEDED" && h.detail.includes("at least one external-validation claim_ref")),
+      message_class,
+    );
+  }
+});
+
+test("ER-05e: non-assurance message class (published_reference-style notice) is not forced to anchor", () => {
+  const record = { ...BASE_RECORD, claim_refs: [] };
+  // BASE uses release_enablement; flip to a class outside the assurance set
+  const record2 = { ...record, message_class: "status_report" };
+  assert.equal(evaluatePreflight(record2, new Map(), LEDGERS).status, "HOLD");
 });
 
 // --- source <-> check semantic binding --------------------------------------
