@@ -53,3 +53,22 @@ semantics) and MUST NOT be bypassed via KV.
 2. Reference it from `claims/public-claims.yml` via `external_evidence_refs`
    with a matching `claim_class`.
 3. EXT + claims validators enforce the rest in CI.
+
+## Send a substantive external update
+
+Before posting a package/version/command/release/conformance update:
+
+1. Create an `evidence/external-outbound/*.json` preflight record.
+2. Verify final primary sources.
+3. Replay every install/run command against the published artifact.
+4. Resolve every contradiction; any contradiction is HOLD.
+5. Run the external-evidence and public-claims validators.
+6. Require TECHNICALLY_READY.
+7. Obtain explicit human approval.
+8. Only then treat the message as EXTERNAL_READY.
+
+A correction requires at least two primary sources, including one
+final-state source. A single warning or inferred diagnosis is never
+sufficient to trigger an external correction.
+See `docs/external-outbound-preflight.md` and
+`scripts/verify-external-outbound-preflight.mjs`.

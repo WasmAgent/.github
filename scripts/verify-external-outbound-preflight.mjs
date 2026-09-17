@@ -1,0 +1,397 @@
+#!/usr/bin/env node
+// External outbound technical preflight (validator).
+//
+// Verifies evidence/external-outbound/*.json preflight records against real
+// primary sources before a substantive external message is considered
+// TECHNICALLY_READY:
+//   1. structural validation against schemas/external-outbound-preflight.schema.json
+//   2. artifact existence + exact registry expectations (npm / PyPI)
+//   3. clean-install of the PUBLISHED artifact and replay of the exact
+//      structured commands the message gives to external users
+//   4. final GitHub PR / release-run / comment state
+//   5. claim_refs against the existing public-claims / external-validation ledgers
+//   6. any unresolved contradiction => HOLD
+//
+// Structured allowlisted checks only — the record never contains shell for
+// the verifier to execute. TECHNICALLY_READY does NOT authorize posting:
+// EXTERNAL_READY additionally requires explicit human approval from a
+// non-bot maintainer, and even then the posting itself stays manual.
+//
+// Output contract:
+//   TECHNICALLY_READY                       exit 0 (EXTERNAL_READY reported separately)
+//   HOLD: <CODE>                            exit 1
+//
+// Usage:
+//   node scripts/verify-external-outbound-preflight.mjs [record.json]
+//   (no argument => every record under evidence/external-outbound/)
+
+import { execFileSync, spawnSync } from "node:child_process";
+import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { evaluatePreflight } from "./external-outbound-preflight-core.mjs";
+
+const REPO_ROOT = new URL("..", import.meta.url).pathname;
+const EVIDENCE_DIR = join(REPO_ROOT, "evidence", "external-outbound");
+const LEDGER_FILES = {
+  "public-claims": join(REPO_ROOT, "claims", "public-claims.yml"),
+  "external-validation": join(REPO_ROOT, "evidence", "external-validation.json"),
+};
+
+// ---------------------------------------------------------------------------
+// Structural validation (stdlib subset of the JSON Schema contract).
+// ---------------------------------------------------------------------------
+
+const MESSAGE_CLASSES = new Set([
+  "release_enablement",
+  "release_announcement",
+  "install_instructions",
+  "status_report",
+  "rerun_request",
+  "correction",
+]);
+
+function structuralProblems(record) {
+  const problems = [];
+  const push = (cond, msg) => {
+    if (!cond) problems.push(msg);
+  };
+  push(record && typeof record === "object" && !Array.isArray(record), "record must be a JSON object");
+  if (problems.length) return problems;
+
+  push(record.schema_version === 1, "schema_version must be 1");
+  push(typeof record.id === "string" && /^[A-Z0-9]+(-[A-Z0-9]+)*-[0-9]{3,}$/.test(record.id), `invalid id ${JSON.stringify(record.id)}`);
+  push(record.target && typeof record.target.repository === "string" && record.target.repository.length > 0, "target.repository required");
+  push(MESSAGE_CLASSES.has(record.message_class), `invalid message_class ${JSON.stringify(record.message_class)}`);
+  push(Array.isArray(record.artifacts), "artifacts must be an array");
+  for (const a of record.artifacts ?? []) {
+    push(a && ["npm", "pypi"].includes(a.ecosystem), "artifact ecosystem must be npm|pypi");
+    push(a && typeof a.package === "string" && a.package.length > 0, "artifact package required");
+    push(a && typeof a.version === "string" && a.version.length > 0, "artifact version required");
+  }
+  push(Array.isArray(record.primary_sources), "primary_sources must be an array");
+  for (const s of record.primary_sources ?? []) {
+    push(s && typeof s.kind === "string" && typeof s.ref === "string", "primary_source needs kind + ref");
+  }
+  push(Array.isArray(record.command_replays), "command_replays must be an array");
+  for (const r of record.command_replays ?? []) {
+    push(r && typeof r.id === "string" && typeof r.kind === "string", `replay needs id + kind`);
+    push(r && r.argv === undefined || Array.isArray(r.argv), `replay ${r?.id}: argv must be a string array`);
+  }
+  push(Array.isArray(record.claim_refs), "claim_refs must be an array");
+  push(
+    record.human_approval && record.human_approval.required === true && typeof record.human_approval.approved === "boolean",
+    "human_approval {required: true, approved: bool} is mandatory",
+  );
+  return problems;
+}
+
+// ---------------------------------------------------------------------------
+// Adapters (each returns {ok, detail}; never throws).
+// ---------------------------------------------------------------------------
+
+function sh(cmd, args, opts = {}) {
+  try {
+    return {
+      ok: true,
+      stdout: execFileSync(cmd, args, { encoding: "utf8", ...opts }),
+    };
+  } catch (err) {
+    return { ok: false, stdout: err.stdout ?? "", detail: `${cmd} ${args.join(" ")} failed: ${err.status ?? err.message}` };
+  }
+}
+
+function npmView(spec, field) {
+  const r = sh("npm", ["view", spec, ...(field ? [field] : [])]);
+  return { ...r, value: r.ok ? r.stdout.trim() : null };
+}
+
+function pypiMetadata(pkg, version) {
+  try {
+    const res = spawnSync("curl", ["-sf", `https://pypi.org/pypi/${pkg}/${version}/json`], { encoding: "utf8" });
+    if (res.status !== 0) return { ok: false, detail: `PyPI has no ${pkg} ${version}` };
+    const data = JSON.parse(res.stdout);
+    return { ok: data.info?.version === version, detail: data.info?.version !== version ? `PyPI serves ${data.info?.version}` : undefined };
+  } catch (err) {
+    return { ok: false, detail: `PyPI metadata fetch failed: ${err.message}` };
+  }
+}
+
+function ghApi(path) {
+  const r = sh("gh", ["api", path]);
+  if (!r.ok) return r;
+  try {
+    return { ok: true, json: JSON.parse(r.stdout) };
+  } catch (err) {
+    return { ok: false, detail: `gh api returned non-JSON: ${err.message}` };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Replay execution against the published artifacts.
+// ---------------------------------------------------------------------------
+
+function gatherCheckResults(record) {
+  const results = new Map();
+  const set = (id, ok, detail) => results.set(id, { ok, detail });
+
+  // --- artifacts: existence + exact expectations ----------------------------
+  const artifactConflicts = [];
+  let artifactsOk = true;
+  for (const a of record.artifacts ?? []) {
+    const spec = `${a.package}@${a.version}`;
+    if (a.ecosystem === "npm") {
+      const r = npmView(spec, "version");
+      if (!r.ok || r.value !== a.version) {
+        artifactsOk = false;
+        set(`artifact:${a.ecosystem}:${spec}`, false, `npm registry does not serve ${spec}`);
+        continue;
+      }
+      if (a.expect && "bin" in a.expect) {
+        // Full metadata as JSON: `npm view <spec> bin --json` treats --json as
+        // a second field name, but `npm view <spec> --json` is well-defined.
+        const metaR = npmView(spec, "--json");
+        let observed = null;
+        try {
+          observed = metaR.ok ? (JSON.parse(metaR.stdout || "null")?.bin ?? null) : null;
+        } catch {
+          observed = null;
+        }
+        const expected = a.expect.bin;
+        if (JSON.stringify(observed) !== JSON.stringify(expected)) {
+          artifactConflicts.push(
+            `${spec}: message expects bin=${JSON.stringify(expected)}, registry serves ${JSON.stringify(observed)}`,
+          );
+        }
+      }
+      set(`artifact:npm:${spec}`, true);
+    } else {
+      const r = pypiMetadata(a.package, a.version);
+      if (!r.ok) {
+        artifactsOk = false;
+        set(`artifact:${a.ecosystem}:${spec}`, false, r.detail ?? `PyPI does not serve ${spec}`);
+      } else {
+        set(`artifact:${a.ecosystem}:${spec}`, true);
+      }
+    }
+  }
+  results.set("__artifacts__", { ok: artifactsOk, artifacts: artifactConflicts });
+
+  // --- structured replays ----------------------------------------------------
+  const envs = new Map(); // replay id -> installed environment dir
+  for (const replay of record.command_replays ?? []) {
+    switch (replay.kind) {
+      case "npm_metadata": {
+        const r = npmView(`${replay.package}@${replay.version}`, "version");
+        set(replay.id, r.ok && r.value === replay.version, r.ok ? undefined : r.detail ?? `registry does not serve ${replay.package}@${replay.version}`);
+        break;
+      }
+      case "npm_clean_install": {
+        const dir = mkdtempSync(join(tmpdir(), "aep-outbound-"));
+        writePkgJson(dir);
+        const r = sh("npm", ["install", `${replay.package}@${replay.version}`], { cwd: dir });
+        envs.set(replay.id, dir);
+        set(replay.id, r.ok, r.detail);
+        break;
+      }
+      case "npm_bin_exists": {
+        const dir = envs.get(replay.requires);
+        if (!dir) {
+          set(replay.id, false, `requires missing clean-install ${replay.requires}`);
+          break;
+        }
+        const bin = join(dir, "node_modules", ".bin", replay.bin_name);
+        let ok = false;
+        try {
+          ok = statSync(bin).isFile();
+        } catch {
+          ok = false;
+        }
+        set(replay.id, ok, ok ? undefined : `${replay.bin_name} missing from node_modules/.bin`);
+        break;
+      }
+      case "npm_exec": {
+        const dir = envs.get(replay.requires);
+        if (!dir) {
+          set(replay.id, false, `requires missing clean-install ${replay.requires}`);
+          break;
+        }
+        const args = ["--no-install", ...(replay.argv ?? [])];
+        let r;
+        try {
+          const out = execFileSync("npx", args, { cwd: dir, encoding: "utf8" });
+          r = { ok: true, stdout: out, status: 0 };
+        } catch (err) {
+          r = { ok: false, stdout: err.stdout ?? "", status: err.status ?? 1 };
+        }
+        const exitOk = r.status === (replay.expect_exit ?? 0);
+        const contains = (replay.expect_stdout_contains ?? []).every((s) => r.stdout.includes(s));
+        set(replay.id, exitOk && contains, exitOk && contains ? undefined : `exit=${r.status}, stdout=${JSON.stringify(r.stdout.slice(0, 400))}`);
+        break;
+      }
+      case "pypi_metadata": {
+        const r = pypiMetadata(replay.package, replay.version);
+        set(replay.id, r.ok, r.detail);
+        break;
+      }
+      case "pypi_clean_install": {
+        const dir = mkdtempSync(join(tmpdir(), "aep-outbound-py-"));
+        const venv = join(dir, "venv");
+        let r = sh("python3", ["-m", "venv", venv]);
+        if (r.ok) r = sh(join(venv, "bin", "pip"), ["install", `${replay.package}==${replay.version}`]);
+        envs.set(replay.id, venv);
+        set(replay.id, r.ok, r.detail);
+        break;
+      }
+      case "github_release_run": {
+        const repo = replay.repository ?? record.target.repository;
+        const r = ghApi(`/repos/${repo}/actions/runs/${replay.run_id}`);
+        const conclusion = r.ok ? r.json?.conclusion : null;
+        set(replay.id, r.ok && conclusion === (replay.expect_conclusion ?? "success"), r.ok ? `run conclusion=${conclusion}` : r.detail);
+        break;
+      }
+      case "github_pr_state": {
+        const repo = replay.repository ?? record.target.repository;
+        const r = ghApi(`/repos/${repo}/pulls/${replay.pr_number}`);
+        const merged = r.ok ? r.json?.merged === true : false;
+        set(replay.id, r.ok && (replay.expect_state ?? "merged") === "merged" ? merged : r.ok, r.ok ? `merged=${merged}` : r.detail);
+        break;
+      }
+      case "github_issue_comment_exists": {
+        const url = replay.comment_url ?? "";
+        const m = url.match(/github\.com\/([^/]+\/[^/]+)\/(?:issues|pull)\/\d+#issuecomment-(\d+)/);
+        if (!m) {
+          set(replay.id, false, `unparseable comment url ${JSON.stringify(url)}`);
+          break;
+        }
+        const r = ghApi(`/repos/${m[1]}/issues/comments/${m[2]}`);
+        set(replay.id, r.ok && !!r.json?.html_url, r.ok ? undefined : r.detail);
+        break;
+      }
+      case "claim_ref": {
+        set(replay.id, true); // actual check happens against claim_refs below
+        break;
+      }
+      default:
+        set(replay.id, false, `unknown kind ${replay.kind}`);
+    }
+  }
+
+  // --- primary-source verification keys --------------------------------------
+  const cleanInstallOk = [...results.entries()].some(([id, r]) => {
+    const replay = (record.command_replays ?? []).find((c) => c.id === id);
+    return (replay?.kind === "npm_clean_install" || replay?.kind === "pypi_clean_install") && r.ok;
+  });
+  for (const source of record.primary_sources ?? []) {
+    const key = `source:${source.kind}:${source.ref}`;
+    if (["registry_metadata", "published_artifact"].includes(source.kind)) {
+      results.set(key, { ok: artifactsOk, detail: artifactsOk ? undefined : "artifact metadata check failed" });
+    } else if (source.kind === "clean_install_replay") {
+      results.set(key, { ok: cleanInstallOk, detail: cleanInstallOk ? undefined : "no successful clean-install replay" });
+    } else if (source.kind === "github_release_run") {
+      const replay = (record.command_replays ?? []).find((c) => c.kind === "github_release_run" && c.run_id === source.ref);
+      results.set(key, replay ? (results.get(replay.id) ?? { ok: false }) : { ok: false, detail: "no matching replay entry" });
+    } else if (source.kind === "github_pr_state") {
+      const replay = (record.command_replays ?? []).find((c) => c.kind === "github_pr_state" && String(c.pr_number) === source.ref);
+      results.set(key, replay ? (results.get(replay.id) ?? { ok: false }) : { ok: false, detail: "no matching replay entry" });
+    }
+  }
+
+  return results;
+}
+
+function writePkgJson(dir) {
+  writeFileSync(join(dir, "package.json"), JSON.stringify({ name: "aep-outbound-preflight", version: "0.0.0", private: true }, null, 2));
+}
+
+// ---------------------------------------------------------------------------
+// Ledger index for claim_refs.
+// ---------------------------------------------------------------------------
+
+function loadLedgerIndex() {
+  const claimIdsByLedger = new Map();
+  // external-validation.json: plain JSON.
+  try {
+    const ledger = JSON.parse(readFileSync(LEDGER_FILES["external-validation"], "utf8"));
+    claimIdsByLedger.set(
+      "external-validation",
+      new Set((ledger.records ?? []).map((r) => r.id)),
+    );
+  } catch {
+    claimIdsByLedger.set("external-validation", new Set());
+  }
+  // public-claims.yml: text scan for list-item ids (the file's own validator
+  // owns its deep grammar; we only need id existence).
+  const ids = new Set();
+  try {
+    const text = readFileSync(LEDGER_FILES["public-claims"], "utf8");
+    for (const m of text.matchAll(/^\s*-\s*id:\s*(\S+)/gm)) ids.add(m[1]);
+  } catch {
+    // leave empty
+  }
+  claimIdsByLedger.set("public-claims", ids);
+  return { claimIdsByLedger };
+}
+
+// ---------------------------------------------------------------------------
+// Driver.
+// ---------------------------------------------------------------------------
+
+function verifyRecord(path) {
+  let record;
+  try {
+    record = JSON.parse(readFileSync(path, "utf8"));
+  } catch (err) {
+    return { status: "HOLD", exitCode: 1, lines: [`HOLD: SCHEMA_INVALID — ${path}: ${err.message}`] };
+  }
+
+  const problems = structuralProblems(record);
+  if (problems.length) {
+    const lines = [`HOLD: SCHEMA_INVALID — ${path}`];
+    for (const p of problems) lines.push(`  - ${p}`);
+    return { status: "HOLD", exitCode: 1, lines };
+  }
+
+  const checkResults = gatherCheckResults(record);
+  const ledgerIndex = loadLedgerIndex();
+  const verdict = evaluatePreflight(record, checkResults, ledgerIndex);
+
+  const lines = [];
+  lines.push(`${verdict.status}${verdict.status === "HOLD" ? "" : ""} — ${record.id} (${path})`);
+  for (const note of verdict.notes) lines.push(`  ${note}`);
+  for (const h of verdict.holds) lines.push(`  HOLD: ${h.code} — ${h.detail}`);
+  return {
+    status: verdict.status,
+    externalReady: verdict.externalReady,
+    exitCode: verdict.status === "TECHNICALLY_READY" ? 0 : 1,
+    lines,
+  };
+}
+
+function main(argv) {
+  let paths;
+  if (argv[0]) {
+    paths = [argv[0]];
+  } else if (existsSync(EVIDENCE_DIR)) {
+    paths = readdirSync(EVIDENCE_DIR)
+      .filter((f) => f.endsWith(".json"))
+      .map((f) => join(EVIDENCE_DIR, f));
+  } else {
+    console.log("no external-outbound records — nothing to verify");
+    return 0;
+  }
+  if (paths.length === 0) {
+    console.log("no external-outbound records — nothing to verify");
+    return 0;
+  }
+
+  let exit = 0;
+  for (const p of paths) {
+    const r = verifyRecord(p);
+    for (const line of r.lines) console.log(line);
+    if (r.exitCode !== 0) exit = 1;
+  }
+  return exit;
+}
+
+process.exit(main(process.argv.slice(2)));
