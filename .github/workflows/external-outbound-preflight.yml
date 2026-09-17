@@ -1,0 +1,52 @@
+name: External Outbound Preflight
+
+# Technical preflight for substantive external messages (package/version/
+# command/conformance/correction announcements). This workflow can only ever
+# produce TECHNICALLY_READY or HOLD; it can never post anything externally.
+# EXTERNAL_READY additionally requires explicit human approval recorded in
+# the preflight record (see docs/external-outbound-preflight.md).
+
+on:
+  pull_request:
+    paths:
+      - "evidence/external-outbound/**"
+      - "schemas/external-outbound-preflight.schema.json"
+      - "scripts/verify-external-outbound-preflight.mjs"
+      - "scripts/external-outbound-preflight-core.mjs"
+      - "scripts/external-outbound-preflight.test.mjs"
+      - ".github/workflows/external-outbound-preflight.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    name: "Outbound preflight (structured checks + hostile regressions)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '20'
+
+      # Hostile regressions ER-01..ER-07 (hermetic — no registry access).
+      - name: Hostile regressions (ER-01..ER-07)
+        run: node --test scripts/external-outbound-preflight.test.mjs
+
+      # Live verification of every record: registry metadata, clean-install of
+      # the published artifact, exact command replay, final GitHub state,
+      # claim_refs. Requires the release runs / PRs to be public, which they
+      # are; GH_TOKEN raises the GitHub API rate limit.
+      - name: Verify outbound records against primary sources
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/verify-external-outbound-preflight.mjs
+
+      # The outbound gate composes with the existing claim ledgers.
+      - name: External evidence ledger (EXT-01..07)
+        run: python3 scripts/validate-external-evidence.py
+
+      - name: Public claims firewall
+        run: python3 scripts/validate-public-claims.py

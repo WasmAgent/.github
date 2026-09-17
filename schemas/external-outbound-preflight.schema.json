@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "wasmagent-external-outbound-preflight/v1",
+  "title": "External outbound technical preflight record",
+  "description": "Preflight record for substantive external messages (package/version/release/CLI/conformance/provenance/correction announcements). The normative enforcement lives in scripts/verify-external-outbound-preflight.mjs; this schema documents the contract. TECHNICALLY_READY never implies permission to post: EXTERNAL_READY additionally requires explicit human approval.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "id",
+    "target",
+    "message_class",
+    "artifacts",
+    "primary_sources",
+    "command_replays",
+    "claim_refs",
+    "contradictions",
+    "human_approval"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "schema_version": { "const": 1 },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z0-9]+(-[A-Z0-9]+)*-[0-9]{3,}$"
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "target": {
+      "type": "object",
+      "required": ["repository"],
+      "properties": {
+        "repository": { "type": "string", "minLength": 1 },
+        "issue": { "type": "integer", "minimum": 1 },
+        "pull_request": { "type": "integer", "minimum": 1 },
+        "comment_id": { "type": "integer" },
+        "note": { "type": "string" }
+      }
+    },
+    "message_class": {
+      "enum": [
+        "release_enablement",
+        "release_announcement",
+        "install_instructions",
+        "status_report",
+        "rerun_request",
+        "correction"
+      ]
+    },
+    "summary": { "type": "string" },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ecosystem", "package", "version"],
+        "properties": {
+          "ecosystem": { "enum": ["npm", "pypi"] },
+          "package": { "type": "string", "minLength": 1 },
+          "version": { "type": "string", "minLength": 1 },
+          "expect": {
+            "type": "object",
+            "description": "Exact registry facts the message depends on. A mismatch with the live registry is a PRIMARY_SOURCE_CONFLICT (HOLD).",
+            "properties": {
+              "bin": { "type": ["object", "null"], "additionalProperties": { "type": "string" } },
+              "integrity_sha512_prefix": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "primary_sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["kind", "ref"],
+        "properties": {
+          "kind": {
+            "enum": [
+              "release_log",
+              "registry_metadata",
+              "published_artifact",
+              "clean_install_replay",
+              "github_release_run",
+              "github_pr_state",
+              "github_issue_comment",
+              "human_inference"
+            ]
+          },
+          "ref": { "type": "string", "minLength": 1 },
+          "statement": { "type": "string" },
+          "final_state": {
+            "type": "boolean",
+            "description": "True when the source is final-state evidence (registry metadata, published artifact, clean-install replay, final merged/release state)."
+          }
+        }
+      }
+    },
+    "command_replays": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "kind": {
+            "enum": [
+              "npm_metadata",
+              "npm_clean_install",
+              "npm_bin_exists",
+              "npm_exec",
+              "pypi_metadata",
+              "pypi_clean_install",
+              "github_release_run",
+              "github_pr_state",
+              "github_issue_comment_exists",
+              "claim_ref"
+            ],
+            "description": "Allowlisted structured checks only — the verifier never executes arbitrary shell from the record."
+          },
+          "requires": {
+            "type": "string",
+            "description": "id of a preceding npm_clean_install / pypi_clean_install entry whose environment this check runs in."
+          },
+          "ecosystem": { "enum": ["npm", "pypi"] },
+          "package": { "type": "string" },
+          "version": { "type": "string" },
+          "bin_name": { "type": "string" },
+          "argv": { "type": "array", "items": { "type": "string" } },
+          "expect_exit": { "type": "integer" },
+          "expect_stdout_contains": { "type": "array", "items": { "type": "string" } },
+          "run_id": { "type": "string" },
+          "expect_conclusion": { "type": "string" },
+          "repository": {
+            "type": "string",
+            "description": "GitHub repository (owner/name) the run/PR lives in; defaults to target.repository."
+          },
+          "pr_number": { "type": "integer" },
+          "expect_state": { "type": "string" },
+          "comment_url": { "type": "string" },
+          "ledger": { "enum": ["public-claims", "external-validation"] },
+          "claim_id": { "type": "string" }
+        }
+      }
+    },
+    "claim_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ledger", "claim_id"],
+        "properties": {
+          "ledger": { "enum": ["public-claims", "external-validation"] },
+          "claim_id": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "contradictions": {
+      "type": "array",
+      "description": "Known or suspected conflicts between sources. Every entry must carry resolved_by = the id of a check that resolves it; unresolved contradictions are HOLD: PRIMARY_SOURCE_CONFLICT.",
+      "items": {
+        "type": "object",
+        "required": ["id", "description"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "description": { "type": "string", "minLength": 1 },
+          "resolved_by": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "human_approval": {
+      "type": "object",
+      "required": ["required", "approved"],
+      "properties": {
+        "required": { "const": true },
+        "approved": { "type": "boolean" },
+        "reviewed_by": { "type": ["string", "null"] },
+        "note": { "type": "string" }
+      }
+    }
+  }
+}
