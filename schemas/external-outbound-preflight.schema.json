@@ -195,7 +195,8 @@
               "github_release_run",
               "github_pr_state",
               "github_issue_comment_exists",
-              "claim_ref"
+              "claim_ref",
+              "pypi_exec"
             ],
             "description": "Allowlisted structured checks only — the verifier never executes arbitrary shell from the record."
           },
@@ -247,7 +248,12 @@
             "type": "integer"
           },
           "expect_state": {
-            "type": "string"
+            "enum": [
+              "merged",
+              "open",
+              "closed"
+            ],
+            "description": "Exact pull-request state to assert (merged | open | closed)."
           },
           "comment_url": {
             "type": "string"
@@ -260,6 +266,18 @@
           },
           "claim_id": {
             "type": "string"
+          },
+          "install": {
+            "type": "object",
+            "properties": {
+              "selector": {
+                "enum": [
+                  "exact",
+                  "latest"
+                ],
+                "description": "exact (default): install the declared version. latest: install exactly what an UNVERSIONED user command resolves to today — the installed version must equal the declared version or the replay fails (a draft that says \"latest\" may never be silently replayed against an older pinned version)."
+              }
+            }
           }
         }
       }

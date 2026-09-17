@@ -71,7 +71,10 @@
       "id": "npm-install",
       "kind": "npm_clean_install",
       "package": "@wasmagent/protocol",
-      "version": "0.1.11"
+      "version": "0.1.11",
+      "install": {
+        "selector": "latest"
+      }
     },
     {
       "id": "npm-bin",
@@ -118,7 +121,10 @@
       "id": "pypi-install",
       "kind": "pypi_clean_install",
       "package": "wasmagent-protocol",
-      "version": "0.1.11"
+      "version": "0.1.11",
+      "install": {
+        "selector": "latest"
+      }
     },
     {
       "id": "release-run",
@@ -131,6 +137,35 @@
       "id": "comment-exists",
       "kind": "github_issue_comment_exists",
       "comment_url": "https://github.com/Agent-Authority-Conformance/aps-conformance-suite/issues/92#issuecomment-5709814263"
+    },
+    {
+      "id": "pypi-path",
+      "kind": "pypi_exec",
+      "requires": "pypi-install",
+      "argv": [
+        "wasmagent-protocol",
+        "aep-conformance",
+        "path"
+      ],
+      "expect_exit": 0,
+      "expect_stdout_contains": [
+        "conformance/aep"
+      ]
+    },
+    {
+      "id": "pypi-self-check",
+      "kind": "pypi_exec",
+      "requires": "pypi-install",
+      "argv": [
+        "wasmagent-protocol",
+        "aep-conformance",
+        "self-check"
+      ],
+      "expect_exit": 0,
+      "expect_stdout_contains": [
+        "30/30",
+        "NOT independent semantic verification"
+      ]
     }
   ],
   "claim_refs": [

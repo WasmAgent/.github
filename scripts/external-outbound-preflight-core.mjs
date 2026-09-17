@@ -28,6 +28,7 @@ export const ALLOWED_REPLAY_KINDS = new Set([
   "npm_exec",
   "pypi_metadata",
   "pypi_clean_install",
+  "pypi_exec",
   "github_release_run",
   "github_pr_state",
   "github_issue_comment_exists",
@@ -115,6 +116,28 @@ export function evaluatePreflight(record, checkResults, ledgerIndex) {
       holds.push({
         code: "PRIMARY_SOURCE_CONFLICT",
         detail: `contradiction ${c.id} unresolved: ${c.description}`,
+      });
+    }
+  }
+
+  // Assurance-framing messages must anchor at least one EXTERNAL evidence
+  // record: an empty claim_refs array would skip the prohibited-claim audit
+  // entirely (ER-05d).
+  const ASSURANCE_MESSAGE_CLASSES = new Set([
+    "status_report",
+    "release_announcement",
+    "release_enablement",
+    "rerun_request",
+    "correction",
+  ]);
+  if (ASSURANCE_MESSAGE_CLASSES.has(record.message_class)) {
+    const extRefs = (record.claim_refs ?? []).filter((r) => r.ledger === "external-validation");
+    if (extRefs.length === 0) {
+      holds.push({
+        code: "CLAIM_CEILING_EXCEEDED",
+        detail:
+          `${record.message_class} messages assert external/assurance facts and require at ` +
+          "least one external-validation claim_ref; an unanchored message cannot be audited",
       });
     }
   }

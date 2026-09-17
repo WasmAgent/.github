@@ -39,6 +39,8 @@ export const OUTBOUND_PATH_PATTERNS = [
   /^claims\//,
   /^evidence\//,
   /^docs\//,
+  /^media\//,
+  /^releases\//,
   /^profile\//,
   /^README\.md$/,
   /^ORG-FOCUS-2026Q3\.md$/,

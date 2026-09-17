@@ -49,7 +49,7 @@ jobs:
           fi
           base="origin/${{ github.base_ref }}"
           git fetch --no-tags origin "${{ github.base_ref }}" >/dev/null 2>&1 || true
-          if git diff --name-only "$base"...HEAD | grep -qE '^(evidence/external-outbound/|schemas/external-outbound-preflight\.schema\.json|scripts/external-outbound-preflight|scripts/external-outbound/|scripts/verify-external-outbound-preflight\.mjs|\.github/workflows/external-outbound-preflight\.yml|claims/public-claims\.yml|claims/claim-overreach-allowlist\.json|evidence/external-validation\.json|scripts/validate-public-claims\.py|scripts/validate-external-evidence\.py)'; then
+          if git diff --name-only "$base"...HEAD | grep -qE '^(evidence/external-outbound/|schemas/external-outbound-preflight\.schema\.json|scripts/external-outbound-preflight|scripts/external-outbound/|scripts/verify-external-outbound-preflight\.mjs|\.github/workflows/external-outbound-preflight\.yml|claims/|evidence/|docs/|media/|releases/|profile/|schemas/external-outbound-preflight\.schema\.json|scripts/validate-public-claims\.py|scripts/validate-external-evidence\.py)'; then
             echo "relevant=true" >> "$GITHUB_OUTPUT"
           else
             echo "relevant=false" >> "$GITHUB_OUTPUT"
