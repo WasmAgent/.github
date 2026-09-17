@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_reviewed": "2026-09-15",
+  "last_reviewed": "2026-09-17",
   "_comment": "Machine-readable ledger of external evidence about WasmAgent artifacts. Distinct evidence_type values carry distinct claim ceilings; formal_certification is never inferred from organization affiliation and requires explicit certificate fields. Consumed by scripts/validate-external-evidence.py (EXT-01..07).",
   "records": [
     {
@@ -14,7 +14,12 @@
         "affiliation": "LF Decentralized Trust lab"
       },
       "evidence_type": "independent_layered_run",
-      "state": "pending_merge",
+      "state": "merged",
+      "merge": {
+        "final_pr_head": "669edfa35b1bca5009a2ea0560bf96c37709a084",
+        "main_rebase_result": "5717bfdd2b3a367d78f903cf6004a9ae0add5c72",
+        "merged_at": "2026-09-16T06:38:17Z"
+      },
       "tested_target": "aep-certified-2026-09-13-03",
       "layers": {
         "js_native_record": "reproduced",
@@ -28,19 +33,19 @@
         "dsse_fixtures": "9 exercised",
         "cross_language_positive": "both directions reproduced"
       },
-      "claim_ceiling": "Independent layered run reproduced the stated JS/Rust and semantic corpus behavior for the pinned component tuple.",
+      "claim_ceiling": "Independent layered run reproduced the stated JS/Rust and semantic corpus behavior for the pinned component tuple. The merged record is external evidence, not formal certification.",
       "prohibited_claims": [
         "certified_by_linux_foundation",
         "lf_endorsed",
         "formally_certified",
-        "independent_python_native_verifier"
+        "independent_python_native_verifier",
+        "independent_semantic_verifier"
       ],
       "anchors": {
         "issue_url": "https://github.com/Agent-Authority-Conformance/aps-conformance-suite/issues/92",
         "pr_url": "https://github.com/Agent-Authority-Conformance/aps-conformance-suite/pull/94"
       },
       "limitations": [
-        "PR #94 must merge before this becomes a landed external record.",
         "LAB-SEMANTIC is Mode B / author-produced.",
         "This is not an end-to-end certification."
       ]
