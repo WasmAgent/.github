@@ -130,6 +130,27 @@ export function evaluatePreflight(record, checkResults, ledgerIndex) {
     }
   }
 
+  // Claim ceiling binding (CLAIM_AUDIT): the EXACT outbound draft is scanned
+  // against the prohibited claims of every referenced evidence record. A
+  // ledger reference alone proves nothing about the message being sent.
+  const message = String(record.outbound_message?.content ?? "");
+  if (message) {
+    const normalized = message.toLowerCase();
+    for (const ref of record.claim_refs ?? []) {
+      if (ref.ledger !== "external-validation") continue;
+      const prohibited = ledgerIndex?.prohibitedByExtId?.get(ref.claim_id) ?? [];
+      for (const token of prohibited) {
+        const phrase = String(token).toLowerCase().replace(/_/g, " ");
+        if (phrase && normalized.includes(phrase)) {
+          holds.push({
+            code: "CLAIM_CEILING_EXCEEDED",
+            detail: `outbound message hits prohibited claim '${token}' of ${ref.claim_id}`,
+          });
+        }
+      }
+    }
+  }
+
   // Correction threshold (ER-07..ER-07g): a factual correction requires at
   // least TWO MACHINE-VERIFIED evidence sources — each `verified_by` must
   // point to a DISTINCT, PASSING check that SEMANTICALLY VERIFIES that exact
@@ -175,24 +196,23 @@ export function evaluatePreflight(record, checkResults, ledgerIndex) {
 }
 
 /**
- * Parse an artifact identity reference: "npm:@scope/pkg@1.2.3",
- * "pypi:pkg@1.2.3", or bare "pkg@1.2.3" (ecosystem derived from the check).
+ * Parse an artifact identity reference. The ecosystem prefix is REQUIRED
+ * ("npm:<pkg>@<ver>" / "pypi:<pkg>@<ver>"): a bare "<pkg>@<ver>" is not
+ * verifiable — allowing it would let the same fact be re-declared in two
+ * canonicalizations to dodge duplicate-source detection.
  */
 export function parseArtifactRef(ref) {
   if (typeof ref !== "string") return null;
-  let ecosystem;
-  let rest = ref;
   const m = ref.match(/^(npm|pypi):(.+)$/);
-  if (m) {
-    ecosystem = m[1];
-    rest = m[2];
-  }
+  if (!m) return null;
+  const ecosystem = m[1];
+  const rest = m[2];
   const at = rest.lastIndexOf("@");
   if (at <= 0) return null;
   const pkg = rest.slice(0, at);
   const version = rest.slice(at + 1);
   if (!pkg || !version) return null;
-  return ecosystem ? { ecosystem, package: pkg, version } : { package: pkg, version };
+  return { ecosystem, package: pkg, version };
 }
 
 /** True when the parsed artifact identities are equivalent (ecosystem only

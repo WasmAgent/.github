@@ -14,7 +14,8 @@
     "command_replays",
     "claim_refs",
     "contradictions",
-    "human_approval"
+    "human_approval",
+    "outbound_message"
   ],
   "additionalProperties": true,
   "properties": {
@@ -135,7 +136,7 @@
           },
           "ref": {
             "type": "string",
-            "description": "Identity reference. For artifact kinds: npm:<pkg>@<ver> / pypi:<pkg>@<ver> / <pkg>@<ver>. GitHub kinds instead use the structured fields below (repository + run_id / pr_number / comment_id); ref is not used for them."
+            "description": "Identity reference for artifact kinds — MUST carry the ecosystem prefix: npm:<pkg>@<ver> or pypi:<pkg>@<ver> (bare <pkg>@<ver> is not verifiable and never counts toward evidence thresholds). GitHub kinds instead use the structured fields below."
           },
           "statement": {
             "type": "string"
@@ -180,7 +181,8 @@
         "properties": {
           "id": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "description": "id of the replay entry — MUST be unique across command_replays; duplicate ids make check-result lookup ambiguous and fail structural validation."
           },
           "kind": {
             "enum": [
@@ -332,6 +334,25 @@
         },
         "note": {
           "type": "string"
+        }
+      }
+    },
+    "outbound_message": {
+      "type": "object",
+      "required": [
+        "content"
+      ],
+      "description": "The EXACT outbound draft this record authorizes. The validator scans it against the prohibited claims of every referenced evidence record (CLAIM_AUDIT); a mismatched sha256 or a prohibited phrase is HOLD.",
+      "properties": {
+        "content": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Exact message text that may be sent."
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "Optional integrity hash of content; must match when present."
         }
       }
     }

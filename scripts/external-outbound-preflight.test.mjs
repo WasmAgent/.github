@@ -10,7 +10,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { evaluatePreflight, isHumanReviewer, parseArtifactRef, sourceMatchesCheck } from "./external-outbound-preflight-core.mjs";
-import { execBinAllowlisted, sanitizeEnv, INSTALL_SCRIPTS_ALLOWLIST } from "./verify-external-outbound-preflight.mjs";
+import {
+  execBinAllowlisted,
+  sanitizeEnv,
+  INSTALL_SCRIPTS_ALLOWLIST,
+  structuralProblems,
+} from "./verify-external-outbound-preflight.mjs";
 import { computeRelevance, OUTBOUND_PATH_PATTERNS } from "./external-outbound/relevance.mjs";
 
 const LEDGERS = {
@@ -360,9 +365,79 @@ test("non-allowlisted replay kind is rejected", () => {
   assert.ok(verdict.holds.some((h) => h.code === "COMMAND_REPLAY_FAILED" && h.detail.includes("not allowlisted")));
 });
 
+// --- claim ceiling binding (P0) ----------------------------------------------
+
+const LEDGERS_WITH_CEILING = {
+  claimIdsByLedger: new Map([["external-validation", new Set(["EXT-AEP-0001"])]]),
+  prohibitedByExtId: new Map([
+    ["EXT-AEP-0001", ["certified_by_linux_foundation", "formally_certified", "independent_semantic_verifier"]],
+  ]),
+};
+
+test("ER-05b: outbound draft hitting a prohibited claim => HOLD: CLAIM_CEILING_EXCEEDED", () => {
+  const record = {
+    ...BASE_RECORD,
+    claim_refs: [{ ledger: "external-validation", claim_id: "EXT-AEP-0001" }],
+    outbound_message: { content: "Good news: this package is formally certified by the lab." },
+  };
+  const verdict = evaluatePreflight(record, new Map(), LEDGERS_WITH_CEILING);
+  assert.equal(verdict.status, "HOLD");
+  assert.ok(verdict.holds.some((h) => h.code === "CLAIM_CEILING_EXCEEDED" && h.detail.includes("formally_certified")));
+});
+
+test("ER-05c: negated or differently-worded phrasing does not trip the ceiling scan", () => {
+  const record = {
+    ...BASE_RECORD,
+    claim_refs: [{ ledger: "external-validation", claim_id: "EXT-AEP-0001" }],
+    outbound_message: {
+      content:
+        "Self-check is explicitly *not* independent semantic verification, and no independent semantic implementation is implied; this is not a formal certification.",
+    },
+  };
+  const verdict = evaluatePreflight(record, new Map(), LEDGERS_WITH_CEILING);
+  assert.equal(verdict.status, "TECHNICALLY_READY");
+});
+
+test("duplicate replay ids fail structural validation", () => {
+  const record = {
+    ...BASE_RECORD,
+    command_replays: [
+      { id: "r", kind: "npm_metadata", package: "@wasmagent/a", version: "1.0.0" },
+      { id: "r", kind: "npm_clean_install", package: "@wasmagent/b", version: "2.0.0" },
+    ],
+  };
+  const problems = structuralProblems(record);
+  assert.ok(problems.some((p) => p.includes("duplicate replay id")), problems.join("; "));
+});
+
+test("missing outbound_message fails structural validation", () => {
+  const problems = structuralProblems({ ...BASE_RECORD });
+  assert.ok(problems.some((p) => p.includes("outbound_message")), problems.join("; "));
+});
+
+test("canonicalization bypass: bare-ref duplicate of a prefixed source adds no evidence", () => {
+  const record = {
+    ...BASE_RECORD,
+    message_class: "correction",
+    primary_sources: [
+      { kind: "registry_metadata", ref: "npm:@wasmagent/a@1.0.0", verified_by: "meta-1" },
+      // bare form of the SAME fact — unparseable now, so never verified:
+      { kind: "registry_metadata", ref: "@wasmagent/a@1.0.0", verified_by: "meta-2" },
+    ],
+    command_replays: [
+      { id: "meta-1", kind: "npm_metadata", package: "@wasmagent/a", version: "1.0.0" },
+      { id: "meta-2", kind: "npm_metadata", package: "@wasmagent/a", version: "1.0.0" },
+    ],
+  };
+  const results = new Map([ok("__artifacts__"), ok("meta-1"), ok("meta-2")]);
+  const verdict = evaluatePreflight(record, results, LEDGERS);
+  assert.equal(verdict.status, "HOLD");
+  assert.ok(verdict.holds.some((h) => h.code === "CORRECTION_EVIDENCE_INSUFFICIENT"));
+});
+
 // --- source <-> check semantic binding --------------------------------------
 
-test("parseArtifactRef handles scoped npm, pypi prefix, and bare identities", () => {
+test("parseArtifactRef requires the ecosystem prefix (no bare canonicalization bypass)", () => {
   assert.deepEqual(parseArtifactRef("npm:@wasmagent/protocol@0.1.11"), {
     ecosystem: "npm",
     package: "@wasmagent/protocol",
@@ -373,7 +448,9 @@ test("parseArtifactRef handles scoped npm, pypi prefix, and bare identities", ()
     package: "wasmagent-protocol",
     version: "0.1.11",
   });
-  assert.deepEqual(parseArtifactRef("pkg@1.2.3"), { package: "pkg", version: "1.2.3" });
+  // A bare identity is NOT parseable — it can never be verified and never
+  // counts as a distinct canonicalization of a prefixed source.
+  assert.equal(parseArtifactRef("pkg@1.2.3"), null);
   assert.equal(parseArtifactRef("not-an-identity"), null);
   assert.equal(parseArtifactRef(undefined), null);
 });

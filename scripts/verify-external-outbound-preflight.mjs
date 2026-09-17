@@ -26,6 +26,7 @@
 //   (no argument => every record under evidence/external-outbound/)
 
 import { execFileSync, spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -51,7 +52,7 @@ const MESSAGE_CLASSES = new Set([
   "correction",
 ]);
 
-function structuralProblems(record) {
+export function structuralProblems(record) {
   const problems = [];
   const push = (cond, msg) => {
     if (!cond) problems.push(msg);
@@ -96,6 +97,29 @@ function structuralProblems(record) {
     record.human_approval && record.human_approval.required === true && typeof record.human_approval.approved === "boolean",
     "human_approval {required: true, approved: bool} is mandatory",
   );
+  // The exact outbound draft is mandatory — a ledger reference without the
+  // message it authorizes cannot be claim-ceiling audited.
+  push(
+    record.outbound_message && typeof record.outbound_message.content === "string" && record.outbound_message.content.length > 0,
+    "outbound_message.content (the exact draft) is mandatory",
+  );
+  if (typeof record.outbound_message?.sha256 === "string") {
+    push(
+      /^[0-9a-f]{64}$/.test(record.outbound_message.sha256) &&
+        createHash("sha256").update(record.outbound_message.content ?? "").digest("hex") === record.outbound_message.sha256,
+      "outbound_message.sha256 does not match content",
+    );
+  }
+  // Replay ids must be unique: duplicate ids make check-result lookup
+  // ambiguous (a later entry could shadow the identity an earlier one
+  // verified).
+  const seenReplayIds = new Set();
+  for (const r of record.command_replays ?? []) {
+    if (r && typeof r.id === "string") {
+      push(!seenReplayIds.has(r.id), `duplicate replay id: ${r.id}`);
+      seenReplayIds.add(r.id);
+    }
+  }
   return problems;
 }
 
@@ -406,7 +430,44 @@ function loadLedgerIndex() {
     // leave empty
   }
   claimIdsByLedger.set("public-claims", ids);
-  return { claimIdsByLedger };
+  // Prohibited-claim tokens per external-validation record id — the ceiling
+  // the exact outbound draft is audited against.
+  const prohibitedByExtId = new Map();
+  try {
+    const ledger = JSON.parse(readFileSync(LEDGER_FILES["external-validation"], "utf8"));
+    for (const r of ledger.records ?? []) {
+      prohibitedByExtId.set(r.id, (r.prohibited_claims ?? []).map(String));
+    }
+  } catch {
+    // leave empty
+  }
+  return { claimIdsByLedger, prohibitedByExtId };
+}
+
+/**
+ * Integrity snapshot of the trust-authority files. The replayed external
+ * bins execute AFTER the ledgers are read; a bin that mutates the ledgers in
+ * the workspace must not be able to retroactively change what was audited —
+ * and the mutation itself is a fail-closed HOLD.
+ */
+function snapshotLedgers() {
+  const snapshots = new Map();
+  for (const [ledger, path] of Object.entries(LEDGER_FILES)) {
+    if (existsSync(path)) snapshots.set(ledger, readFileSync(path, "utf8"));
+  }
+  return snapshots;
+}
+
+function ledgersUnmutated(snapshots) {
+  const problems = [];
+  for (const [ledger, path] of Object.entries(LEDGER_FILES)) {
+    const before = snapshots.get(ledger);
+    const after = existsSync(path) ? readFileSync(path, "utf8") : null;
+    if (before !== after) {
+      problems.push(`trust authority mutated during replay: ${path}`);
+    }
+  }
+  return problems;
 }
 
 // ---------------------------------------------------------------------------
@@ -428,17 +489,37 @@ function verifyRecord(path) {
     return { status: "HOLD", exitCode: 1, lines };
   }
 
-  const checkResults = gatherCheckResults(record);
+  // TOCTOU guard: snapshot the trust-authority files and build the ledger
+  // index BEFORE any external executable from the record runs. The replayed
+  // bins must not be able to influence what is audited, and any workspace
+  // mutation they cause is itself a fail-closed HOLD.
   const ledgerIndex = loadLedgerIndex();
+  const ledgerSnapshots = snapshotLedgers();
+
+  const checkResults = gatherCheckResults(record);
+
+  const mutationProblems = ledgersUnmutated(ledgerSnapshots);
+  for (const p of mutationProblems) {
+    checkResults.set(`__authority_integrity__`, { ok: false, detail: p });
+  }
+  if (mutationProblems.length) {
+    checkResults.get("__artifacts__").ok = false;
+  }
+
   const verdict = evaluatePreflight(record, checkResults, ledgerIndex);
+  for (const p of mutationProblems) {
+    verdict.holds.push({ code: "PRIMARY_SOURCE_CONFLICT", detail: p });
+    verdict.status = "HOLD";
+    verdict.notes = verdict.notes.filter((n) => !n.includes("HUMAN_APPROVAL"));
+  }
 
   const lines = [];
-  lines.push(`${verdict.status}${verdict.status === "HOLD" ? "" : ""} — ${record.id} (${path})`);
+  lines.push(`${verdict.status} — ${record.id} (${path})`);
   for (const note of verdict.notes) lines.push(`  ${note}`);
   for (const h of verdict.holds) lines.push(`  HOLD: ${h.code} — ${h.detail}`);
   return {
     status: verdict.status,
-    externalReady: verdict.externalReady,
+    humanApprovalRecorded: verdict.humanApprovalRecorded,
     exitCode: verdict.status === "TECHNICALLY_READY" ? 0 : 1,
     lines,
   };
