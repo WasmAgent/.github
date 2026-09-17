@@ -214,10 +214,27 @@ const SOURCE_VERIFIER_KINDS = {
 };
 
 /**
+ * Normalized logical identity of a primary source. Two sources with the same
+ * kind and the same normalized identity are THE SAME claim — duplicating
+ * them with different verified_by checks must not double-count (ER-07h).
+ */
+export function sourceIdentityKey(source) {
+  if (source.kind === "github_release_run") return `github_release_run:${source.repository ?? ""}#${source.run_id ?? ""}`;
+  if (source.kind === "github_pr_state") return `github_pr_state:${source.repository ?? ""}#${source.pr_number ?? ""}`;
+  if (source.kind === "github_issue_comment") return `github_issue_comment:${source.repository ?? ""}#${source.comment_id ?? ""}`;
+  const parsed = parseArtifactRef(source.ref);
+  if (parsed) {
+    return `${source.kind}:${parsed.ecosystem ?? "*"}:${parsed.package}@${parsed.version}`;
+  }
+  return `${source.kind}:${source.ref ?? ""}`;
+}
+
+/**
  * Semantic binding between a primary source and the check that claims to
  * verify it: the check kind must be an allowed verifier for the source kind,
- * and the check's parameters must match the source's identity (same artifact
- * ecosystem+name+version, same run id, same PR number, same comment).
+ * and the check's parameters must EXACTLY match the source's structured
+ * identity (repository + run id / PR number / comment id for GitHub sources;
+ * artifact ecosystem+name+version for registry/artifact sources).
  */
 export function sourceMatchesCheck(source, replay, envSpecById) {
   if (!source || !replay) return false;
@@ -226,11 +243,24 @@ export function sourceMatchesCheck(source, replay, envSpecById) {
 
   switch (source.kind) {
     case "github_release_run":
-      return replay.run_id === source.ref;
+      return (
+        replay.repository === source.repository && String(replay.run_id) === String(source.run_id)
+      );
     case "github_pr_state":
-      return String(replay.pr_number) === String(source.ref);
-    case "github_issue_comment":
-      return typeof replay.comment_url === "string" && replay.comment_url.includes(String(source.ref));
+      return (
+        replay.repository === source.repository &&
+        String(replay.pr_number) === String(source.pr_number)
+      );
+    case "github_issue_comment": {
+      // Exact identity match (repository + comment id) — never substring.
+      const url = typeof replay.comment_url === "string" ? replay.comment_url : "";
+      const m = url.match(/github\.com\/([^/]+\/[^/]+)\/(?:issues|pull)\/\d+#issuecomment-(\d+)/);
+      return (
+        m !== null &&
+        m[1] === source.repository &&
+        String(m[2]) === String(source.comment_id)
+      );
+    }
     case "registry_metadata":
     case "published_artifact":
     case "clean_install_replay": {
@@ -262,9 +292,10 @@ export function sourceMatchesCheck(source, replay, envSpecById) {
 /**
  * Count machine-verified sources for the correction threshold. A source
  * counts only when it carries `verified_by` pointing at a DISTINCT, PASSING
- * check that SEMANTICALLY VERIFIES it. Returns the verified count and how
- * many of the verified sources are final-state evidence (derived from kind,
- * never from self-declared flags).
+ * check that SEMANTICALLY VERIFIES it, and when no other counted source has
+ * the same logical identity (kind + normalized identity). Returns the
+ * verified count and how many of the verified sources are final-state
+ * evidence (derived from kind, never from self-declared flags).
  */
 function countVerifiedSources(record, checkResults) {
   // Clean-install environment identities, for bin/exec verifier resolution.
@@ -275,7 +306,9 @@ function countVerifiedSources(record, checkResults) {
     }
   }
 
+  const defaultRepo = record.target?.repository;
   const seenChecks = new Set();
+  const seenSourceIdentities = new Set();
   let verified = 0;
   let verifiedFinalState = 0;
   for (const source of record.primary_sources ?? []) {
@@ -285,8 +318,17 @@ function countVerifiedSources(record, checkResults) {
     const result = checkResults.get(checkId);
     if (!result || !result.ok) continue;
     const replay = (record.command_replays ?? []).find((r) => r.id === checkId);
-    if (!sourceMatchesCheck(source, replay, envSpecById)) continue;
+    // GitHub replays may omit `repository`, inheriting the record target.
+    const resolvedReplay =
+      replay && !replay.repository && replay.kind.startsWith("github_")
+        ? { ...replay, repository: defaultRepo }
+        : replay;
+    if (!sourceMatchesCheck(source, resolvedReplay, envSpecById)) continue;
+
+    const identityKey = sourceIdentityKey(source);
+    if (seenSourceIdentities.has(identityKey)) continue;
     seenChecks.add(checkId);
+    seenSourceIdentities.add(identityKey);
     verified += 1;
     if (FINAL_STATE_SOURCE_KINDS.has(source.kind)) {
       verifiedFinalState += 1;

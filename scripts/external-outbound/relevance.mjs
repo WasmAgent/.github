@@ -32,10 +32,17 @@ export const OUTBOUND_PATH_PATTERNS = [
   /^scripts\/verify-external-outbound-preflight\.mjs$/,
   /^scripts\/external-outbound\/relevance\.mjs$/,
   /^\.github\/workflows\/external-outbound-preflight\.yml$/,
-  // Claim/evidence ledgers the validator reads as authority, and their
-  // validators — weakening them must not slip past this gate.
-  /^claims\/public-claims\.yml$/,
-  /^evidence\/external-validation\.json$/,
+  // Claim-firewall authority and public-text surfaces — exactly what
+  // scripts/validate-public-claims.py reads and scans (SCAN_DIRS,
+  // SCAN_FILES, ALLOWLIST_PATH). Weakening the claim authority or editing
+  // public claim text must not slip past this gate.
+  /^claims\//,
+  /^evidence\//,
+  /^docs\//,
+  /^profile\//,
+  /^README\.md$/,
+  /^ORG-FOCUS-2026Q3\.md$/,
+  // Ledger validators
   /^scripts\/validate-public-claims\.py$/,
   /^scripts\/validate-external-evidence\.py$/,
 ];

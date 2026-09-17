@@ -30,9 +30,10 @@
   "primary_sources": [
     {
       "kind": "github_release_run",
-      "ref": "35188712433",
       "statement": "v0.1.11 tag release workflow: preflight, build, npm publish, PyPI publish all succeeded",
-      "verified_by": "release-run"
+      "verified_by": "release-run",
+      "repository": "WasmAgent/wasmagent-protocol",
+      "run_id": "35188712433"
     },
     {
       "kind": "registry_metadata",

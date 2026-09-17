@@ -71,7 +71,20 @@ function structuralProblems(record) {
   }
   push(Array.isArray(record.primary_sources), "primary_sources must be an array");
   for (const s of record.primary_sources ?? []) {
-    push(s && typeof s.kind === "string" && typeof s.ref === "string", "primary_source needs kind + ref");
+    push(s && typeof s.kind === "string", "primary_source needs kind");
+    if (!s) continue;
+    if (s.kind === "github_release_run") {
+      push(typeof s.repository === "string" && s.repository.length > 0, `github_release_run source needs repository`);
+      push(typeof s.run_id === "string" && s.run_id.length > 0, `github_release_run source needs run_id`);
+    } else if (s.kind === "github_pr_state") {
+      push(typeof s.repository === "string" && s.repository.length > 0, `github_pr_state source needs repository`);
+      push(Number.isInteger(s.pr_number) && s.pr_number > 0, `github_pr_state source needs pr_number`);
+    } else if (s.kind === "github_issue_comment") {
+      push(typeof s.repository === "string" && s.repository.length > 0, `github_issue_comment source needs repository`);
+      push(Number.isInteger(s.comment_id) && s.comment_id > 0, `github_issue_comment source needs comment_id`);
+    } else {
+      push(typeof s.ref === "string" && s.ref.length > 0, `primary_source ${s.kind} needs ref`);
+    }
   }
   push(Array.isArray(record.command_replays), "command_replays must be an array");
   for (const r of record.command_replays ?? []) {
@@ -307,7 +320,17 @@ function gatherCheckResults(record) {
         const dir = mkdtempSync(join(tmpdir(), "aep-outbound-py-"));
         const venv = join(dir, "venv");
         let r = sh("python3", ["-m", "venv", venv], { env: childEnv });
-        if (r.ok) r = sh(join(venv, "bin", "pip"), ["install", `${replay.package}==${replay.version}`], { env: childEnv });
+        if (r.ok) {
+          // Wheel-only, no dependency resolution: a version that ships only an
+          // sdist would execute its build backend here — refuse instead (the
+          // replay then HOLDs for manual review rather than building
+          // candidate-named code).
+          r = sh(
+            join(venv, "bin", "pip"),
+            ["install", "--only-binary=:all:", "--no-deps", `${replay.package}==${replay.version}`],
+            { env: childEnv },
+          );
+        }
         envs.set(replay.id, { dir: venv, spec: `${replay.package}==${replay.version}` });
         set(replay.id, r.ok, r.detail);
         break;

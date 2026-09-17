@@ -99,7 +99,7 @@ test("ER-03: source tests pass but published-artifact command replay fails => HO
   const record = {
     ...BASE_RECORD,
     artifacts: [{ ecosystem: "npm", package: "@wasmagent/x", version: "1.0.0" }],
-    primary_sources: [{ kind: "github_release_run", ref: "run-1", verified_by: "r-run" }],
+    primary_sources: [{ kind: "github_release_run", repository: "WasmAgent/wasmagent-js", run_id: "run-1", verified_by: "r-run" }],
     command_replays: [
       { id: "r-run", kind: "github_release_run", repository: "WasmAgent/wasmagent-js", run_id: "run-1", expect_conclusion: "success" },
       { id: "r-install", kind: "npm_clean_install", package: "@wasmagent/x", version: "1.0.0" },
@@ -121,7 +121,7 @@ test("ER-04: CI green but final artifact absent from registry => HOLD: ARTIFACT_
   const record = {
     ...BASE_RECORD,
     artifacts: [{ ecosystem: "npm", package: "@wasmagent/ghost", version: "9.9.9" }],
-    primary_sources: [{ kind: "github_release_run", ref: "run-2", verified_by: "r-run" }],
+    primary_sources: [{ kind: "github_release_run", repository: "WasmAgent/wasmagent-js", run_id: "run-2", verified_by: "r-run" }],
     command_replays: [{ id: "r-run", kind: "github_release_run", run_id: "run-2", expect_conclusion: "success" }],
   };
   const results = new Map([
@@ -302,6 +302,44 @@ test("ER-07g: final_state self-declaration has no power — unverifiable kind st
   assert.ok(verdict.holds.some((h) => h.code === "CORRECTION_EVIDENCE_INSUFFICIENT"));
 });
 
+test("ER-07h: the same logical source duplicated with two checks counts once => HOLD", () => {
+  const record = {
+    ...BASE_RECORD,
+    message_class: "correction",
+    primary_sources: [
+      // SAME logical source (kind + artifact identity), two different checks:
+      { kind: "registry_metadata", ref: "npm:@wasmagent/a@1.0.0", verified_by: "meta-1" },
+      { kind: "registry_metadata", ref: "npm:@wasmagent/a@1.0.0", verified_by: "meta-2" },
+    ],
+    command_replays: [
+      { id: "meta-1", kind: "npm_metadata", package: "@wasmagent/a", version: "1.0.0" },
+      { id: "meta-2", kind: "npm_metadata", package: "@wasmagent/a", version: "1.0.0" },
+    ],
+  };
+  const results = new Map([ok("__artifacts__"), ok("meta-1"), ok("meta-2")]);
+  const verdict = evaluatePreflight(record, results, LEDGERS);
+  assert.equal(verdict.status, "HOLD");
+  assert.ok(verdict.holds.some((h) => h.code === "CORRECTION_EVIDENCE_INSUFFICIENT"));
+});
+
+test("ER-07i: different modalities of the same artifact remain two sources (metadata + replay)", () => {
+  const record = {
+    ...BASE_RECORD,
+    message_class: "correction",
+    primary_sources: [
+      { kind: "registry_metadata", ref: "npm:@wasmagent/a@1.0.0", verified_by: "meta-1" },
+      { kind: "clean_install_replay", ref: "npm:@wasmagent/a@1.0.0", verified_by: "install-1" },
+    ],
+    command_replays: [
+      { id: "meta-1", kind: "npm_metadata", package: "@wasmagent/a", version: "1.0.0" },
+      { id: "install-1", kind: "npm_clean_install", package: "@wasmagent/a", version: "1.0.0" },
+    ],
+  };
+  const results = new Map([ok("__artifacts__"), ok("meta-1"), ok("install-1")]);
+  const verdict = evaluatePreflight(record, results, LEDGERS);
+  assert.ok(!verdict.holds.some((h) => h.code === "CORRECTION_EVIDENCE_INSUFFICIENT"), verdict.holds.join("; "));
+});
+
 test("unresolved contradiction blocks even a clean record", () => {
   const record = {
     ...BASE_RECORD,
@@ -369,14 +407,49 @@ test("sourceMatchesCheck enforces kind and identity binding", () => {
     ),
     false,
   );
-  // Run-id binding.
+  // Structured GitHub identity: repository + run id, exact match.
   assert.equal(
     sourceMatchesCheck(
-      { kind: "github_release_run", ref: "35188712433" },
-      { kind: "github_release_run", run_id: "35188712433" },
+      { kind: "github_release_run", repository: "WasmAgent/wasmagent-protocol", run_id: "35188712433" },
+      { kind: "github_release_run", repository: "WasmAgent/wasmagent-protocol", run_id: "35188712433" },
       envSpecs,
     ),
     true,
+  );
+  // A different repository with the same run/PR number is NOT the same source.
+  assert.equal(
+    sourceMatchesCheck(
+      { kind: "github_release_run", repository: "WasmAgent/wasmagent-protocol", run_id: "42" },
+      { kind: "github_release_run", repository: "WasmAgent/wasmagent-js", run_id: "42" },
+      envSpecs,
+    ),
+    false,
+  );
+  assert.equal(
+    sourceMatchesCheck(
+      { kind: "github_pr_state", repository: "WasmAgent/wasmagent-js", pr_number: 94 },
+      { kind: "github_pr_state", repository: "WasmAgent/wasmagent-protocol", pr_number: 94 },
+      envSpecs,
+    ),
+    false,
+  );
+  // Comment identity is an exact repository+comment_id match, not substring.
+  assert.equal(
+    sourceMatchesCheck(
+      { kind: "github_issue_comment", repository: "WasmAgent/wasmagent-js", comment_id: 5709814263 },
+      { kind: "github_issue_comment_exists", comment_url: "https://github.com/WasmAgent/wasmagent-js/issues/92#issuecomment-5709814263" },
+      envSpecs,
+    ),
+    true,
+  );
+  assert.equal(
+    sourceMatchesCheck(
+      { kind: "github_issue_comment", repository: "WasmAgent/wasmagent-js", comment_id: 570981426 },
+      { kind: "github_issue_comment_exists", comment_url: "https://github.com/WasmAgent/wasmagent-js/issues/92#issuecomment-5709814263" },
+      envSpecs,
+    ),
+    false,
+    "comment id must match exactly, not by substring",
   );
 });
 
@@ -441,13 +514,25 @@ test("relevance detector matches gate sources, ledgers, and their validators", (
 
 test("relevance detector ignores unrelated changes", () => {
   const { relevant, matched } = computeRelevance([
-    "docs/external-outbound-preflight.md",
-    "README.md",
+    "packages/foo/index.js",
     "scripts/some-other-script.mjs",
-    "evidence/external-outboundish/README.md",
+    "src/unrelated.ts",
   ]);
   assert.equal(relevant, false);
   assert.deepEqual(matched, []);
+});
+
+test("relevance detector covers the claim-firewall authority and public-text surfaces", () => {
+  const { relevant, matched } = computeRelevance([
+    "claims/claim-overreach-allowlist.json",
+    "docs/some-public-page.md",
+    "profile/README.md",
+    "README.md",
+    "ORG-FOCUS-2026Q3.md",
+    "evidence/anything.json",
+  ]);
+  assert.equal(relevant, true);
+  assert.equal(matched.length, 6);
 });
 
 test("relevance detector pattern list is not empty and anchored", () => {
