@@ -99,13 +99,25 @@ jobs:
         with:
           persist-credentials: false
 
+      # Trust anchor: the VERIFIER, CORE and hostile tests come from an
+      # immutable main revision — the candidate cannot weaken them. The
+      # verifier inspects the candidate DATA via --repo-root.
+      - name: Checkout pinned trusted verifier
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: WasmAgent/.github
+          ref: b766222d89bfd071e8490188c6b0291c386d60e0
+          path: .verifier
+          persist-credentials: false
+
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '20'
 
-      # Hostile regressions ER-01..ER-07 (hermetic — no registry access).
-      - name: Hostile regressions (ER-01..ER-07)
-        run: node --test scripts/external-outbound-preflight.test.mjs
+      # SECURITY AUTHORITY: hostile regressions ER-01..ER-07 from the pinned
+      # revision (hermetic — no registry access).
+      - name: Hostile regressions (pinned, authority)
+        run: node --test .verifier/scripts/external-outbound-preflight.test.mjs
 
       # Live verification of every record against real primary sources:
       # registry metadata, clean-install of the PUBLISHED artifact (secrets
@@ -115,7 +127,13 @@ jobs:
       - name: Verify outbound records against primary sources
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node scripts/verify-external-outbound-preflight.mjs
+        run: node .verifier/scripts/verify-external-outbound-preflight.mjs --repo-root .
+
+      # ADDITIVE EVIDENCE ONLY (non-blocking): candidate-tree tests may add
+      # coverage but can never define the security decision.
+      - name: Candidate hostile regressions (additive, non-blocking)
+        run: node --test scripts/external-outbound-preflight.test.mjs
+        continue-on-error: true
 
   outbound-preflight-summary:
     name: External outbound preflight (.github)
