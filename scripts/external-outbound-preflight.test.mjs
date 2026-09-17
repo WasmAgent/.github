@@ -9,8 +9,9 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { evaluatePreflight, isHumanReviewer } from "./external-outbound-preflight-core.mjs";
+import { evaluatePreflight, isHumanReviewer, parseArtifactRef, sourceMatchesCheck } from "./external-outbound-preflight-core.mjs";
 import { execBinAllowlisted, sanitizeEnv, INSTALL_SCRIPTS_ALLOWLIST } from "./verify-external-outbound-preflight.mjs";
+import { computeRelevance, OUTBOUND_PATH_PATTERNS } from "./external-outbound/relevance.mjs";
 
 const LEDGERS = {
   claimIdsByLedger: new Map([
@@ -51,7 +52,7 @@ test("ER-01: registry metadata contradicting the recorded claim => HOLD: PRIMARY
     ],
     primary_sources: [
       { kind: "release_log", ref: "run-35188712433", statement: "npm warn: bin was invalid and removed" },
-      { kind: "registry_metadata", ref: "npm:@wasmagent/protocol@0.1.11", final_state: true, verified_by: "r-meta" },
+      { kind: "registry_metadata", ref: "npm:@wasmagent/protocol@0.1.11", verified_by: "r-meta" },
     ],
     command_replays: [{ id: "r-meta", kind: "npm_metadata", package: "@wasmagent/protocol", version: "0.1.11" }],
   };
@@ -71,7 +72,7 @@ test("ER-02: suspected log signal refuted by clean-install replay => TECHNICALLY
     artifacts: [{ ecosystem: "npm", package: "@wasmagent/protocol", version: "0.1.11" }],
     primary_sources: [
       { kind: "release_log", ref: "run-35188712433", statement: "suspected bin removal warning" },
-      { kind: "clean_install_replay", ref: "replay-0.1.11", final_state: true, verified_by: "r-bin" },
+      { kind: "clean_install_replay", ref: "npm:@wasmagent/protocol@0.1.11", verified_by: "r-bin" },
     ],
     command_replays: [
       { id: "r-install", kind: "npm_clean_install", package: "@wasmagent/protocol", version: "0.1.11" },
@@ -98,7 +99,7 @@ test("ER-03: source tests pass but published-artifact command replay fails => HO
   const record = {
     ...BASE_RECORD,
     artifacts: [{ ecosystem: "npm", package: "@wasmagent/x", version: "1.0.0" }],
-    primary_sources: [{ kind: "github_release_run", ref: "run-1", final_state: true, verified_by: "r-run" }],
+    primary_sources: [{ kind: "github_release_run", ref: "run-1", verified_by: "r-run" }],
     command_replays: [
       { id: "r-run", kind: "github_release_run", repository: "WasmAgent/wasmagent-js", run_id: "run-1", expect_conclusion: "success" },
       { id: "r-install", kind: "npm_clean_install", package: "@wasmagent/x", version: "1.0.0" },
@@ -120,7 +121,7 @@ test("ER-04: CI green but final artifact absent from registry => HOLD: ARTIFACT_
   const record = {
     ...BASE_RECORD,
     artifacts: [{ ecosystem: "npm", package: "@wasmagent/ghost", version: "9.9.9" }],
-    primary_sources: [{ kind: "github_release_run", ref: "run-2", final_state: true, verified_by: "r-run" }],
+    primary_sources: [{ kind: "github_release_run", ref: "run-2", verified_by: "r-run" }],
     command_replays: [{ id: "r-run", kind: "github_release_run", run_id: "run-2", expect_conclusion: "success" }],
   };
   const results = new Map([
@@ -137,7 +138,7 @@ test("ER-05: executable command but claim outside ledger ceiling => HOLD: CLAIM_
   const record = {
     ...BASE_RECORD,
     artifacts: [{ ecosystem: "npm", package: "@wasmagent/protocol", version: "0.1.11" }],
-    primary_sources: [{ kind: "clean_install_replay", ref: "replay", final_state: true, verified_by: "r-install" }],
+    primary_sources: [{ kind: "clean_install_replay", ref: "npm:@wasmagent/protocol@0.1.11", verified_by: "r-install" }],
     command_replays: [{ id: "r-install", kind: "npm_clean_install", package: "@wasmagent/protocol", version: "0.1.11" }],
     claim_refs: [{ ledger: "external-validation", claim_id: "EXT-DOES-NOT-EXIST" }],
   };
@@ -198,8 +199,8 @@ test("ER-07b: clean-install replay + unverified inference does NOT satisfy the c
     ...BASE_RECORD,
     message_class: "correction",
     primary_sources: [
-      { kind: "human_inference", ref: "ai-analysis", statement: "looks broken", final_state: true },
-      { kind: "clean_install_replay", ref: "replay-x", final_state: true, verified_by: "r-install" },
+      { kind: "human_inference", ref: "ai-analysis", statement: "looks broken" },
+      { kind: "clean_install_replay", ref: "npm:@wasmagent/p@1.0.0", verified_by: "r-install" },
     ],
     command_replays: [{ id: "r-install", kind: "npm_clean_install", package: "@wasmagent/p", version: "1.0.0" }],
   };
@@ -214,8 +215,8 @@ test("ER-07c: correction with two DISTINCT machine-verified sources incl. one fi
     ...BASE_RECORD,
     message_class: "correction",
     primary_sources: [
-      { kind: "registry_metadata", ref: "npm:@wasmagent/p@1.0.0", final_state: true, verified_by: "r-meta" },
-      { kind: "clean_install_replay", ref: "replay-x", final_state: true, verified_by: "r-install" },
+      { kind: "registry_metadata", ref: "npm:@wasmagent/p@1.0.0", verified_by: "r-meta" },
+      { kind: "clean_install_replay", ref: "npm:@wasmagent/p@1.0.0", verified_by: "r-install" },
     ],
     command_replays: [
       { id: "r-meta", kind: "npm_metadata", package: "@wasmagent/p", version: "1.0.0" },
@@ -232,8 +233,8 @@ test("ER-07d: two sources verified_by the SAME check count once — threshold st
     ...BASE_RECORD,
     message_class: "correction",
     primary_sources: [
-      { kind: "registry_metadata", ref: "s1", final_state: true, verified_by: "r-meta" },
-      { kind: "published_artifact", ref: "s2", final_state: true, verified_by: "r-meta" },
+      { kind: "registry_metadata", ref: "npm:@wasmagent/p@1.0.0", verified_by: "r-meta" },
+      { kind: "published_artifact", ref: "npm:@wasmagent/p@1.0.0", verified_by: "r-meta" },
     ],
     command_replays: [{ id: "r-meta", kind: "npm_metadata", package: "@wasmagent/p", version: "1.0.0" }],
   };
@@ -248,8 +249,8 @@ test("ER-07e: verified_by pointing at a failed check does not count", () => {
     ...BASE_RECORD,
     message_class: "correction",
     primary_sources: [
-      { kind: "registry_metadata", ref: "s1", final_state: true, verified_by: "r-meta" },
-      { kind: "published_artifact", ref: "s2", final_state: true, verified_by: "r-fail" },
+      { kind: "registry_metadata", ref: "npm:@wasmagent/p@1.0.0", verified_by: "r-meta" },
+      { kind: "published_artifact", ref: "npm:@wasmagent/p@1.0.0", verified_by: "r-fail" },
     ],
     command_replays: [
       { id: "r-meta", kind: "npm_metadata", package: "@wasmagent/p", version: "1.0.0" },
@@ -257,6 +258,45 @@ test("ER-07e: verified_by pointing at a failed check does not count", () => {
     ],
   };
   const results = new Map([ok("__artifacts__"), ok("r-meta"), ["r-fail", { ok: false, detail: "install failed" }]]);
+  const verdict = evaluatePreflight(record, results, LEDGERS);
+  assert.equal(verdict.status, "HOLD");
+  assert.ok(verdict.holds.some((h) => h.code === "CORRECTION_EVIDENCE_INSUFFICIENT"));
+});
+
+test("ER-07f: passing checks that verify a DIFFERENT artifact do not bind semantically => HOLD", () => {
+  const record = {
+    ...BASE_RECORD,
+    message_class: "correction",
+    primary_sources: [
+      // Source claims facts about package-A, but the check verifies package-B.
+      { kind: "registry_metadata", ref: "npm:@wasmagent/package-a@1.0.0", verified_by: "check-b" },
+      { kind: "published_artifact", ref: "npm:@wasmagent/package-a@1.0.0", verified_by: "check-c" },
+    ],
+    command_replays: [
+      { id: "check-b", kind: "npm_metadata", package: "@wasmagent/package-b", version: "2.0.0" },
+      { id: "check-c", kind: "npm_clean_install", package: "@wasmagent/package-b", version: "2.0.0" },
+    ],
+  };
+  const results = new Map([ok("__artifacts__"), ok("check-b"), ok("check-c")]);
+  const verdict = evaluatePreflight(record, results, LEDGERS);
+  assert.equal(verdict.status, "HOLD");
+  assert.ok(verdict.holds.some((h) => h.code === "CORRECTION_EVIDENCE_INSUFFICIENT"));
+});
+
+test("ER-07g: final_state self-declaration has no power — unverifiable kind stays unverified", () => {
+  const record = {
+    ...BASE_RECORD,
+    message_class: "correction",
+    primary_sources: [
+      { kind: "human_inference", ref: "anything", final_state: true, verified_by: "r-meta" },
+      { kind: "release_log", ref: "log-9", final_state: true, verified_by: "r-meta2" },
+    ],
+    command_replays: [
+      { id: "r-meta", kind: "npm_metadata", package: "@wasmagent/p", version: "1.0.0" },
+      { id: "r-meta2", kind: "npm_metadata", package: "@wasmagent/p", version: "1.0.0" },
+    ],
+  };
+  const results = new Map([ok("__artifacts__"), ok("r-meta"), ok("r-meta2")]);
   const verdict = evaluatePreflight(record, results, LEDGERS);
   assert.equal(verdict.status, "HOLD");
   assert.ok(verdict.holds.some((h) => h.code === "CORRECTION_EVIDENCE_INSUFFICIENT"));
@@ -280,6 +320,64 @@ test("non-allowlisted replay kind is rejected", () => {
   const verdict = evaluatePreflight(record, new Map(), LEDGERS);
   assert.equal(verdict.status, "HOLD");
   assert.ok(verdict.holds.some((h) => h.code === "COMMAND_REPLAY_FAILED" && h.detail.includes("not allowlisted")));
+});
+
+// --- source <-> check semantic binding --------------------------------------
+
+test("parseArtifactRef handles scoped npm, pypi prefix, and bare identities", () => {
+  assert.deepEqual(parseArtifactRef("npm:@wasmagent/protocol@0.1.11"), {
+    ecosystem: "npm",
+    package: "@wasmagent/protocol",
+    version: "0.1.11",
+  });
+  assert.deepEqual(parseArtifactRef("pypi:wasmagent-protocol@0.1.11"), {
+    ecosystem: "pypi",
+    package: "wasmagent-protocol",
+    version: "0.1.11",
+  });
+  assert.deepEqual(parseArtifactRef("pkg@1.2.3"), { package: "pkg", version: "1.2.3" });
+  assert.equal(parseArtifactRef("not-an-identity"), null);
+  assert.equal(parseArtifactRef(undefined), null);
+});
+
+test("sourceMatchesCheck enforces kind and identity binding", () => {
+  const envSpecs = new Map([["r-install", { package: "@wasmagent/protocol", version: "0.1.11" }]]);
+  // bin_exists check binds to the artifact installed by its `requires` env.
+  assert.equal(
+    sourceMatchesCheck(
+      { kind: "clean_install_replay", ref: "npm:@wasmagent/protocol@0.1.11" },
+      { kind: "npm_bin_exists", requires: "r-install", bin_name: "wasmagent-protocol" },
+      envSpecs,
+    ),
+    true,
+  );
+  // Same check cannot verify a different artifact.
+  assert.equal(
+    sourceMatchesCheck(
+      { kind: "clean_install_replay", ref: "npm:@wasmagent/other@9.9.9" },
+      { kind: "npm_bin_exists", requires: "r-install", bin_name: "wasmagent-protocol" },
+      envSpecs,
+    ),
+    false,
+  );
+  // A metadata check cannot verify a clean-install-replay claim.
+  assert.equal(
+    sourceMatchesCheck(
+      { kind: "clean_install_replay", ref: "npm:@wasmagent/protocol@0.1.11" },
+      { kind: "npm_metadata", package: "@wasmagent/protocol", version: "0.1.11" },
+      envSpecs,
+    ),
+    false,
+  );
+  // Run-id binding.
+  assert.equal(
+    sourceMatchesCheck(
+      { kind: "github_release_run", ref: "35188712433" },
+      { kind: "github_release_run", run_id: "35188712433" },
+      envSpecs,
+    ),
+    true,
+  );
 });
 
 // --- replay execution isolation (P1-4) --------------------------------------
@@ -321,4 +419,40 @@ test("npm_exec argv[0] must be a bin declared by the target package", () => {
   assert.equal(execBinAllowlisted(["node", "-e", "require('child_process')"], binKeys), false);
   assert.equal(execBinAllowlisted([], binKeys), false);
   assert.equal(execBinAllowlisted([""], binKeys), false);
+});
+
+// --- default-branch-owned relevance detector (P0) ----------------------------
+
+test("relevance detector matches gate sources, ledgers, and their validators", () => {
+  const { relevant, matched } = computeRelevance([
+    "evidence/external-outbound/APS92-aep-conformance-kit-0.1.11.json",
+    "claims/public-claims.yml",
+    "evidence/external-validation.json",
+    "scripts/validate-public-claims.py",
+    "scripts/validate-external-evidence.py",
+    "scripts/verify-external-outbound-preflight.mjs",
+    "scripts/external-outbound/relevance.mjs",
+    ".github/workflows/external-outbound-preflight.yml",
+    "schemas/external-outbound-preflight.schema.json",
+  ]);
+  assert.equal(relevant, true);
+  assert.equal(matched.length, 9);
+});
+
+test("relevance detector ignores unrelated changes", () => {
+  const { relevant, matched } = computeRelevance([
+    "docs/external-outbound-preflight.md",
+    "README.md",
+    "scripts/some-other-script.mjs",
+    "evidence/external-outboundish/README.md",
+  ]);
+  assert.equal(relevant, false);
+  assert.deepEqual(matched, []);
+});
+
+test("relevance detector pattern list is not empty and anchored", () => {
+  assert.ok(OUTBOUND_PATH_PATTERNS.length >= 10);
+  for (const p of OUTBOUND_PATH_PATTERNS) {
+    assert.ok(p.source.startsWith("^"), `pattern must be anchored: ${p.source}`);
+  }
 });

@@ -41,6 +41,27 @@ machine ready       != human approval
   TECHNICALLY_READY — even an approval-recorded post is posted manually, by
   a human.
 
+## Trusted relevance
+
+The required summary check does not trust relevance from the candidate tree:
+the summary job recomputes it by loading the detector from **origin/main**
+(`scripts/external-outbound/relevance.mjs`) and applying it to the objective
+`git diff --name-only origin/main...HEAD` file list. Editing the detector or
+its path list therefore requires merging a change that is itself evaluated
+by the detector already on main. The candidate-side `changes` job only
+decides whether the expensive inner job runs; the pinned evaluator consumes
+the recomputed relevance, so a candidate `relevant=false` cannot skip a
+gate the default branch says must run.
+
+## Ledger dependency
+
+The validator reads `claims/public-claims.yml` and
+`evidence/external-validation.json` as its claim authority. Both files — and
+their validators (`scripts/validate-public-claims.py`,
+`scripts/validate-external-evidence.py`) — are inside the gate's relevance
+scope, and the ledger validators run inside the gate's inner job. Weakening
+the ledgers can no longer bypass the outbound gate.
+
 ## State machine
 
 ```text
@@ -57,13 +78,17 @@ primary sources means **HOLD** — never "pick an interpretation", never
 
 An external correction requires **at least two MACHINE-VERIFIED primary
 sources** — each carrying `verified_by` pointing at a DISTINCT, PASSING
-structured check — of which at least one is **final-state evidence**
-(registry metadata, the actual published artifact, an exact clean-install
-command replay, or the final merged/release state). `human_inference` and
-`release_log` sources are recorded honestly but are never machine-verifiable
-and never count toward the threshold. A single warning line, a commit
-message, a PR body, or an inference — human or AI — is never sufficient to
-trigger an external correction.
+structured check that **semantically verifies that exact source** (same
+artifact ecosystem+name+version, same release run, same PR — a passing check
+for a different artifact never counts) — of which at least one is
+**final-state evidence**. Final-state status is DERIVED from the source kind
+(registry metadata, published artifact, clean-install replay, final
+release/PR state) plus a passing bound check; a `final_state: true` flag in
+the record has no power. `human_inference` and `release_log` sources are
+recorded honestly but are never machine-verifiable and never count toward
+the threshold. A single warning line, a commit message, a PR body, or an
+inference — human or AI — is never sufficient to trigger an external
+correction.
 
 ## Mechanics
 
