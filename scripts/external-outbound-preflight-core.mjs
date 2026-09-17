@@ -34,11 +34,15 @@ export const ALLOWED_REPLAY_KINDS = new Set([
   "claim_ref",
 ]);
 
-/** Primary-source kinds that are final-state evidence by nature. */
+/** Primary-source kinds that are final-state evidence by nature. The
+ * `final_state` field on a record is NOT trusted — final-state is derived
+ * from the source kind plus a passing, semantically-bound check. */
 const FINAL_STATE_SOURCE_KINDS = new Set([
   "registry_metadata",
   "published_artifact",
   "clean_install_replay",
+  "github_release_run",
+  "github_pr_state",
 ]);
 
 /**
@@ -126,11 +130,12 @@ export function evaluatePreflight(record, checkResults, ledgerIndex) {
     }
   }
 
-  // Correction threshold (ER-07..ER-07c): a factual correction requires at
+  // Correction threshold (ER-07..ER-07g): a factual correction requires at
   // least TWO MACHINE-VERIFIED evidence sources — each `verified_by` must
-  // point to a DISTINCT, PASSING check; unverified statements, inferences and
-  // log quotations never count — and at least one verified source must be
-  // final-state evidence.
+  // point to a DISTINCT, PASSING check that SEMANTICALLY VERIFIES that exact
+  // source (same artifact identity / same run / same PR) — and at least one
+  // verified source must be final-state evidence BY KIND (never by
+  // self-declared flags).
   if (record.message_class === "correction") {
     const { verified, verifiedFinalState } = countVerifiedSources(record, checkResults);
     if (verified < 2 || verifiedFinalState < 1) {
@@ -170,12 +175,106 @@ export function evaluatePreflight(record, checkResults, ledgerIndex) {
 }
 
 /**
+ * Parse an artifact identity reference: "npm:@scope/pkg@1.2.3",
+ * "pypi:pkg@1.2.3", or bare "pkg@1.2.3" (ecosystem derived from the check).
+ */
+export function parseArtifactRef(ref) {
+  if (typeof ref !== "string") return null;
+  let ecosystem;
+  let rest = ref;
+  const m = ref.match(/^(npm|pypi):(.+)$/);
+  if (m) {
+    ecosystem = m[1];
+    rest = m[2];
+  }
+  const at = rest.lastIndexOf("@");
+  if (at <= 0) return null;
+  const pkg = rest.slice(0, at);
+  const version = rest.slice(at + 1);
+  if (!pkg || !version) return null;
+  return ecosystem ? { ecosystem, package: pkg, version } : { package: pkg, version };
+}
+
+/** True when the parsed artifact identities are equivalent (ecosystem only
+ * compared when BOTH sides declare one). */
+function artifactIdentityMatches(a, b) {
+  if (!a || !b) return false;
+  if (a.package !== b.package || a.version !== b.version) return false;
+  return a.ecosystem === undefined || b.ecosystem === undefined || a.ecosystem === b.ecosystem;
+}
+
+/** The check kinds allowed to verify each source kind, semantically. */
+const SOURCE_VERIFIER_KINDS = {
+  registry_metadata: ["npm_metadata", "pypi_metadata"],
+  published_artifact: ["npm_clean_install", "pypi_clean_install", "npm_bin_exists", "npm_exec"],
+  clean_install_replay: ["npm_clean_install", "pypi_clean_install", "npm_bin_exists", "npm_exec"],
+  github_release_run: ["github_release_run"],
+  github_pr_state: ["github_pr_state"],
+  github_issue_comment: ["github_issue_comment_exists"],
+};
+
+/**
+ * Semantic binding between a primary source and the check that claims to
+ * verify it: the check kind must be an allowed verifier for the source kind,
+ * and the check's parameters must match the source's identity (same artifact
+ * ecosystem+name+version, same run id, same PR number, same comment).
+ */
+export function sourceMatchesCheck(source, replay, envSpecById) {
+  if (!source || !replay) return false;
+  const allowed = SOURCE_VERIFIER_KINDS[source.kind];
+  if (!allowed || !allowed.includes(replay.kind)) return false;
+
+  switch (source.kind) {
+    case "github_release_run":
+      return replay.run_id === source.ref;
+    case "github_pr_state":
+      return String(replay.pr_number) === String(source.ref);
+    case "github_issue_comment":
+      return typeof replay.comment_url === "string" && replay.comment_url.includes(String(source.ref));
+    case "registry_metadata":
+    case "published_artifact":
+    case "clean_install_replay": {
+      // The verifying check's own artifact identity, resolved through the
+      // clean-install environment for bin/exec checks.
+      let ecosystem;
+      if (replay.kind.startsWith("npm_")) ecosystem = "npm";
+      else if (replay.kind.startsWith("pypi_")) ecosystem = "pypi";
+      let package_ = replay.package;
+      let version = replay.version;
+      if ((replay.kind === "npm_bin_exists" || replay.kind === "npm_exec") && envSpecById) {
+        const envSpec = envSpecById.get(replay.requires);
+        if (!envSpec) return false;
+        ecosystem = "npm";
+        package_ = envSpec.package;
+        version = envSpec.version;
+      }
+      return artifactIdentityMatches(parseArtifactRef(source.ref), {
+        ecosystem,
+        package: package_,
+        version,
+      });
+    }
+    default:
+      return false;
+  }
+}
+
+/**
  * Count machine-verified sources for the correction threshold. A source
  * counts only when it carries `verified_by` pointing at a DISTINCT, PASSING
- * check and is of a verifiable kind. Returns the verified count and how many
- * of the verified sources are final-state evidence.
+ * check that SEMANTICALLY VERIFIES it. Returns the verified count and how
+ * many of the verified sources are final-state evidence (derived from kind,
+ * never from self-declared flags).
  */
 function countVerifiedSources(record, checkResults) {
+  // Clean-install environment identities, for bin/exec verifier resolution.
+  const envSpecById = new Map();
+  for (const replay of record.command_replays ?? []) {
+    if (replay.kind === "npm_clean_install") {
+      envSpecById.set(replay.id, { package: replay.package, version: replay.version });
+    }
+  }
+
   const seenChecks = new Set();
   let verified = 0;
   let verifiedFinalState = 0;
@@ -185,9 +284,11 @@ function countVerifiedSources(record, checkResults) {
     if (!checkId || seenChecks.has(checkId)) continue;
     const result = checkResults.get(checkId);
     if (!result || !result.ok) continue;
+    const replay = (record.command_replays ?? []).find((r) => r.id === checkId);
+    if (!sourceMatchesCheck(source, replay, envSpecById)) continue;
     seenChecks.add(checkId);
     verified += 1;
-    if (source.final_state === true || FINAL_STATE_SOURCE_KINDS.has(source.kind)) {
+    if (FINAL_STATE_SOURCE_KINDS.has(source.kind)) {
       verifiedFinalState += 1;
     }
   }

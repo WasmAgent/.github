@@ -88,11 +88,11 @@
           "statement": { "type": "string" },
           "final_state": {
             "type": "boolean",
-            "description": "True when the source is final-state evidence (registry metadata, published artifact, clean-install replay, final merged/release state)."
+            "description": "INFORMATIONAL ONLY and ignored by the validator: final-state status is derived from the source kind plus a passing, semantically-bound check — never from this self-declared flag."
           },
           "verified_by": {
             "type": "string",
-            "description": "id of the command_replays[] check that machine-verifies this source. Corrections count only sources with a verified_by pointing at a DISTINCT, PASSING check; human_inference and release_log sources are never machine-verifiable."
+            "description": "id of the command_replays[] check that machine-verifies this source. Corrections count only sources whose verified_by points at a DISTINCT, PASSING check that semantically matches the source (same artifact identity / run / PR); human_inference and release_log sources are never machine-verifiable; final-state status is derived from the source kind, not declared."
           }
         }
       }

@@ -346,25 +346,9 @@ function gatherCheckResults(record) {
     }
   }
 
-  // --- primary-source verification keys --------------------------------------
-  const cleanInstallOk = [...results.entries()].some(([id, r]) => {
-    const replay = (record.command_replays ?? []).find((c) => c.id === id);
-    return (replay?.kind === "npm_clean_install" || replay?.kind === "pypi_clean_install") && r.ok;
-  });
-  for (const source of record.primary_sources ?? []) {
-    const key = `source:${source.kind}:${source.ref}`;
-    if (["registry_metadata", "published_artifact"].includes(source.kind)) {
-      results.set(key, { ok: artifactsOk, detail: artifactsOk ? undefined : "artifact metadata check failed" });
-    } else if (source.kind === "clean_install_replay") {
-      results.set(key, { ok: cleanInstallOk, detail: cleanInstallOk ? undefined : "no successful clean-install replay" });
-    } else if (source.kind === "github_release_run") {
-      const replay = (record.command_replays ?? []).find((c) => c.kind === "github_release_run" && c.run_id === source.ref);
-      results.set(key, replay ? (results.get(replay.id) ?? { ok: false }) : { ok: false, detail: "no matching replay entry" });
-    } else if (source.kind === "github_pr_state") {
-      const replay = (record.command_replays ?? []).find((c) => c.kind === "github_pr_state" && String(c.pr_number) === source.ref);
-      results.set(key, replay ? (results.get(replay.id) ?? { ok: false }) : { ok: false, detail: "no matching replay entry" });
-    }
-  }
+  // Source-to-check semantic binding is enforced inside the core evaluator
+  // (countVerifiedSources via sourceMatchesCheck), which reads
+  // record.command_replays directly — no auxiliary result keys needed.
 
   return results;
 }

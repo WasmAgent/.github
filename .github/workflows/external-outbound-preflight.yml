@@ -5,14 +5,14 @@ name: External Outbound Preflight
 # provenance status claims, corrections). This workflow can only ever produce
 # TECHNICALLY_READY or HOLD; it can never post anything externally.
 #
-# Required-check architecture (mirrors org-compat.yml, N3-P1-03): the workflow
-# triggers on every pull request (no workflow-level paths filter, which would
-# leave the required check Expected/Pending forever). Relevance is detected in
-# a lightweight job, the live primary-source verification runs only when
-# relevant, and a final summary job always emits the stable required check
-# "External outbound preflight (.github)". The evaluator is loaded from the
-# immutable org-gate revision (pinned full commit SHA), never from the
-# candidate tree, so a candidate cannot weaken the decision.
+# Required-check architecture (mirrors org-compat.yml, N3-P1-03) with one
+# hardening on top: the relevance decision is NOT trusted from the candidate
+# tree. The candidate-side `changes` job only decides whether the expensive
+# inner job runs (an optimization); the summary job RECOMPUTES relevance from
+# the detector loaded from origin/main (default-branch-owned, never the
+# candidate) over the objective git diff file list, and feeds that result to
+# the pinned immutable evaluator. A candidate cannot weaken the gate by
+# editing the detector, its path list, or its own changes job.
 
 on:
   pull_request:
@@ -40,7 +40,7 @@ jobs:
           fi
           base="origin/${{ github.base_ref }}"
           git fetch --no-tags origin "${{ github.base_ref }}" >/dev/null 2>&1 || true
-          if git diff --name-only "$base"...HEAD | grep -qE '^(evidence/external-outbound/|schemas/external-outbound-preflight\.schema\.json|scripts/external-outbound-preflight|scripts/verify-external-outbound-preflight\.mjs|\.github/workflows/external-outbound-preflight\.yml)'; then
+          if git diff --name-only "$base"...HEAD | grep -qE '^(evidence/external-outbound/|schemas/external-outbound-preflight\.schema\.json|scripts/external-outbound-preflight|scripts/external-outbound/|scripts/verify-external-outbound-preflight\.mjs|\.github/workflows/external-outbound-preflight\.yml|claims/public-claims\.yml|evidence/external-validation\.json|scripts/validate-public-claims\.py|scripts/validate-external-evidence\.py)'; then
             echo "relevant=true" >> "$GITHUB_OUTPUT"
           else
             echo "relevant=false" >> "$GITHUB_OUTPUT"
@@ -64,12 +64,21 @@ jobs:
 
       # Live verification of every record against real primary sources:
       # registry metadata, clean-install of the PUBLISHED artifact (secrets
-      # scrubbed, --ignore-scripts, bin allowlist), exact command replay,
-      # final GitHub state, claim_refs.
+      # scrubbed, --ignore-scripts, bin allowlist), exact command replay with
+      # semantic source binding, final GitHub state, claim_refs.
       - name: Verify outbound records against primary sources
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/verify-external-outbound-preflight.mjs
+
+      # The outbound validator treats these two ledgers as its claim
+      # authority — they are inside the gate's trust chain, so their own
+      # validators run here too.
+      - name: External evidence ledger (EXT-01..07)
+        run: python3 scripts/validate-external-evidence.py
+
+      - name: Public claims firewall
+        run: python3 scripts/validate-public-claims.py
 
   outbound-preflight-summary:
     name: External outbound preflight (.github)
@@ -77,8 +86,46 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
+      # Candidate tree: only used to compute the OBJECTIVE changed-file list.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+
+      # Default-branch-owned detector: loaded from origin/main, never from the
+      # candidate tree, so a candidate cannot weaken relevance.
+      - name: Checkout relevance detector from default branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          path: .gate
+
+      - name: Recompute relevance from the default-branch-owned detector
+        id: relevance
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "relevant=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git fetch --no-tags origin main >/dev/null 2>&1 || true
+          git diff --name-only "origin/main...HEAD" > /tmp/changed-files.txt
+          # Trust anchor: the detector comes from origin/main. The candidate
+          # copy is used ONLY until this script first lands on main
+          # (bootstrap of the gate itself) and is loudly annotated.
+          DETECTOR=".gate/scripts/external-outbound/relevance.mjs"
+          if [ ! -f "$DETECTOR" ]; then
+            echo "::warning::default-branch detector not present yet (gate bootstrap) — falling back to the candidate copy; after this change merges, origin/main is the trust anchor"
+            DETECTOR="scripts/external-outbound/relevance.mjs"
+            [ -f "$DETECTOR" ] || { echo "no relevance detector available"; exit 1; }
+          fi
+          node "$DETECTOR" --files /tmp/changed-files.txt | tee /tmp/relevance.txt
+          grep -q '^relevant=' /tmp/relevance.txt
+          value=$(sed -n 's/^relevant=//p' /tmp/relevance.txt)
+          echo "relevant=$value" >> "$GITHUB_OUTPUT"
+
       # The evaluator is loaded from the immutable org-gate revision, never
-      # from the candidate tree, so a candidate cannot weaken the decision.
+      # from the candidate tree; its relevance input is the default-branch
+      # detector's recomputation, not the candidate's changes job.
       - name: Checkout org gate evaluator
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -90,6 +137,6 @@ jobs:
           set -euo pipefail
           node .org/scripts/org-contract/required-result.mjs \
             --changes-result "${{ needs.changes.result }}" \
-            --relevant "${{ needs.changes.outputs.relevant }}" \
+            --relevant "${{ steps.relevance.outputs.relevant }}" \
             --inner-name "outbound-preflight" \
             --inner-result "${{ needs.outbound-preflight.result }}"
