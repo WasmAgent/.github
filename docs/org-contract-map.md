@@ -4,15 +4,15 @@ Canonical ownership of all cross-repository schemas, protocols, and trust artifa
 Update this file when ownership changes. This is the authoritative reference —
 individual repo CLAUDE.md files should agree with this table.
 
-Last updated: 2026-09-14
+Last updated: 2026-09-17
 
 ## Current AEP truth
 
 - **Current AEP schema family: `aep/v0.5`.** Legacy versions (`aep/v0.1`–`aep/v0.4`)
   remain readable for compatibility but must never be emitted as current truth.
 - **Current signed conformance profile: DSSE only** (`aep-dsse-ed25519-decoded-body-v1`).
-- Current certified target: `aep-certified-2026-09-13-03`
-  (Gate C run 34760116414, verdict pass). Do not hardcode a moving `main` as certified truth.
+- Current certified target: `aep-certified-2026-09-16-01`
+  (Gate C run 35051620734, verdict pass). Do not hardcode a moving `main` as certified truth.
 - Package versions at the certified SHAs: `@wasmagent/aep 2.9.0`, `@wasmagent/protocol 0.1.10`.
 - Machine-readable lock: [`golden-path/versions.lock.json`](../golden-path/versions.lock.json).
 

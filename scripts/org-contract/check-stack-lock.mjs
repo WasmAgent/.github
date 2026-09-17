@@ -9,17 +9,17 @@ import { execSync } from "node:child_process";
 import { loadStackLock, ownershipProblems, requiredNonCoreRepos } from "./stack-lock.mjs";
 
 const CERTIFIED = {
-  "wasmagent-protocol": "35320c567ba02ae30ba441f488952954dd66a4cc",
-  "wasmagent-js": "bb71077cbd13051c05e17195d11d16efd0d1c572",
+  "wasmagent-protocol": "16f9db2b80e57a31de17d6ac25378b0ea06c22ec",
+  "wasmagent-js": "93b25ba466e08d32be836e4a5e1c3c4323afd103",
   "wasmagent-proxy": "4b4bde3b2e06eb62b7910cb3f379d75288cc4db1",
-  "trace-pipeline": "5820bf811302a1e202b762792cac6ef44e833ad6",
+  "trace-pipeline": "8e7a9932bee8c5e4e9e4b58df2f1b09f61abd4d5",
 };
 
 const lock = loadStackLock();
 const errors = [];
 
 if (lock.format !== "wasmagent-org-stack-lock/v1") errors.push(`unexpected format ${lock.format}`);
-if (lock.aep_certified_target !== "aep-certified-2026-09-13-03") {
+if (lock.aep_certified_target !== "aep-certified-2026-09-16-01") {
   errors.push(`unexpected certified target ${lock.aep_certified_target}`);
 }
 
