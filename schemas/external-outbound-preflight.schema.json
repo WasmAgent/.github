@@ -89,6 +89,10 @@
           "final_state": {
             "type": "boolean",
             "description": "True when the source is final-state evidence (registry metadata, published artifact, clean-install replay, final merged/release state)."
+          },
+          "verified_by": {
+            "type": "string",
+            "description": "id of the command_replays[] check that machine-verifies this source. Corrections count only sources with a verified_by pointing at a DISTINCT, PASSING check; human_inference and release_log sources are never machine-verifiable."
           }
         }
       }

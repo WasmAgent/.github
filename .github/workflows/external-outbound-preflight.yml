@@ -1,28 +1,55 @@
 name: External Outbound Preflight
 
-# Technical preflight for substantive external messages (package/version/
-# command/conformance/correction announcements). This workflow can only ever
-# produce TECHNICALLY_READY or HOLD; it can never post anything externally.
-# EXTERNAL_READY additionally requires explicit human approval recorded in
-# the preflight record (see docs/external-outbound-preflight.md).
+# Technical preflight gate for substantive external messages (package/version
+# announcements, install/run commands handed to external users, CI/conformance/
+# provenance status claims, corrections). This workflow can only ever produce
+# TECHNICALLY_READY or HOLD; it can never post anything externally.
+#
+# Required-check architecture (mirrors org-compat.yml, N3-P1-03): the workflow
+# triggers on every pull request (no workflow-level paths filter, which would
+# leave the required check Expected/Pending forever). Relevance is detected in
+# a lightweight job, the live primary-source verification runs only when
+# relevant, and a final summary job always emits the stable required check
+# "External outbound preflight (.github)". The evaluator is loaded from the
+# immutable org-gate revision (pinned full commit SHA), never from the
+# candidate tree, so a candidate cannot weaken the decision.
 
 on:
   pull_request:
-    paths:
-      - "evidence/external-outbound/**"
-      - "schemas/external-outbound-preflight.schema.json"
-      - "scripts/verify-external-outbound-preflight.mjs"
-      - "scripts/external-outbound-preflight-core.mjs"
-      - "scripts/external-outbound-preflight.test.mjs"
-      - ".github/workflows/external-outbound-preflight.yml"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  preflight:
-    name: "Outbound preflight (structured checks + hostile regressions)"
+  changes:
+    name: Detect outbound-sensitive changes
+    runs-on: ubuntu-latest
+    outputs:
+      relevant: ${{ steps.detect.outputs.relevant }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - id: detect
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "relevant=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          base="origin/${{ github.base_ref }}"
+          git fetch --no-tags origin "${{ github.base_ref }}" >/dev/null 2>&1 || true
+          if git diff --name-only "$base"...HEAD | grep -qE '^(evidence/external-outbound/|schemas/external-outbound-preflight\.schema\.json|scripts/external-outbound-preflight|scripts/verify-external-outbound-preflight\.mjs|\.github/workflows/external-outbound-preflight\.yml)'; then
+            echo "relevant=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "relevant=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  outbound-preflight:
+    name: Outbound preflight (live primary-source verification)
+    needs: changes
+    if: needs.changes.outputs.relevant == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -35,18 +62,34 @@ jobs:
       - name: Hostile regressions (ER-01..ER-07)
         run: node --test scripts/external-outbound-preflight.test.mjs
 
-      # Live verification of every record: registry metadata, clean-install of
-      # the published artifact, exact command replay, final GitHub state,
-      # claim_refs. Requires the release runs / PRs to be public, which they
-      # are; GH_TOKEN raises the GitHub API rate limit.
+      # Live verification of every record against real primary sources:
+      # registry metadata, clean-install of the PUBLISHED artifact (secrets
+      # scrubbed, --ignore-scripts, bin allowlist), exact command replay,
+      # final GitHub state, claim_refs.
       - name: Verify outbound records against primary sources
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/verify-external-outbound-preflight.mjs
 
-      # The outbound gate composes with the existing claim ledgers.
-      - name: External evidence ledger (EXT-01..07)
-        run: python3 scripts/validate-external-evidence.py
-
-      - name: Public claims firewall
-        run: python3 scripts/validate-public-claims.py
+  outbound-preflight-summary:
+    name: External outbound preflight (.github)
+    needs: [changes, outbound-preflight]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      # The evaluator is loaded from the immutable org-gate revision, never
+      # from the candidate tree, so a candidate cannot weaken the decision.
+      - name: Checkout org gate evaluator
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: WasmAgent/.github
+          ref: ca2067cda59a58dc67a824ff6e4a0c58c5addf95
+          path: .org
+      - name: Evaluate preflight result (fail closed)
+        run: |
+          set -euo pipefail
+          node .org/scripts/org-contract/required-result.mjs \
+            --changes-result "${{ needs.changes.result }}" \
+            --relevant "${{ needs.changes.outputs.relevant }}" \
+            --inner-name "outbound-preflight" \
+            --inner-result "${{ needs.outbound-preflight.result }}"
