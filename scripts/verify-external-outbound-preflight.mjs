@@ -119,6 +119,13 @@ export function structuralProblems(record) {
       "outbound_message.sha256 does not match content",
     );
   }
+  // outbound_commands: every user-visible command must be declared and
+  // bound to a replay (three-way binding enforced in the core evaluator).
+  push(Array.isArray(record.outbound_commands), "outbound_commands must be an array");
+  for (const c of record.outbound_commands ?? []) {
+    push(c && typeof c.id === "string" && typeof c.text === "string" && typeof c.verified_by === "string",
+      "outbound_commands entries need id, text and verified_by");
+  }
   // Replay ids must be unique: duplicate ids make check-result lookup
   // ambiguous (a later entry could shadow the identity an earlier one
   // verified).
@@ -162,6 +169,60 @@ export function sanitizeEnv(env = process.env) {
  * a data record can never open this door.
  */
 export const INSTALL_SCRIPTS_ALLOWLIST = new Set();
+
+/**
+ * Parse [console_scripts] names from a wheel's dist-info entry_points.txt.
+ * These are the ONLY executables a replay may run from the installed venv —
+ * venv/bin also contains python/pip and other interpreters that must never
+ * be reachable from candidate DATA.
+ */
+export function parseConsoleScripts(iniText) {
+  const names = [];
+  let inSection = false;
+  for (const rawLine of String(iniText ?? "").split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith("#")) continue;
+    if (line.startsWith("[")) {
+      inSection = line === "[console_scripts]";
+      continue;
+    }
+    if (inSection) {
+      const eq = line.indexOf("=");
+      if (eq > 0) names.push(line.slice(0, eq).trim());
+    }
+  }
+  return names;
+}
+
+/** Collect the union of console_scripts declared by every installed dist. */
+function collectConsoleScripts(venv) {
+  const allow = new Set();
+  const libDir = join(venv, "lib");
+  let siteDirs = [];
+  try {
+    siteDirs = readdirSync(libDir).map((py) => join(libDir, py, "site-packages"));
+  } catch {
+    siteDirs = [];
+  }
+  for (const site of siteDirs) {
+    let dists = [];
+    try {
+      dists = readdirSync(site).filter((d) => d.endsWith(".dist-info"));
+    } catch {
+      continue;
+    }
+    for (const dist of dists) {
+      const ep = join(site, dist, "entry_points.txt");
+      if (!existsSync(ep)) continue;
+      try {
+        for (const name of parseConsoleScripts(readFileSync(ep, "utf8"))) allow.add(name);
+      } catch {
+        // unreadable entry points: not adding anything is fail-closed
+      }
+    }
+  }
+  return [...allow];
+}
 
 /**
  * Version actually installed under node_modules (scoped-package aware) —
@@ -413,21 +474,38 @@ function gatherCheckResults(record) {
             detail = `install selector "${selector}" resolved to ${replay.package}==${installed}, but the record declares ${replay.version} — re-verify the record against the new release`;
           }
         }
-        envs.set(replay.id, { dir: venv, binDir: join(venv, "bin"), spec: `${replay.package}==${replay.version}`, cwd: dir });
+        envs.set(replay.id, {
+          dir: venv,
+          binDir: join(venv, "bin"),
+          spec: `${replay.package}==${replay.version}`,
+          cwd: dir,
+          binAllowlist: ok ? collectConsoleScripts(venv) : [],
+        });
         set(replay.id, ok, detail);
         break;
       }
       case "pypi_exec": {
-        // Runs the console entry point the installed wheel materialized in
-        // the venv: argv[0] must exist as an executable there (the PyPI
-        // analog of the npm bin allowlist — installed-artifact-level, not
-        // record-declared).
+        // Runs a console entry point of the installed distribution.
+        // PROVENANCE ALLOWLIST: argv[0] must be a console_script the target
+        // distribution itself declares in its dist-info entry_points.txt —
+        // venv/bin also contains python/pip, and candidate DATA must never
+        // be able to reach an interpreter.
         const env = envs.get(replay.requires);
         if (!env?.binDir) {
           set(replay.id, false, `requires missing pypi_clean_install ${replay.requires}`);
           break;
         }
-        const bin = join(env.binDir, replay.argv?.[0] ?? "");
+        const allow = new Set(env.binAllowlist ?? []);
+        const head = replay.argv?.[0];
+        if (typeof head !== "string" || !allow.has(head)) {
+          set(
+            replay.id,
+            false,
+            `argv[0] ${JSON.stringify(head ?? null)} is not a console_script declared by ${env.spec} (declared: ${JSON.stringify([...allow].sort())})`,
+          );
+          break;
+        }
+        const bin = join(env.binDir, head);
         let binOk = false;
         try {
           binOk = statSync(bin).isFile();
@@ -435,7 +513,7 @@ function gatherCheckResults(record) {
           binOk = false;
         }
         if (!binOk) {
-          set(replay.id, false, `argv[0] ${JSON.stringify(replay.argv?.[0] ?? null)} is not an executable installed by ${env.spec}`);
+          set(replay.id, false, `${head} missing from the installed venv bin`);
           break;
         }
         let r;

@@ -12,10 +12,16 @@ import assert from "node:assert/strict";
 import { evaluatePreflight, isHumanReviewer, parseArtifactRef, sourceMatchesCheck } from "./external-outbound-preflight-core.mjs";
 import {
   execBinAllowlisted,
+  parseConsoleScripts,
   sanitizeEnv,
   INSTALL_SCRIPTS_ALLOWLIST,
   structuralProblems,
 } from "./verify-external-outbound-preflight.mjs";
+import {
+  commandTextMatchesReplay,
+  extractFencedCommandLines,
+  normalizeCommandText,
+} from "./external-outbound-preflight-core.mjs";
 import { computeRelevance, OUTBOUND_PATH_PATTERNS } from "./external-outbound/relevance.mjs";
 
 const LEDGERS = {
@@ -454,11 +460,116 @@ test("ER-05d: assurance-framing message with empty claim_refs => HOLD: CLAIM_CEI
   }
 });
 
-test("ER-05e: non-assurance message class (published_reference-style notice) is not forced to anchor", () => {
-  const record = { ...BASE_RECORD, claim_refs: [] };
-  // BASE uses release_enablement; flip to a class outside the assurance set
-  const record2 = { ...record, message_class: "status_report" };
-  assert.equal(evaluatePreflight(record2, new Map(), LEDGERS).status, "HOLD");
+test("ER-05e: NO message class escapes the anchor requirement (enum downgrade bypass closed)", () => {
+  // message_class is candidate-controlled: install_instructions previously
+  // escaped the assurance anchor. Now every class requires it.
+  for (const message_class of ["install_instructions", "status_report", "release_announcement", "release_enablement", "rerun_request", "correction"]) {
+    const record = { ...BASE_RECORD, message_class, claim_refs: [] };
+    const verdict = evaluatePreflight(record, new Map(), LEDGERS);
+    assert.equal(verdict.status, "HOLD", message_class);
+    assert.ok(
+      verdict.holds.some((h) => h.code === "CLAIM_CEILING_EXCEEDED"),
+      message_class,
+    );
+  }
+});
+
+// --- draft <-> replay three-way binding (P0) ---------------------------------
+
+test("ER-07j: an undeclared fenced command line in the draft => HOLD", () => {
+  const record = {
+    ...BASE_RECORD,
+    outbound_message: {
+      content: "Run it:\n\n```bash\nnpm install @wasmagent/protocol\ndangerous-second-command --wipe\n```",
+    },
+    outbound_commands: [
+      { id: "c1", text: "npm install @wasmagent/protocol", verified_by: "r-install" },
+    ],
+    command_replays: [{ id: "r-install", kind: "npm_clean_install", package: "@wasmagent/protocol", version: "0.1.11" }],
+  };
+  const results = new Map([ok("__artifacts__"), ok("r-install")]);
+  const verdict = evaluatePreflight(record, results, LEDGERS);
+  assert.equal(verdict.status, "HOLD");
+  assert.ok(verdict.holds.some((h) => h.detail.includes("dangerous-second-command")));
+});
+
+test("ER-07k: a declared command bound to a failing or non-matching replay => HOLD", () => {
+  const record = {
+    ...BASE_RECORD,
+    outbound_message: { content: "```bash\nnpx wasmagent-protocol aep-conformance self-check\n```" },
+    outbound_commands: [
+      { id: "c1", text: "npx wasmagent-protocol aep-conformance self-check", verified_by: "r-exec" },
+    ],
+    command_replays: [
+      { id: "r-exec", kind: "npm_exec", requires: "r-install", argv: ["wasmagent-protocol", "aep-conformance", "self-check"], expect_exit: 0 },
+    ],
+  };
+  // failing check:
+  let results = new Map([ok("__artifacts__"), ["r-exec", { ok: false, detail: "exit=1" }]]);
+  let verdict = evaluatePreflight(record, results, LEDGERS);
+  assert.equal(verdict.status, "HOLD");
+
+  // passing check but argv does not correspond to the declared text:
+  const mismatch = {
+    ...record,
+    command_replays: [
+      { id: "r-exec", kind: "npm_exec", requires: "r-install", argv: ["wasmagent-protocol", "totally-different"], expect_exit: 0 },
+    ],
+  };
+  results = new Map([ok("__artifacts__"), ok("r-exec")]);
+  verdict = evaluatePreflight(mismatch, results, LEDGERS);
+  assert.equal(verdict.status, "HOLD");
+  assert.ok(verdict.holds.some((h) => h.detail.includes("not covered by a passing replay")));
+});
+
+test("command text normalization and template matching", () => {
+  // trailing comments and whitespace collapse
+  assert.equal(normalizeCommandText("  npx wasmagent-protocol aep-conformance path   # locate corpus "), "npx wasmagent-protocol aep-conformance path");
+  // fenced extraction skips comments and blanks
+  assert.deepEqual(
+    extractFencedCommandLines("```bash\n# npm\nnpm install @wasmagent/protocol\n\n```"),
+    ["npm install @wasmagent/protocol"],
+  );
+  // latest-selector install template (unversioned text)
+  assert.equal(
+    commandTextMatchesReplay("pip install wasmagent-protocol", { kind: "pypi_clean_install", package: "wasmagent-protocol", version: "0.1.11", install: { selector: "latest" } }),
+    true,
+  );
+  // exact-selector requires the versioned text
+  assert.equal(
+    commandTextMatchesReplay("pip install wasmagent-protocol", { kind: "pypi_clean_install", package: "wasmagent-protocol", version: "0.1.11", install: { selector: "exact" } }),
+    false,
+  );
+  // npx prefix is equivalent to the bin invocation
+  assert.equal(
+    commandTextMatchesReplay("npx wasmagent-protocol aep-conformance path", { kind: "npm_exec", argv: ["wasmagent-protocol", "aep-conformance", "path"] }),
+    true,
+  );
+});
+
+// --- PyPI console-script provenance allowlist (P0/security) ------------------
+
+test("parseConsoleScripts reads only the console_scripts section", () => {
+  const ini = [
+    "[console_scripts]",
+    "wasmagent-protocol = wasmagent_protocol.cli:main",
+    "",
+    "[gui_scripts]",
+    "evil-gui = evil:main",
+    "",
+    "[other]",
+    "also-evil = x:y",
+  ].join("\n");
+  assert.deepEqual(parseConsoleScripts(ini), ["wasmagent-protocol"]);
+});
+
+test("venv interpreter names are never implicitly allowed", () => {
+  // The allowlist comes ONLY from the distribution's declared entry points;
+  // python/pip living in venv/bin grants nothing.
+  const allow = new Set(parseConsoleScripts("[console_scripts]\nwasmagent-protocol = m:f"));
+  assert.equal(allow.has("python"), false);
+  assert.equal(allow.has("pip"), false);
+  assert.equal(allow.has("wasmagent-protocol"), true);
 });
 
 // --- source <-> check semantic binding --------------------------------------

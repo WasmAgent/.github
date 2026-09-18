@@ -64,6 +64,77 @@ export function isHumanReviewer(name) {
   return typeof name === "string" && name.length > 0 && !BOT_REVIEWERS.has(name);
 }
 
+// --- outbound command <-> replay binding ------------------------------------
+
+/** Normalize a command line: trim, collapse whitespace, strip trailing comments. */
+export function normalizeCommandText(text) {
+  return String(text ?? "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .replace(/\s+#.*$/, "")
+    .trim();
+}
+
+/**
+ * Extract candidate command lines from fenced code blocks in the outbound
+ * draft (``` fences; comment and blank lines skipped). Deliberately NOT a
+ * shell parser: this only asserts DRAFT-COMMAND COMPLETENESS — every
+ * executable-looking fenced line must be a declared, verified command.
+ */
+export function extractFencedCommandLines(content) {
+  const lines = [];
+  let inFence = false;
+  for (const raw of String(content ?? "").split(/\r?\n/)) {
+    const line = raw.trim();
+    if (line.startsWith("```")) {
+      inFence = !inFence;
+      continue;
+    }
+    if (!inFence || !line || line.startsWith("#")) continue;
+    const normalized = normalizeCommandText(line);
+    if (normalized) lines.push(normalized);
+  }
+  return lines;
+}
+
+/**
+ * True when the declared command text corresponds to what the replay
+ * actually executes:
+ *   install replays  -> "npm install <pkg>[@<ver>]" / "pip install <pkg>[==<ver>]"
+ *                       (unversioned text matches a "latest"-selector replay;
+ *                        a version-pinned text matches the pinned form)
+ *   exec replays     -> the exact argv joined with spaces (a leading "npx "
+ *                       in the draft is equivalent to calling the bin
+ *                       directly)
+ */
+export function commandTextMatchesReplay(text, replay, envSpecById) {
+  const normalized = normalizeCommandText(text);
+  if (!normalized || !replay) return false;
+  switch (replay.kind) {
+    case "npm_clean_install":
+    case "pypi_clean_install": {
+      const isNpm = replay.kind === "npm_clean_install";
+      const selector = replay.install?.selector ?? "exact";
+      const expected =
+        selector === "latest"
+          ? `${isNpm ? "npm install" : "pip install"} ${replay.package}`
+          : isNpm
+            ? `npm install ${replay.package}@${replay.version}`
+            : `pip install ${replay.package}==${replay.version}`;
+      return normalized === expected;
+    }
+    case "npm_exec": {
+      let t = normalized;
+      if (t.startsWith("npx ")) t = t.slice(4);
+      return t === (replay.argv ?? []).join(" ");
+    }
+    case "pypi_exec":
+      return normalized === (replay.argv ?? []).join(" ");
+    default:
+      return false;
+  }
+}
+
 /**
  * Evaluate one preflight record against gathered check results.
  *
@@ -87,6 +158,32 @@ export function evaluatePreflight(record, checkResults, ledgerIndex) {
   }
   for (const conflict of artifactChecks.artifacts ?? []) {
     holds.push({ code: "PRIMARY_SOURCE_CONFLICT", detail: conflict });
+  }
+
+  // Draft-command <-> replay three-way binding: every declared outbound
+  // command must be covered by a DISTINCT, PASSING replay that actually
+  // executes that command (ER-07j/07k), and every executable-looking fenced
+  // line in the draft must be declared. Without this,
+  // USER_COMMAND_REPLAY_VERIFIED would only mean DECLARED_REPLAYS_VERIFIED.
+  const declaredCommands = record.outbound_commands ?? [];
+  for (const cmd of declaredCommands) {
+    const result = checkResults.get(cmd.verified_by);
+    const replay = (record.command_replays ?? []).find((r) => r.id === cmd.verified_by);
+    if (!result || !result.ok || !commandTextMatchesReplay(cmd.text, replay)) {
+      holds.push({
+        code: "COMMAND_REPLAY_FAILED",
+        detail: `outbound command '${normalizeCommandText(cmd.text)}' is not covered by a passing replay`,
+      });
+    }
+  }
+  const declaredTexts = new Set(declaredCommands.map((c) => normalizeCommandText(c.text)));
+  for (const line of extractFencedCommandLines(record.outbound_message?.content ?? "")) {
+    if (!declaredTexts.has(line)) {
+      holds.push({
+        code: "COMMAND_REPLAY_FAILED",
+        detail: `outbound draft contains an undeclared command line: '${line}'`,
+      });
+    }
   }
 
   // Every replay entry needs a result, and each must pass.
@@ -120,26 +217,18 @@ export function evaluatePreflight(record, checkResults, ledgerIndex) {
     }
   }
 
-  // Assurance-framing messages must anchor at least one EXTERNAL evidence
-  // record: an empty claim_refs array would skip the prohibited-claim audit
-  // entirely (ER-05d).
-  const ASSURANCE_MESSAGE_CLASSES = new Set([
-    "status_report",
-    "release_announcement",
-    "release_enablement",
-    "rerun_request",
-    "correction",
-  ]);
-  if (ASSURANCE_MESSAGE_CLASSES.has(record.message_class)) {
-    const extRefs = (record.claim_refs ?? []).filter((r) => r.ledger === "external-validation");
-    if (extRefs.length === 0) {
-      holds.push({
-        code: "CLAIM_CEILING_EXCEEDED",
-        detail:
-          `${record.message_class} messages assert external/assurance facts and require at ` +
-          "least one external-validation claim_ref; an unanchored message cannot be audited",
-      });
-    }
+  // EVERY outbound record must anchor at least one EXTERNAL evidence record
+  // (ER-05d/05e): message_class is candidate-controlled, so trusting it to
+  // decide whether the claim audit applies is a downgrade bypass. Purely
+  // technical install notes can reference their matching public claim.
+  const extRefs = (record.claim_refs ?? []).filter((r) => r.ledger === "external-validation");
+  if (extRefs.length === 0) {
+    holds.push({
+      code: "CLAIM_CEILING_EXCEEDED",
+      detail:
+        "every external-outbound record requires at least one external-validation " +
+        "claim_ref; an unanchored message cannot be claim-audited",
+    });
   }
 
   // claim_refs must exist in the referenced ledger (ER-05).

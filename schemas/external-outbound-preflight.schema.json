@@ -15,7 +15,8 @@
     "claim_refs",
     "contradictions",
     "human_approval",
-    "outbound_message"
+    "outbound_message",
+    "outbound_commands"
   ],
   "additionalProperties": true,
   "properties": {
@@ -371,6 +372,33 @@
           "type": "string",
           "pattern": "^[0-9a-f]{64}$",
           "description": "Optional integrity hash of content; must match when present."
+        }
+      }
+    },
+    "outbound_commands": {
+      "type": "array",
+      "description": "EVERY executable command the outbound draft shows to users, three-way bound: text == a fenced line in outbound_message.content == the argv of the referenced replay (verified_by must point at a DISTINCT, PASSING replay that actually executes this command). Undeclared fenced lines and unverified declarations are HOLD.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "text",
+          "verified_by"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The command exactly as it appears in the draft (trailing comments ignored)."
+          },
+          "verified_by": {
+            "type": "string",
+            "description": "id of the replay executing this command."
+          }
         }
       }
     }
