@@ -152,22 +152,22 @@ jobs:
             "target": { "repository": "WasmAgent/wasmagent-protocol", "issue": 92 },
             "message_class": "release_enablement",
             "artifacts": [
-              { "ecosystem": "npm", "package": "@wasmagent/protocol", "version": "0.1.11" }
+              { "ecosystem": "pypi", "package": "wasmagent-protocol", "version": "0.1.11" }
             ],
             "primary_sources": [
-              { "kind": "registry_metadata", "ref": "npm:@wasmagent/protocol@0.1.11" }
+              { "kind": "registry_metadata", "ref": "pypi:wasmagent-protocol@0.1.11" }
             ],
             "command_replays": [
-              { "id": "r-install", "kind": "npm_clean_install", "package": "@wasmagent/protocol", "version": "0.1.11" }
+              { "id": "r-install", "kind": "pypi_clean_install", "package": "wasmagent-protocol", "version": "0.1.11" }
             ],
             "claim_refs": [ { "ledger": "external-validation", "claim_id": "EXT-AEP-0001" } ],
             "contradictions": [],
             "human_approval": { "required": true, "approved": false, "reviewed_by": null },
             "outbound_message": {
-              "content": "Install it:\n\n```bash\nnpm install @wasmagent/protocol\ncandidate-injected-undeclared-command --dangerous\n```"
+              "content": "Install it:\n\n```bash\npip install wasmagent-protocol\ncandidate-injected-undeclared-command --dangerous\n```"
             },
             "outbound_commands": [
-              { "id": "cmd-1", "text": "npm install @wasmagent/protocol", "verified_by": "r-install" }
+              { "id": "cmd-1", "text": "pip install wasmagent-protocol", "verified_by": "r-install" }
             ]
           }
           JSON
