@@ -190,5 +190,37 @@
   "outbound_message": {
     "content": "The corpus updates keep landing, so one concrete enablement note: the AEP\nconformance corpus is now **installable from the published packages**\n(`@wasmagent/protocol` npm / `wasmagent-protocol` PyPI, version `0.1.11`) —\nno repo clone needed.\n\n```bash\n# npm\nnpm install @wasmagent/protocol\nnpx wasmagent-protocol aep-conformance path        # locate the installed corpus\nnpx wasmagent-protocol aep-conformance self-check  # verify the installed corpus\n\n# PyPI\npip install wasmagent-protocol\nwasmagent-protocol aep-conformance path\nwasmagent-protocol aep-conformance self-check\n```\n\n- Manifest = verdict authority; signing profile\n  `aep-dsse-ed25519-decoded-body-v1`; verifying keys ship under `dsse/`.\n- Independent-implementation rules and first-blind-run recording:\n  `conformance/aep/IMPLEMENTER.md` (also inside the installed package).\n  Short version: implement semantics from the public spec/schema/manifest,\n  don't import the WasmAgent evaluator, pin the corpus version/target, and\n  preserve your first blind run before mismatch-specific fixes.\n- Self-check only proves corpus integrity + project-owned reference layers —\n  it is explicitly *not* independent semantic verification.\n\nNo request to rerun #94 — that record stands as-is for\n`aep-certified-2026-09-13-03`. If you do end up building an independent\nsemantic implementation against a packaged corpus, we'd be glad to link it\nfrom the external-evidence ledger with the same claim-ceiling discipline as\nbefore.\n",
     "sha256": "79e84c27dbdbd979cfda0c0e20ef2dd566b4257763be440a7f1951db33954023"
-  }
+  },
+  "outbound_commands": [
+    {
+      "id": "cmd-npm-install",
+      "text": "npm install @wasmagent/protocol",
+      "verified_by": "npm-install"
+    },
+    {
+      "id": "cmd-npm-path",
+      "text": "npx wasmagent-protocol aep-conformance path",
+      "verified_by": "npm-path"
+    },
+    {
+      "id": "cmd-npm-self-check",
+      "text": "npx wasmagent-protocol aep-conformance self-check",
+      "verified_by": "npm-self-check"
+    },
+    {
+      "id": "cmd-pip-install",
+      "text": "pip install wasmagent-protocol",
+      "verified_by": "pypi-install"
+    },
+    {
+      "id": "cmd-pypi-path",
+      "text": "wasmagent-protocol aep-conformance path",
+      "verified_by": "pypi-path"
+    },
+    {
+      "id": "cmd-pypi-self-check",
+      "text": "wasmagent-protocol aep-conformance self-check",
+      "verified_by": "pypi-self-check"
+    }
+  ]
 }

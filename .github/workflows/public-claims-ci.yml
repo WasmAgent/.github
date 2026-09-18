@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           repository: WasmAgent/.github
-          ref: 4a5a9126eadd8a9961b5b200f6e146f9d091ad0e
+          ref: b766222d89bfd071e8490188c6b0291c386d60e0
           path: .validator
           persist-credentials: false
       - name: Set up Python
@@ -38,3 +38,60 @@ jobs:
         run: python -m pip install --disable-pip-version-check pyyaml
       - name: Validate claims/public-claims.yml + overreach guard
         run: python .validator/scripts/validate-public-claims.py --repo-root .
+
+      # STALE-PIN REGRESSION (discriminating): a hostile fixture — a
+      # perfect-looking self-declared formal_certification record plus an
+      # allowlist entry citing it — must be REJECTED by the PINNED validator.
+      # Verified empirically: the stale revision 4a5a9126 PASSES this fixture
+      # (bypass allowed); b766222d and later reject it via the hard-disable
+      # rule. If a future pin bump lands on a stale revision, this step
+      # fails and blocks the merge.
+      - name: Stale-pin regression (pinned validator must reject fake certification allowlist)
+        run: |
+          set -euo pipefail
+          TMP=$(mktemp -d)
+          cp -r . "$TMP/repo"
+          rm -rf "$TMP/repo/.git" "$TMP/repo/.validator"
+          python3 - "$TMP/repo" <<'PY'
+          import json, os, sys
+          repo = sys.argv[1]
+          ledger_path = os.path.join(repo, "evidence", "external-validation.json")
+          ledger = json.load(open(ledger_path, encoding="utf-8"))
+          ledger["records"].append({
+              "id": "EXT-FAKE-9999",
+              "subject": "AEP",
+              "venue": {"org": "Example Body", "repo": "example/repo"},
+              "evidence_type": "formal_certification",
+              "state": "merged",
+              "certifying_body": "Example Certification Body",
+              "certificate_id": "FAKE-001",
+              "certificate_url": "https://example.org/cert/FAKE-001",
+              "scope": "WasmAgent AEP",
+              "valid_from": "2026-01-01",
+              "claim_ceiling": "x" * 40,
+              "prohibited_claims": ["example_forbidden"],
+              "anchors": {"cert": "https://example.org/cert/FAKE-001"},
+              "limitations": ["fixture"]
+          })
+          json.dump(ledger, open(ledger_path, "w", encoding="utf-8"), indent=2)
+          phrase = "certified by the linux foundation"
+          docs = os.path.join(repo, "docs")
+          os.makedirs(docs, exist_ok=True)
+          with open(os.path.join(docs, "hostile-fixture.md"), "w", encoding="utf-8") as fh:
+              fh.write(f"Agentkit is {phrase}.\n")
+          allow_path = os.path.join(repo, "claims", "claim-overreach-allowlist.json")
+          allow = json.load(open(allow_path, encoding="utf-8"))
+          allow["allowlist"] = [
+              {"phrase": phrase, "file": "docs/hostile-fixture.md", "approved_evidence": "EXT-FAKE-9999"},
+              {"phrase": phrase, "file": "claims/claim-overreach-allowlist.json", "approved_evidence": "EXT-FAKE-9999"},
+          ]
+          json.dump(allow, open(allow_path, "w", encoding="utf-8"), indent=2)
+          PY
+          if python .validator/scripts/validate-public-claims.py --repo-root "$TMP/repo" > /tmp/stale-pin.out 2>&1; then
+            echo "FAIL: pinned validator ACCEPTED a self-declared certification allowlist entry — pin is STALE (hard-disable missing from the pinned revision)"
+            exit 1
+          fi
+          grep -q "HARD-DISABLED" /tmp/stale-pin.out || {
+            echo "FAIL: pinned validator failed for another reason — inspect /tmp/stale-pin.out"; cat /tmp/stale-pin.out; exit 1;
+          }
+          echo "OK: pinned validator hard-disables certification allowlist entries"

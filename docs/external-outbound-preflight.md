@@ -53,6 +53,37 @@ decides whether the expensive inner job runs; the pinned evaluator consumes
 the recomputed relevance, so a candidate `relevant=false` cannot skip a
 gate the default branch says must run.
 
+## Pin freshness rule
+
+Whenever a security-semantics change lands in a validator that runtime
+authorities execute from a PINNED revision, the SAME change sequence must
+include a deliberate pin bump to the merged revision. A security rule that
+exists on main but not in the pinned authority is not enforced — that gap
+was real (the allowlist hard-disable sat on main while the required check
+pinned a revision without it, and the stale revision demonstrably allowed a
+self-declared certification bypass). The required claims workflow carries a
+**stale-pin regression**: a hostile fixture (self-declared
+formal_certification + allowlist entry) must FAIL under the pinned
+validator; a stale pin turns this step red.
+
+## Draft-command <-> replay binding
+
+`outbound_commands[]` declares every executable command the draft shows to
+users. The binding is three-way and mechanical:
+
+```text
+fenced line in outbound_message.content
+  == outbound_commands[].text (comment-stripped, whitespace-collapsed)
+  == the argv / install template of a DISTINCT, PASSING replay
+```
+
+An undeclared fenced line, a declaration bound to a failing replay, or a
+declaration whose text does not correspond to what the replay executes are
+all `HOLD: COMMAND_REPLAY_FAILED` (ER-07j/07k). A leading `npx ` in the
+draft is equivalent to invoking the bin directly; unversioned install text
+(`npm install pkg`) matches a `latest`-selector replay, which installs what
+a user gets today and must land on the declared version.
+
 ## Ledger dependency
 
 The validator reads `claims/public-claims.yml`,
@@ -68,12 +99,15 @@ the gate's inner job, and — independently of this gate —
 `Validate claims + overreach guard` is a branch-protection required context
 on its own: the claim firewall is its own security property and must not
 depend on the outbound gate for enforcement. Allowlist entries are
-exceptions to the certification-wording ban and therefore require REAL
-certification evidence: `approved_evidence` must be a structured
-external-validation record id whose record is a MERGED `formal_certification`
-with complete certificate fields. The ledger currently contains no
-formal_certification record — so today, ANY allowlist entry fails the
-firewall, by design.
+exceptions to the certification-wording ban and are **HARD-DISABLED**:
+`formal_certification` records in the ledger are candidate DATA and cannot
+prove their own authenticity, so any allowlist entry fails the firewall
+regardless of how complete it looks. Enabling the first real certification
+requires manual primary-source verification, a new trusted validator rule,
+and a trusted pin bump. PyPI-side replay commands are additionally
+constrained to the console scripts the target distribution itself declares
+in its dist-info entry points (`python`, `pip` and other venv interpreters
+are unreachable from candidate DATA).
 
 ## State machine
 
