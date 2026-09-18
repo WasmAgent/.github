@@ -79,7 +79,7 @@ fenced line in outbound_message.content
 
 An undeclared fenced line, a declaration bound to a failing replay, or a
 declaration whose text does not correspond to what the replay executes are
-all `HOLD: COMMAND_REPLAY_FAILED` (ER-07j/07k). A leading `npx ` in the
+all `HOLD: COMMAND_REPLAY_FAILED` (ER-07j/07k). A leading `npx` prefix in the
 draft is equivalent to invoking the bin directly; unversioned install text
 (`npm install pkg`) matches a `latest`-selector replay, which installs what
 a user gets today and must land on the declared version.
