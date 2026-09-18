@@ -73,7 +73,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           repository: WasmAgent/.github
-          ref: b766222d89bfd071e8490188c6b0291c386d60e0
+          ref: 2dfc99988dd56c4164422939b60b3a308a7b4499
           path: .validator
           persist-credentials: false
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
@@ -106,7 +106,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           repository: WasmAgent/.github
-          ref: b766222d89bfd071e8490188c6b0291c386d60e0
+          ref: 2dfc99988dd56c4164422939b60b3a308a7b4499
           path: .verifier
           persist-credentials: false
 
@@ -128,6 +128,62 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node .verifier/scripts/verify-external-outbound-preflight.mjs --repo-root .
+
+      # STALE-VERIFIER REGRESSION (discriminating): a hostile DATA fixture
+      # whose draft contains an UNDECLARED fenced command must HOLD under the
+      # pinned verifier. The pre-#231 revision b766222d (no outbound_commands
+      # / fenced-completeness semantics) returns TECHNICALLY_READY for this
+      # exact fixture — empirically verified — so a future stale pin makes
+      # this step red instead of stale-verifier + stale-tests agreeing on
+      # green.
+      - name: Stale-verifier regression (pinned verifier must reject undeclared draft command)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TMP=$(mktemp -d)
+          mkdir -p "$TMP/repo/evidence/external-outbound" "$TMP/repo/claims"
+          cp claims/public-claims.yml "$TMP/repo/claims/"
+          cp evidence/external-validation.json "$TMP/repo/evidence/"
+          cat > "$TMP/repo/evidence/external-outbound/hostile-fixture.json" <<'JSON'
+          {
+            "schema_version": 1,
+            "id": "HOSTILE-UNDECLARED-CMD-001",
+            "target": { "repository": "WasmAgent/wasmagent-protocol", "issue": 92 },
+            "message_class": "release_enablement",
+            "artifacts": [
+              { "ecosystem": "pypi", "package": "wasmagent-protocol", "version": "0.1.11" }
+            ],
+            "primary_sources": [
+              { "kind": "registry_metadata", "ref": "pypi:wasmagent-protocol@0.1.11" }
+            ],
+            "command_replays": [
+              { "id": "r-install", "kind": "pypi_clean_install", "package": "wasmagent-protocol", "version": "0.1.11" }
+            ],
+            "claim_refs": [ { "ledger": "external-validation", "claim_id": "EXT-AEP-0001" } ],
+            "contradictions": [],
+            "human_approval": { "required": true, "approved": false, "reviewed_by": null },
+            "outbound_message": {
+              "content": "Install it:\n\n```bash\npip install wasmagent-protocol\ncandidate-injected-undeclared-command --dangerous\n```"
+            },
+            "outbound_commands": [
+              { "id": "cmd-1", "text": "pip install wasmagent-protocol", "verified_by": "r-install" }
+            ]
+          }
+          JSON
+          if node .verifier/scripts/verify-external-outbound-preflight.mjs \
+               --repo-root "$TMP/repo" \
+               "$TMP/repo/evidence/external-outbound/hostile-fixture.json" \
+               > /tmp/stale-verifier.out 2>&1;
+          then
+            echo "FAIL: pinned verifier returned TECHNICALLY_READY for an undeclared draft command — pin is STALE (pre-#231 authority)"
+            cat /tmp/stale-verifier.out
+            exit 1
+          fi
+          grep -q "undeclared command line" /tmp/stale-verifier.out || {
+            echo "FAIL: pinned verifier held for another reason — inspect /tmp/stale-verifier.out"; cat /tmp/stale-verifier.out; exit 1;
+          }
+          echo "OK: pinned verifier rejects undeclared draft commands (authority is current)"
 
       # ADDITIVE EVIDENCE ONLY (non-blocking): candidate-tree tests may add
       # coverage but can never define the security decision.
