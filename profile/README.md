@@ -193,9 +193,22 @@ The **runtime** layer — `wasmagent-js` v1.x — protects agent execution acros
 
 ### Public claims
 
-**5 public claims — all `supported`** · Registry last reviewed **2026-09-12**
+**6 public claims — all `supported`** · Registry last reviewed **2026-09-19**
 
 [`claims/public-claims.yml`](../claims/public-claims.yml) records public software-property claims together with evidence links and review dates so they can be checked independently. This is deliberately separate from marketing copy.
+
+### External validation
+
+AEP currently has a merged independent layered external run in
+[Agent-Authority-Conformance/aps-conformance-suite PR #94](https://github.com/Agent-Authority-Conformance/aps-conformance-suite/pull/94)
+against the pinned `aep-certified-2026-09-13-03` component tuple. The exercised
+JS/Rust native verification and chain surfaces reproduced; the lab semantic
+recomputation matched 28/28 corpus targets but is explicitly Mode B /
+author-produced and is not an independent semantic verifier or formal
+certification.
+
+Claim boundaries and primary evidence are tracked in
+[`docs/external-validation.md`](../docs/external-validation.md).
 
 ### Active OWASP MCP Top 10 upstream work
 
@@ -209,6 +222,15 @@ The following are **open upstream discussions / proposals**, not claims of OWASP
 | [PR #53](https://github.com/OWASP/www-project-mcp-top-10/pull/53) | MCP07 identity and OAuth trust boundaries | Open PR |
 
 The goal is to contribute implementation-neutral control language and concrete open reference implementations where useful — while keeping upstream status explicit.
+
+### Active CycloneDX behavior-evidence work
+
+| Upstream item | Scope | Status |
+| --- | --- | --- |
+| [CycloneDX specification #1015](https://github.com/CycloneDX/specification/issues/1015) | Behavior-evidence interoperability: linking observed agent actions and supporting evidence back to BOM/behavior objects | Open `proposed core enhancement` / `cap: behavior`; Blueprints WG has briefly discussed possible v2.1 work |
+
+This is an open upstream contribution and working-group discussion. It is not
+a claim that CycloneDX or Ecma has adopted, endorsed, or standardized AEP.
 
 ## Trustavo
 
@@ -247,6 +269,7 @@ These organization-level records live in `.github` so they belong to the public 
 
 - [RFC registry](../docs/RFC/README.md) — cross-repository design decisions
 - [Claims registry](../claims/public-claims.yml) — public claims mapped to evidence and review status
+- [External validation ledger](../evidence/external-validation.json) — external evidence records and their claim ceilings (framing in [`docs/external-validation.md`](../docs/external-validation.md))
 - [Release ledger](../releases/public-release-ledger.yml) — public releases across repositories
 - [Media & posts](../media/posts.yml) — talks, posts, and appearances
 - [Project index](../docs/project-index.json) — machine-readable project source of truth
