@@ -1,6 +1,6 @@
 # ADR — Governance root authority: dedicated GitHub App runner
 
-Status: proposed (pending maintainer decision on route)
+Status: accepted (Route B implemented — App-bound required check enforced on .github/main)
 Date: 2026-09-19
 
 ## Context
@@ -87,7 +87,7 @@ Option A can later replace or complement B if the org upgrades.
 
 ## Consequences
 
-- 2026-09-19: Route B implementation started — governance-runner scaffolded with validators vendored from f95d572bff1cfd514d7525fd382b40a520e4b668; App "WasmAgent Governance Root" (ID 4997462) registered; shadow mode in progress.
+- 2026-09-19: Route B implemented — governance-runner scaffolded with validators vendored from f95d572bff1cfd514d7525fd382b40a520e4b668; App "WasmAgent Governance Root" (ID 4997462) installed on .github; shadow verified (positive PASS, negative HOLD); `governance-root-authority` required on .github/main bound to app_id 4997462, original six checks pinned to the GitHub Actions app (15368). The impersonation probe (same-named green check from the Actions app) does not satisfy the requirement.
 
 - The judging authority (validators) moves fully out of the candidate tree.
 - In-tree workflow tampering degrades UX (lost fast feedback) but can no
