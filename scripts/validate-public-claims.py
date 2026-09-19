@@ -15,6 +15,12 @@
     this repository unless allowlisted in claims/claim-overreach-allowlist.json
     (each allowlist entry must carry approved_evidence — an empty
     justification is itself a failure).
+4.  Profile consistency guard (PC-01..03): profile/README.md is the public
+    trust surface for this registry. It must link the registry through its
+    canonical URL (PC-01), show a claim counter equal to the number of
+    `status: supported` entries (PC-02), and show the registry's
+    last_reviewed date verbatim (PC-03) — the homepage cannot silently
+    drift from the ledger.
 
 Exit 0 on success, 1 on any failure. Requires PyYAML (installed in CI).
 """
@@ -23,6 +29,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sys
 
 import yaml
@@ -144,6 +151,40 @@ def main() -> int:
                     "formally_certified claims"
                 )
 
+    # --- profile consistency guard (PC-01..03) ---
+    # The org homepage (profile/README.md) is the public trust surface for
+    # this registry. Its claim counter and registry review date must always
+    # match the live registry, and the registry must be reachable through its
+    # canonical URL — otherwise the homepage silently drifts from the ledger.
+    profile_path = os.path.join(repo_root, "profile", "README.md")
+    if not os.path.isfile(profile_path):
+        failures.append("profile: profile/README.md not found — the claims trust surface is missing")
+    else:
+        with open(profile_path, encoding="utf-8") as handle:
+            profile_norm = " ".join(handle.read().split())
+        supported_count = sum(1 for claim in claims if claim.get("status") == "supported")
+        if supported_count <= 0:
+            failures.append("profile: registry has no supported claims — counter invariant undefined")
+        elif not re.search(rf"(?<!\d){supported_count} public claims", profile_norm):
+            failures.append(
+                f"profile: claim counter must show {supported_count} public claims "
+                "(profile/README.md drifted from claims/public-claims.yml)"
+            )
+        last_reviewed = registry.get("last_reviewed")
+        # PyYAML parses an unquoted YYYY-MM-DD as datetime.date, not str.
+        if hasattr(last_reviewed, "isoformat") and not isinstance(last_reviewed, str):
+            last_reviewed = last_reviewed.isoformat()
+        if not isinstance(last_reviewed, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", last_reviewed):
+            failures.append("profile: registry last_reviewed must be a YYYY-MM-DD date string")
+        elif f"Registry last reviewed **{last_reviewed}**" not in profile_norm:
+            failures.append(
+                f"profile: homepage must show 'Registry last reviewed **{last_reviewed}**' "
+                "(profile/README.md drifted from claims/public-claims.yml)"
+            )
+        canonical_registry_url = "https://github.com/WasmAgent/.github/blob/main/claims/public-claims.yml"
+        if canonical_registry_url not in profile_norm:
+            failures.append("profile: homepage must link the canonical claims registry URL")
+
     # --- overreach wording guard ---
     # Allowlist entries are exceptions to the certification/endorsement
     # wording ban and therefore require REAL certification evidence:
@@ -199,7 +240,6 @@ def main() -> int:
             )
 
     allowed_hits = {(e.get("file"), e.get("phrase", "").lower()) for e in allowlist_entries}
-    import re
 
     patterns = [re.compile(pattern, re.IGNORECASE) for pattern in FORBIDDEN_PATTERNS]
     for path in iter_repo_files(repo_root):

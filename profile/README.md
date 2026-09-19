@@ -138,7 +138,7 @@ Canonical JSON Schemas shared across the organization. Published as `@wasmagent/
 
 | Repository | Role |
 | --- | --- |
-| **[wasmagent-protocol](https://github.com/WasmAgent/wasmagent-protocol)** | **Canonical AEP + compliance JSON Schemas** — `aep-record` with aep/v0.5 attribution grading (floor, itemization, evidence count), compliance contract family, trust-score schema, and RFC registry. Released 0.1.10. |
+| **[wasmagent-protocol](https://github.com/WasmAgent/wasmagent-protocol)** | **Canonical AEP + compliance JSON Schemas** — `aep-record` with aep/v0.5 attribution grading (floor, itemization, evidence count), compliance contract family, trust-score schema, and RFC registry. Released 0.1.11. |
 
 ### ⚡ 02 · Evidence producers — where signed evidence is born
 
