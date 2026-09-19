@@ -253,7 +253,7 @@ We welcome sustained, async contributions across the stack. Commit access follow
 | **Gateway** | `wasmagent-proxy` · Rust · Proxy-Wasm · Envoy / Istio / Kong |
 | **Verification** | `symkernel` · cel-go · wazero · Z3 SMT · Research / Preview |
 | **Pipelines** | `trace-pipeline` / `evomerge` · measurement trust · training admission |
-| **Training evidence** | `wasmagent-train-replay` · Flight Recorder · PROV-DM · GPU causal graphs |
+| **Training evidence** | `wasmagent-train-replay` (Research / Preview) · Flight Recorder · PROV-DM · GPU causal graphs |
 | **Trust tooling** | `agentbom` · MCP Posture · Trust Passport contracts |
 | **Audit product** | `open-agent-audit` / Trustavo · evidence reports · Workers |
 | **Evaluation** | `fresharena` · verifiable adversarial evaluation |

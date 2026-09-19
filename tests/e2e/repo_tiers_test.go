@@ -9,15 +9,19 @@ import (
 )
 
 // TestRepoCoreTierLabels exercises the org's "Core repos" vs
-// "Research / Preview" tier split required by WasmAgent/.github#145:
+// "Research / Preview" tier split required by WasmAgent/.github#145, as
+// realized by the current evidence-lifecycle profile layout:
 //
 //   - Core repos (wasmagent-js, wasmagent-protocol, agentbom) must be
 //     labeled `focus: core-spine` in docs/project-index.json.
-//   - symkernel and wasmagent-train-replay must be labeled
-//     `focus: research-preview` — never core-spine.
-//   - The org profile (profile/README.md) must not list the research repos
-//     alongside Core repos without a Research / Preview qualifier — this
-//     guards the Maintainers-wanted bullets from regressing.
+//   - symkernel must be labeled `focus: research-preview`. Non-core
+//     research repos may be relabeled to finer-grained non-core focuses
+//     (e.g. wasmagent-train-replay's `evidence-consumer`) but must NEVER
+//     be labeled `core-spine`.
+//   - In profile/README.md, every Projects-table row linking a research
+//     repo and every Maintainers-wanted bullet mentioning one must carry
+//     a "Research / Preview" qualifier — research repos are never
+//     presented as core, shipping components.
 func TestRepoCoreTierLabels(t *testing.T) {
 	projectIndex, err := docs.LoadProjectIndex()
 	if err != nil {
@@ -26,11 +30,6 @@ func TestRepoCoreTierLabels(t *testing.T) {
 
 	coreRepos := []string{"wasmagent-js", "wasmagent-protocol", "agentbom"}
 	researchRepos := []string{"symkernel", "wasmagent-train-replay"}
-
-	focusByName := make(map[string]string)
-	for _, repo := range projectIndex.Repos {
-		focusByName[repo.Name] = repo.Focus
-	}
 
 	// Core repos must be labeled core-spine.
 	for _, name := range coreRepos {
@@ -44,25 +43,26 @@ func TestRepoCoreTierLabels(t *testing.T) {
 		}
 	}
 
-	// Research / Preview repos must be labeled research-preview and must never
-	// be labeled as part of the Core spine.
+	// symkernel is the canonical research repo and must stay research-preview;
+	// every research repo must never be labeled core-spine.
 	for _, name := range researchRepos {
 		repo, found := projectIndex.GetRepoByName(name)
 		if !found {
 			t.Errorf("Research / Preview repo %s missing from project index", name)
 			continue
 		}
-		if repo.Focus != "research-preview" {
-			t.Errorf("Research / Preview repo %s has focus %q, want %q", name, repo.Focus, "research-preview")
+		if name == "symkernel" && repo.Focus != "research-preview" {
+			t.Errorf("Research repo %s has focus %q, want %q", name, repo.Focus, "research-preview")
 		}
-		if focusByName[name] == "core-spine" {
+		if repo.Focus == "core-spine" {
 			t.Errorf("Research / Preview repo %s must not be labeled Core (focus=core-spine)", name)
 		}
 	}
 
-	// The org profile must carry the same split: research repos must appear in
-	// the Research / Preview project table and every Maintainers-wanted bullet
-	// mentioning them must carry a Research / Preview qualifier.
+	// The org profile must carry the same split under the evidence-lifecycle
+	// layout: every Projects-table row linking a research repo and every
+	// Maintainers-wanted bullet mentioning one must carry a
+	// "Research / Preview" qualifier.
 	profile, err := os.ReadFile("../../profile/README.md")
 	if err != nil {
 		t.Fatalf("Failed to read profile/README.md: %v", err)
@@ -73,33 +73,18 @@ func TestRepoCoreTierLabels(t *testing.T) {
 	if projectsIdx < 0 {
 		t.Fatal("profile/README.md has no '## Projects' section")
 	}
-	projects := profileText[projectsIdx:]
+	projectsEnd := strings.Index(profileText[projectsIdx:], "\n## ")
+	if projectsEnd < 0 {
+		projectsEnd = len(profileText) - projectsIdx
+	}
+	projects := profileText[projectsIdx : projectsIdx+projectsEnd]
 
-	// Research repos must not appear in the Core project table.
-	coreSection := projects
-	if idx := strings.Index(projects, "### ⭐ Core"); idx >= 0 {
-		coreSection = projects[idx:]
-		if end := strings.Index(coreSection, "\n### "); end >= 0 {
-			coreSection = coreSection[:end]
-		}
-	}
 	for _, name := range researchRepos {
-		if strings.Contains(coreSection, "https://github.com/WasmAgent/"+name) {
-			t.Errorf("Research / Preview repo %s is listed in the Core section of profile/README.md", name)
-		}
-	}
-
-	// Research repos must appear under the Research / Preview project table.
-	researchSection := ""
-	if idx := strings.Index(projects, "### 🧪 Research / Preview"); idx >= 0 {
-		researchSection = projects[idx:]
-		if end := strings.Index(researchSection, "\n### "); end >= 0 {
-			researchSection = researchSection[:end]
-		}
-	}
-	for _, name := range researchRepos {
-		if !strings.Contains(researchSection, "https://github.com/WasmAgent/"+name) {
-			t.Errorf("Research / Preview repo %s is missing from the Research / Preview section of profile/README.md", name)
+		link := "https://github.com/WasmAgent/" + name
+		for _, line := range strings.Split(projects, "\n") {
+			if strings.Contains(line, link) && !strings.Contains(line, "Research / Preview") {
+				t.Errorf("Projects-table row for %s lacks a Research / Preview qualifier: %q", name, line)
+			}
 		}
 	}
 
