@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           repository: WasmAgent/.github
-          ref: b766222d89bfd071e8490188c6b0291c386d60e0
+          ref: 19b0883756c9d306a5e7361c5bc5caf423649cc2
           path: .validator
           persist-credentials: false
       - name: Set up Python
