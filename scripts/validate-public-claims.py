@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Validate claims/public-claims.yml and guard against claim overreach.
 
-1.  Claims schema: schema_version 1, unique ids, known claim_class/status.
+1.  Claims schema: schema_version 1, unique ids, known claim_class, and
+    status restricted to the status enum (supported / deprecated /
+    withdrawn).
 2.  Class/ref coherence: externally_observed, independently_reproduced and
     formally_certified require `external_evidence_refs` pointing at existing
     records in evidence/external-validation.json whose evidence_type matches
@@ -17,10 +19,13 @@
     justification is itself a failure).
 4.  Profile consistency guard (PC-01..03): profile/README.md is the public
     trust surface for this registry. It must link the registry through its
-    canonical URL (PC-01), show a claim counter equal to the number of
-    `status: supported` entries (PC-02), and show the registry's
-    last_reviewed date verbatim (PC-03) — the homepage cannot silently
-    drift from the ledger.
+    canonical URL (PC-01), show a claim counter equal to the TOTAL number
+    of claims (PC-02a), and show the registry's last_reviewed date
+    verbatim (PC-03) — the homepage cannot silently drift from the
+    ledger. When the homepage asserts "all `supported`", that must be
+    true: every claim status is then required to be `supported`
+    (PC-02b), so all-supported wording can never outlive a
+    non-supported claim.
 
 Exit 0 on success, 1 on any failure. Requires PyYAML (installed in CI).
 """
@@ -57,6 +62,7 @@ SCAN_SUFFIXES = (".md", ".yml", ".yaml", ".json")
 
 CLASSES = {"internal_supported", "externally_observed", "independently_reproduced", "formally_certified"}
 EXTERNAL_CLASSES = {"externally_observed", "independently_reproduced", "formally_certified"}
+VALID_STATUSES = {"supported", "deprecated", "withdrawn"}
 CLASS_TO_EVIDENCE = {
     "externally_observed": None,  # any external record
     "independently_reproduced": {"independent_layered_run", "independent_native_run"},
@@ -125,6 +131,11 @@ def main() -> int:
         claim_class = claim.get("claim_class", "internal_supported")
         if claim_class not in CLASSES:
             failures.append(f"{cid}: unknown claim_class '{claim_class}'")
+        status = claim.get("status")
+        if status not in VALID_STATUSES:
+            failures.append(
+                f"{cid}: unknown status '{status}' (must be one of {sorted(VALID_STATUSES)})"
+            )
         refs = claim.get("external_evidence_refs") or []
 
         if claim_class == "internal_supported" and refs:
@@ -162,13 +173,23 @@ def main() -> int:
     else:
         with open(profile_path, encoding="utf-8") as handle:
             profile_norm = " ".join(handle.read().split())
-        supported_count = sum(1 for claim in claims if claim.get("status") == "supported")
-        if supported_count <= 0:
-            failures.append("profile: registry has no supported claims — counter invariant undefined")
-        elif not re.search(rf"(?<!\d){supported_count} public claims", profile_norm):
+        # PC-02a: the displayed counter is the TOTAL number of claims —
+        # not the number of supported ones. Those coincide today, but the
+        # homepage copy ("N public claims — all `supported`") makes two
+        # distinct claims and each is checked separately below.
+        if not re.search(rf"(?<!\d){len(claims)} public claims", profile_norm):
             failures.append(
-                f"profile: claim counter must show {supported_count} public claims "
+                f"profile: claim counter must show {len(claims)} public claims "
                 "(profile/README.md drifted from claims/public-claims.yml)"
+            )
+        # PC-02b: asserting "all `supported`" must be true at the moment of
+        # assertion — a non-supported claim invalidates the wording.
+        if "all `supported`" in profile_norm and any(
+            claim.get("status") != "supported" for claim in claims
+        ):
+            failures.append(
+                "profile: homepage claims 'all `supported`' but the registry "
+                "contains a non-supported claim"
             )
         last_reviewed = registry.get("last_reviewed")
         # PyYAML parses an unquoted YYYY-MM-DD as datetime.date, not str.

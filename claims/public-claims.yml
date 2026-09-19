@@ -10,6 +10,7 @@
 # Endorsement/certification wording (the phrases listed in the validator's
 # FORBIDDEN_PATTERNS) is blocked by the same validator;
 # allowlist: claims/claim-overreach-allowlist.json.
+# status (enforced by the same validator): supported | deprecated | withdrawn
 schema_version: 1
 org: WasmAgent
 last_reviewed: 2026-09-19
