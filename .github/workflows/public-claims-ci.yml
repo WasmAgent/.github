@@ -95,3 +95,45 @@ jobs:
             echo "FAIL: pinned validator failed for another reason — inspect /tmp/stale-pin.out"; cat /tmp/stale-pin.out; exit 1;
           }
           echo "OK: pinned validator hard-disables certification allowlist entries"
+
+          # ── Second generation (G1 authority, #237): the pinned validator
+          # must ALSO enforce the claim-status enum and PC-02a total-count
+          # semantics. Fixture: a 7th claim with status `shipped` while the
+          # homepage still reads "6 public claims — all `supported`". The
+          # pre-G1 pin 19b0883 PASSES this fixture (its supported-count
+          # semantics still match: 6 supported == 6 displayed), so a pin
+          # regression below #237 turns this step red instead of silently
+          # dropping G1 protections. Verified empirically: 19b0883 exits 0
+          # on this exact fixture; e463cc9c and later reject it.
+          TMP2=$(mktemp -d)
+          cp -r . "$TMP2/repo"
+          rm -rf "$TMP2/repo/.git" "$TMP2/repo/.validator"
+          python3 - "$TMP2/repo" <<'PY'
+          import sys
+          repo = sys.argv[1]
+          p = f"{repo}/claims/public-claims.yml"
+          t = open(p, encoding="utf-8").read()
+          t += (
+              "  - id: WA-C-9900\n"
+              "    claim_class: internal_supported\n"
+              "    domain: evidence\n"
+              "    claim: >-\n"
+              "      stale-pin discriminator fixture (not a real claim)\n"
+              "    evidence:\n"
+              "      repo: wasmagent-protocol\n"
+              "    status: shipped\n"
+              "    recorded: 2026-09-19\n"
+          )
+          open(p, "w", encoding="utf-8").write(t)
+          PY
+          if python .validator/scripts/validate-public-claims.py --repo-root "$TMP2/repo" > /tmp/stale-pin-g1.out 2>&1; then
+            echo "FAIL: pinned validator ACCEPTED an unknown claim status with total-count drift — pin is STALE (pre-G1 authority, #237 semantics missing)"
+            exit 1
+          fi
+          grep -q "unknown status 'shipped'" /tmp/stale-pin-g1.out || {
+            echo "FAIL: pinned validator failed for another reason — inspect /tmp/stale-pin-g1.out"; cat /tmp/stale-pin-g1.out; exit 1;
+          }
+          grep -q "claim counter must show 7" /tmp/stale-pin-g1.out || {
+            echo "FAIL: pinned validator did not enforce PC-02a total-count — pin is STALE (pre-G1 authority)"; cat /tmp/stale-pin-g1.out; exit 1;
+          }
+          echo "OK: pinned validator carries G1 authority (status enum + PC-02a/02b)"
