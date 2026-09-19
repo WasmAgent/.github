@@ -175,9 +175,11 @@ jobs:
           grep -q "claim counter must show 7" /tmp/stale-pin-g1.out || {
             echo "FAIL: pinned validator did not enforce PC-02a total-count — pin is STALE (pre-G1 authority)"; cat /tmp/stale-pin-g1.out; exit 1;
           }
-          echo "OK: pinned validator carries G1 authority (status enum + PC-02a/02b)"
+          echo "OK: pinned validator carries G1 authority (status enum + PC-02a)"
 
           # PC-02b independent fixture — keep identical to public-claims-ci.
+          # The validator must fail with EXACTLY ONE failure and it must be
+          # the PC-02b message.
           TMP3=$(mktemp -d)
           cp -r . "$TMP3/repo"
           rm -rf "$TMP3/repo/.git" "$TMP3/repo/.validator"
@@ -194,6 +196,9 @@ jobs:
             echo "FAIL: pinned validator ACCEPTED 'all \`supported\`' wording with a deprecated claim — PC-02b is MISSING from the pin"
             exit 1
           fi
+          test "$(grep -c '^FAIL ' /tmp/stale-pin-pc02b.out)" -eq 1 || {
+            echo "FAIL: expected exactly one PC-02b failure — inspect /tmp/stale-pin-pc02b.out"; cat /tmp/stale-pin-pc02b.out; exit 1;
+          }
           grep -q "contains a non-supported claim" /tmp/stale-pin-pc02b.out || {
             echo "FAIL: pinned validator failed for another reason — inspect /tmp/stale-pin-pc02b.out"; cat /tmp/stale-pin-pc02b.out; exit 1;
           }

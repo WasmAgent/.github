@@ -136,15 +136,15 @@ jobs:
           grep -q "claim counter must show 7" /tmp/stale-pin-g1.out || {
             echo "FAIL: pinned validator did not enforce PC-02a total-count — pin is STALE (pre-G1 authority)"; cat /tmp/stale-pin-g1.out; exit 1;
           }
-          echo "OK: pinned validator carries G1 authority (status enum + PC-02a/02b)"
+          echo "OK: pinned validator carries G1 authority (status enum + PC-02a)"
 
           # ── PC-02b independent fixture: exactly one existing claim flips
           # supported -> deprecated (total stays 6, status enum legal,
-          # homepage still asserts "all `supported`"). The ONLY acceptable
-          # failure is the PC-02b message; a validator missing PC-02b
-          # (e.g. one carrying status enum + PC-02a but not 02b) exits 0
-          # here, so this grep is the independent tripwire for the third
-          # G1 invariant.
+          # homepage still asserts "all `supported`"). The validator must
+          # fail with EXACTLY ONE failure and it must be the PC-02b
+          # message; a validator missing PC-02b (e.g. one carrying status
+          # enum + PC-02a but not 02b) exits 0 here, so this is the
+          # independent tripwire for the third G1 invariant.
           TMP3=$(mktemp -d)
           cp -r . "$TMP3/repo"
           rm -rf "$TMP3/repo/.git" "$TMP3/repo/.validator"
@@ -161,6 +161,9 @@ jobs:
             echo "FAIL: pinned validator ACCEPTED 'all \`supported\`' wording with a deprecated claim — PC-02b is MISSING from the pin"
             exit 1
           fi
+          test "$(grep -c '^FAIL ' /tmp/stale-pin-pc02b.out)" -eq 1 || {
+            echo "FAIL: expected exactly one PC-02b failure — inspect /tmp/stale-pin-pc02b.out"; cat /tmp/stale-pin-pc02b.out; exit 1;
+          }
           grep -q "contains a non-supported claim" /tmp/stale-pin-pc02b.out || {
             echo "FAIL: pinned validator failed for another reason — inspect /tmp/stale-pin-pc02b.out"; cat /tmp/stale-pin-pc02b.out; exit 1;
           }
