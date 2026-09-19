@@ -14,10 +14,12 @@ import (
 //
 //   - Core repos (wasmagent-js, wasmagent-protocol, agentbom) must be
 //     labeled `focus: core-spine` in docs/project-index.json.
-//   - symkernel must be labeled `focus: research-preview`. Non-core
-//     research repos may be relabeled to finer-grained non-core focuses
-//     (e.g. wasmagent-train-replay's `evidence-consumer`) but must NEVER
-//     be labeled `core-spine`.
+//   - symkernel must be labeled `focus: research-preview`. The ENUMERATED
+//     Research / Preview repositories must never be labeled core-spine;
+//     non-core research repos may carry finer-grained non-core focuses
+//     (e.g. wasmagent-train-replay's `evidence-consumer`). Deriving the
+//     research set from an authoritative maturity registry instead of this
+//     hardcoded list is deferred to the pinned-CI round.
 //   - In profile/README.md, every Projects-table row linking a research
 //     repo and every Maintainers-wanted bullet mentioning one must carry
 //     a "Research / Preview" qualifier — research repos are never
