@@ -106,7 +106,7 @@ org-owner power; any reduction is an org-membership decision.
 
 ## Consequences
 
-- 2026-09-19: Route B implemented — governance-runner scaffolded with validators vendored from f95d572bff1cfd514d7525fd382b40a520e4b668; App "WasmAgent Governance Root" (ID 4997462) installed on .github; shadow verified (positive PASS, negative HOLD); `governance-root-authority` required on .github/main bound to app_id 4997462, original six checks pinned to the GitHub Actions app (15368). The impersonation probe (same-named green check from the Actions app) does not satisfy the requirement.
+- 2026-09-19: Route B implemented — governance-runner scaffolded with validators vendored from f95d572bff1cfd514d7525fd382b40a520e4b668; App "WasmAgent Governance Root" (ID 4997462) installed on .github; shadow verified (positive PASS, negative HOLD); `governance-root-authority` required on .github/main bound to app_id 4997462, original six checks pinned to the GitHub Actions app (15368). (Historical wording: superseded by the epoch-bound context `governance-root-authority/<runner-sha>` — see the P0d entry.) The impersonation probe (same-named green check from the Actions app) does not satisfy the requirement.
 - 2026-09-19: Root semantic coverage (P0b) increment — governance-runner now pins the candidate's entire judge-code surface (`.github/workflows/**` + `scripts/**`, 44 files @ 6edea17d60aa) in `authority-manifest.json`; tampered, deleted, or unmanifested judge code makes the root check HOLD. Judge-code changes follow the two-phase runbook: manifest PR lands in governance-runner first, then the candidate change.
 - 2026-09-19: Authority epoch (P0d) — the required check context carries
   the full governance-RUNNER authority SHA (the actual judge), e.g.
@@ -123,8 +123,10 @@ org-owner power; any reduction is an org-membership decision.
   40-hex source_commit), then enforces the production SOURCE BINDING: it
   rebuilds the manifest from `source_commit`'s immutable git tree (the
   workflow clones the canonical .github object database) and requires an
-  exact match — unverifiable or mismatched binding fails closed with
-  visible HOLDs and can never be skipped; the runner self-test exercises
+  exact match — mismatched binding fails closed with visible
+  HOLDs and can never be skipped; an unverifiable binding (e.g. the
+  pre-sweeper target clone failing) also fails closed but presents as a
+  missing/pending required check rather than a HOLD; the runner self-test exercises
   the REAL checked-in manifest (16 assertions over 15 obligations); and
   the builder hashes the immutable GIT TREE of the reviewed commit
   (`git ls-tree`/`git show`) instead of a working tree, making the
