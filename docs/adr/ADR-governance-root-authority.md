@@ -85,9 +85,26 @@ Proposed: **B**, in two phases —
 
 Option A can later replace or complement B if the org upgrades.
 
+## Trust assumptions
+
+The governance trust root is:
+
+```text
+WasmAgent organization owners
++ governance-runner admins (2026-09-19: telleroutlook, tellerlin, HainingYin)
++ the Governance App private key (single secret, in governance-runner)
+```
+
+These principals can modify the judge (validators, manifest, App wiring) and
+are therefore part of the trust boundary by definition — this is recorded as
+a trust assumption, not a vulnerability. Repository-level admin on
+governance-runner for principals who are org owners cannot be reduced below
+org-owner power; any reduction is an org-membership decision.
+
 ## Consequences
 
 - 2026-09-19: Route B implemented — governance-runner scaffolded with validators vendored from f95d572bff1cfd514d7525fd382b40a520e4b668; App "WasmAgent Governance Root" (ID 4997462) installed on .github; shadow verified (positive PASS, negative HOLD); `governance-root-authority` required on .github/main bound to app_id 4997462, original six checks pinned to the GitHub Actions app (15368). The impersonation probe (same-named green check from the Actions app) does not satisfy the requirement.
+- 2026-09-19: Root semantic coverage (P0b) increment — governance-runner now pins the candidate's entire judge-code surface (`.github/workflows/**` + `scripts/**`, 44 files @ 6edea17d60aa) in `authority-manifest.json`; tampered, deleted, or unmanifested judge code makes the root check HOLD. Judge-code changes follow the two-phase runbook: manifest PR lands in governance-runner first, then the candidate change.
 
 - The judging authority (validators) moves fully out of the candidate tree.
 - In-tree workflow tampering degrades UX (lost fast feedback) but can no
