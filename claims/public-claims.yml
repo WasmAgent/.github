@@ -12,7 +12,7 @@
 # allowlist: claims/claim-overreach-allowlist.json.
 schema_version: 1
 org: WasmAgent
-last_reviewed: 2026-09-12
+last_reviewed: 2026-09-19
 claims:
   - id: WA-C-0001
     claim_class: internal_supported
@@ -101,3 +101,25 @@ claims:
         - docs/paper-strategy.md (paper in preparation)
     status: supported
     recorded: 2026-07-16
+  - id: WA-C-0006
+    claim_class: independently_reproduced
+    domain: evidence
+    claim: >-
+      An external layered run in Agent-Authority-Conformance/aps-conformance-suite
+      (PR #94, merged 2026-09-16) reproduced the published JS/Rust native AEP
+      verification and chain behavior for the pinned target
+      aep-certified-2026-09-13-03: the lab semantic recomputation matched 28/28
+      corpus semantic targets, 9 DSSE fixtures were exercised, and
+      cross-language positives reproduced in both directions. The semantic layer
+      is Mode B / author-produced and does not constitute an independent
+      semantic verifier or formal certification; the current certified target
+      was not tested by this run.
+    evidence:
+      repo: wasmagent-protocol
+      artifacts:
+        - conformance/aep corpus
+        - certified target aep-certified-2026-09-13-03
+    external_evidence_refs:
+      - EXT-AEP-0001
+    status: supported
+    recorded: 2026-09-19
