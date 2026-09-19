@@ -77,7 +77,7 @@ Platform facts verified 2026-09-19 (owner API):
 
 ## Decision
 
-Proposed: **B**, in two phases —
+Decision: **B** — accepted and implemented, in two phases —
 1. shadow mode: App + runner live, check created but NOT required (observe);
 2. enforcement: add `{context: "governance-root-authority", app_id}` to
    required checks; in-tree pinned-validator steps remain as fast advisory
@@ -105,6 +105,16 @@ org-owner power; any reduction is an org-membership decision.
 
 - 2026-09-19: Route B implemented — governance-runner scaffolded with validators vendored from f95d572bff1cfd514d7525fd382b40a520e4b668; App "WasmAgent Governance Root" (ID 4997462) installed on .github; shadow verified (positive PASS, negative HOLD); `governance-root-authority` required on .github/main bound to app_id 4997462, original six checks pinned to the GitHub Actions app (15368). The impersonation probe (same-named green check from the Actions app) does not satisfy the requirement.
 - 2026-09-19: Root semantic coverage (P0b) increment — governance-runner now pins the candidate's entire judge-code surface (`.github/workflows/**` + `scripts/**`, 44 files @ 6edea17d60aa) in `authority-manifest.json`; tampered, deleted, or unmanifested judge code makes the root check HOLD. Judge-code changes follow the two-phase runbook: manifest PR lands in governance-runner first, then the candidate change.
+- 2026-09-19: Authority-update provenance (P0c) — the checked-in
+  `authority-manifest.json` is itself a validated authority artifact: the
+  sweeper validates its contract at startup (schema v2, required prefixes/
+  exact_files, exact ⊆ files, paths within the surface, sha256 format,
+  40-hex source_commit) and fails closed with visible HOLDs on violation;
+  the runner self-test exercises the REAL checked-in manifest (13 checks);
+  and the builder hashes the immutable GIT TREE of the reviewed commit
+  (`git ls-tree`/`git show`) instead of a working tree, making the
+  wrong-checkout manifest-poisoning near-miss a machine-impossible error
+  class.
 - 2026-09-19: Judge semantic-config closure (P0b2) — manifest v2 (schema_version 2) extends the authority surface to judge POLICY/CONFIG: `policies/**`, `schemas/**`, `golden-path/versions.lock.json`, `claims/claim-overreach-allowlist.json` (50 files @ da2f5e1649db). Real before/after on one head (PR-head of the P0b2 counterexample): under manifest v1 the root check PASSED a weakened `repository-ownership.yml` (and the candidate-owned ownership guard was green); under v2 the same head HOLDs naming the policy hash. Ledger: judge-code integrity (P0b1) and judge semantic-config closure (P0b2) both CLOSED; ordinary governed data (docs/, claims/, evidence/, profile/) remains free to change.
 
 - The judging authority (validators) moves fully out of the candidate tree.
