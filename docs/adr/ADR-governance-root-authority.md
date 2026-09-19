@@ -108,20 +108,25 @@ org-owner power; any reduction is an org-membership decision.
 
 - 2026-09-19: Route B implemented — governance-runner scaffolded with validators vendored from f95d572bff1cfd514d7525fd382b40a520e4b668; App "WasmAgent Governance Root" (ID 4997462) installed on .github; shadow verified (positive PASS, negative HOLD); `governance-root-authority` required on .github/main bound to app_id 4997462, original six checks pinned to the GitHub Actions app (15368). The impersonation probe (same-named green check from the Actions app) does not satisfy the requirement.
 - 2026-09-19: Root semantic coverage (P0b) increment — governance-runner now pins the candidate's entire judge-code surface (`.github/workflows/**` + `scripts/**`, 44 files @ 6edea17d60aa) in `authority-manifest.json`; tampered, deleted, or unmanifested judge code makes the root check HOLD. Judge-code changes follow the two-phase runbook: manifest PR lands in governance-runner first, then the candidate change.
-- 2026-09-19: Authority epoch (P0d) — the required check context now
-  carries the manifest's source_commit
-  (`governance-root-authority/da2f5e1`, app_id 4997462): any authority
-  upgrade automatically changes the context name, so a green verdict from
-  an older authority can never satisfy the current one. The unnumbered
-  `governance-root-authority` context was removed from protection; the
-  flip is the single manual step per upgrade.
+- 2026-09-19: Authority epoch (P0d) — the required check context carries
+  the full governance-RUNNER authority SHA (the actual judge), e.g.
+  `governance-root-authority/87a88229…` (app_id 4997462): a runner change
+  (validators, sweeper, manifest, workflow) changes the emitted context,
+  and after the protection flip a green verdict from an older authority
+  structurally cannot satisfy the current required context. The flip is
+  the single manual step per upgrade (automatic transition would need an
+  App with branch-protection Administration — deliberately not granted).
 - 2026-09-19: Authority-update provenance (P0c) — the checked-in
   `authority-manifest.json` is itself a validated authority artifact: the
   sweeper validates its contract at startup (schema v2, required prefixes/
   exact_files, exact ⊆ files, paths within the surface, sha256 format,
-  40-hex source_commit) and fails closed with visible HOLDs on violation;
-  the runner self-test exercises the REAL checked-in manifest (13 checks);
-  and the builder hashes the immutable GIT TREE of the reviewed commit
+  40-hex source_commit), then enforces the production SOURCE BINDING: it
+  rebuilds the manifest from `source_commit`'s immutable git tree (the
+  workflow clones the canonical .github object database) and requires an
+  exact match — unverifiable or mismatched binding fails closed with
+  visible HOLDs and can never be skipped; the runner self-test exercises
+  the REAL checked-in manifest (16 assertions over 15 obligations); and
+  the builder hashes the immutable GIT TREE of the reviewed commit
   (`git ls-tree`/`git show`) instead of a working tree, making the
   wrong-checkout manifest-poisoning near-miss a machine-impossible error
   class.
