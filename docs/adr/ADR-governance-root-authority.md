@@ -87,6 +87,8 @@ Option A can later replace or complement B if the org upgrades.
 
 ## Consequences
 
+- 2026-09-19: Route B implementation started — governance-runner scaffolded with validators vendored from f95d572bff1cfd514d7525fd382b40a520e4b668; App "WasmAgent Governance Root" (ID 4997462) registered; shadow mode in progress.
+
 - The judging authority (validators) moves fully out of the candidate tree.
 - In-tree workflow tampering degrades UX (lost fast feedback) but can no
   longer produce a passing required check.
