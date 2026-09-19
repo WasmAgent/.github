@@ -46,7 +46,7 @@ func TestRepoCoreTierLabels(t *testing.T) {
 	}
 
 	// symkernel is the canonical research repo and must stay research-preview;
-	// every research repo must never be labeled core-spine.
+	// every ENUMERATED research repo must never be labeled core-spine.
 	for _, name := range researchRepos {
 		repo, found := projectIndex.GetRepoByName(name)
 		if !found {
@@ -62,8 +62,8 @@ func TestRepoCoreTierLabels(t *testing.T) {
 	}
 
 	// The org profile must carry the same split under the evidence-lifecycle
-	// layout: every Projects-table row linking a research repo and every
-	// Maintainers-wanted bullet mentioning one must carry a
+	// layout: every Projects-table row linking an ENUMERATED research repo
+	// and every Maintainers-wanted bullet mentioning one must carry a
 	// "Research / Preview" qualifier.
 	profile, err := os.ReadFile("../../profile/README.md")
 	if err != nil {

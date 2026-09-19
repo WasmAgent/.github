@@ -86,6 +86,97 @@ jobs:
       - name: Public claims firewall
         run: python .validator/scripts/validate-public-claims.py --repo-root .
 
+      # STALE-PIN REGRESSION — equivalent authority assurance with
+      # public-claims-ci (keep the fixtures identical when updating):
+      #   Generation 1: a self-declared formal_certification + allowlist
+      #     entry must be HARD-DISABLED (pre-b766222d pins pass it).
+      #   Generation 2 (G1, #237): a 7th claim with status `shipped` while
+      #     the homepage still reads "6 public claims — all `supported`"
+      #     must be rejected via the status enum AND PC-02a total-count
+      #     (the pre-G1 pin 19b0883 passes this exact fixture, so a pin
+      #     regression below #237 turns this step red).
+      - name: Stale-pin regression (pinned validator authority — hard-disable and G1)
+        run: |
+          set -euo pipefail
+          TMP=$(mktemp -d)
+          cp -r . "$TMP/repo"
+          rm -rf "$TMP/repo/.git" "$TMP/repo/.validator"
+          python3 - "$TMP/repo" <<'PY'
+          import json, os, sys
+          repo = sys.argv[1]
+          ledger_path = os.path.join(repo, "evidence", "external-validation.json")
+          ledger = json.load(open(ledger_path, encoding="utf-8"))
+          ledger["records"].append({
+              "id": "EXT-FAKE-9999",
+              "subject": "AEP",
+              "venue": {"org": "Example Body", "repo": "example/repo"},
+              "evidence_type": "formal_certification",
+              "state": "merged",
+              "certifying_body": "Example Certification Body",
+              "certificate_id": "FAKE-001",
+              "certificate_url": "https://example.org/cert/FAKE-001",
+              "scope": "WasmAgent AEP",
+              "valid_from": "2026-01-01",
+              "claim_ceiling": "x" * 40,
+              "prohibited_claims": ["example_forbidden"],
+              "anchors": {"cert": "https://example.org/cert/FAKE-001"},
+              "limitations": ["fixture"]
+          })
+          json.dump(ledger, open(ledger_path, "w", encoding="utf-8"), indent=2)
+          phrase = "certified by the linux foundation"
+          docs = os.path.join(repo, "docs")
+          os.makedirs(docs, exist_ok=True)
+          with open(os.path.join(docs, "hostile-fixture.md"), "w", encoding="utf-8") as fh:
+              fh.write(f"Agentkit is {phrase}.\n")
+          allow_path = os.path.join(repo, "claims", "claim-overreach-allowlist.json")
+          allow = json.load(open(allow_path, encoding="utf-8"))
+          allow["allowlist"] = [
+              {"phrase": phrase, "file": "docs/hostile-fixture.md", "approved_evidence": "EXT-FAKE-9999"},
+              {"phrase": phrase, "file": "claims/claim-overreach-allowlist.json", "approved_evidence": "EXT-FAKE-9999"},
+          ]
+          json.dump(allow, open(allow_path, "w", encoding="utf-8"), indent=2)
+          PY
+          if python .validator/scripts/validate-public-claims.py --repo-root "$TMP/repo" > /tmp/stale-pin.out 2>&1; then
+            echo "FAIL: pinned validator ACCEPTED a self-declared certification allowlist entry — pin is STALE (hard-disable missing)"
+            exit 1
+          fi
+          grep -q "HARD-DISABLED" /tmp/stale-pin.out || {
+            echo "FAIL: pinned validator failed for another reason — inspect /tmp/stale-pin.out"; cat /tmp/stale-pin.out; exit 1;
+          }
+          echo "OK: pinned validator hard-disables certification allowlist entries"
+          TMP2=$(mktemp -d)
+          cp -r . "$TMP2/repo"
+          rm -rf "$TMP2/repo/.git" "$TMP2/repo/.validator"
+          python3 - "$TMP2/repo" <<'PY'
+          import sys
+          repo = sys.argv[1]
+          p = f"{repo}/claims/public-claims.yml"
+          t = open(p, encoding="utf-8").read()
+          t += (
+              "  - id: WA-C-9900\n"
+              "    claim_class: internal_supported\n"
+              "    domain: evidence\n"
+              "    claim: >-\n"
+              "      stale-pin discriminator fixture (not a real claim)\n"
+              "    evidence:\n"
+              "      repo: wasmagent-protocol\n"
+              "    status: shipped\n"
+              "    recorded: 2026-09-19\n"
+          )
+          open(p, "w", encoding="utf-8").write(t)
+          PY
+          if python .validator/scripts/validate-public-claims.py --repo-root "$TMP2/repo" > /tmp/stale-pin-g1.out 2>&1; then
+            echo "FAIL: pinned validator ACCEPTED an unknown claim status with total-count drift — pin is STALE (pre-G1 authority, #237 semantics missing)"
+            exit 1
+          fi
+          grep -q "unknown status 'shipped'" /tmp/stale-pin-g1.out || {
+            echo "FAIL: pinned validator failed for another reason — inspect /tmp/stale-pin-g1.out"; cat /tmp/stale-pin-g1.out; exit 1;
+          }
+          grep -q "claim counter must show 7" /tmp/stale-pin-g1.out || {
+            echo "FAIL: pinned validator did not enforce PC-02a total-count — pin is STALE (pre-G1 authority)"; cat /tmp/stale-pin-g1.out; exit 1;
+          }
+          echo "OK: pinned validator carries G1 authority (status enum + PC-02a/02b)"
+
   # Replay job: installs and RUNS record-named external packages. Chained
   # after the authority job; it never re-validates the ledgers afterwards —
   # the validator snapshots them before replay and fails closed on mutation.
