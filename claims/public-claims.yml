@@ -30,7 +30,7 @@ claims:
         - packages/mcp-attestation
         - packages/aep (v1.11.0)
         - packages/capability-compiler
-    status: supported
+    status: shipped
     recorded: 2026-07-16
   - id: WA-C-0002
     claim_class: internal_supported

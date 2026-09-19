@@ -1,0 +1,16 @@
+name: Impersonation probe (audit step 21 — never merge)
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  governance-root-authority:
+    name: governance-root-authority
+    runs-on: ubuntu-latest
+    steps:
+      - name: same-named green check from the GitHub Actions app
+        run: echo "deliberate impersonation probe — must NOT satisfy the app_id-bound required check"
