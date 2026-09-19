@@ -73,7 +73,7 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           repository: WasmAgent/.github
-          ref: 2dfc99988dd56c4164422939b60b3a308a7b4499
+          ref: 19b0883756c9d306a5e7361c5bc5caf423649cc2
           path: .validator
           persist-credentials: false
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
