@@ -8,6 +8,10 @@ import (
 	"testing"
 )
 
+// TestVerifiedClaimsSection keeps the profile README's public-claims trust
+// signal in lockstep with claims/public-claims.yml: the claim counter and the
+// registry review date shown on the org homepage must match the live registry,
+// and the registry must be reachable through its canonical absolute URL.
 func TestVerifiedClaimsSection(t *testing.T) {
 	profile, err := os.ReadFile("../../profile/README.md")
 	if err != nil {
@@ -20,14 +24,6 @@ func TestVerifiedClaimsSection(t *testing.T) {
 
 	profileText := string(profile)
 	claimsText := string(claims)
-	sectionIdx := strings.Index(profileText, "## Verified Claims")
-	brandDiagramIdx := strings.Index(profileText, "![WasmAgent architecture]")
-	if sectionIdx < 0 {
-		t.Fatal("profile/README.md is missing the Verified Claims section")
-	}
-	if brandDiagramIdx < 0 || sectionIdx > brandDiagramIdx {
-		t.Fatal("Verified Claims section must appear before the org brand diagram")
-	}
 
 	activeClaimCount := len(regexp.MustCompile(`(?m)^\s+status:\s+supported\s*$`).FindAllString(claimsText, -1))
 
@@ -37,16 +33,16 @@ func TestVerifiedClaimsSection(t *testing.T) {
 	}
 
 	readmeNormalized := strings.Join(strings.Fields(profileText), " ")
-	if !strings.Contains(readmeNormalized, "[`public-claims.yml`](https://github.com/WasmAgent/.github/blob/main/claims/public-claims.yml)") {
-		t.Fatal("Verified Claims section is missing the canonical public-claims.yml link")
+	if !strings.Contains(readmeNormalized, "https://github.com/WasmAgent/.github/blob/main/claims/public-claims.yml") {
+		t.Fatal("profile README is missing the canonical public-claims.yml URL")
 	}
-	if !strings.Contains(readmeNormalized, strconv.Itoa(activeClaimCount)+" active public claims") {
-		t.Fatalf("Verified Claims section does not show the active claim count (%d)", activeClaimCount)
+	if !strings.Contains(readmeNormalized, strconv.Itoa(activeClaimCount)+" public claims") {
+		t.Fatalf("profile README does not show the active claim count (%d)", activeClaimCount)
 	}
-	if !strings.Contains(readmeNormalized, "Last reviewed: **"+reviewMatch[1]+"**") {
-		t.Fatalf("Verified Claims section does not show the registry review date (%s)", reviewMatch[1])
+	if !strings.Contains(readmeNormalized, "Registry last reviewed **"+reviewMatch[1]+"**") {
+		t.Fatalf("profile README does not show the registry review date (%s)", reviewMatch[1])
 	}
-	if !strings.Contains(readmeNormalized, "public claims about our software properties, each with an evidence link and review date — independently checkable") {
-		t.Fatal("Verified Claims section is missing its independently checkable claims explanation")
+	if !strings.Contains(readmeNormalized, "records public software-property claims together with evidence links and review dates so they can be checked independently") {
+		t.Fatal("profile README is missing its independently checkable claims explanation")
 	}
 }

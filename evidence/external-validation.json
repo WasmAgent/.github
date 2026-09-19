@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "last_reviewed": "2026-09-17",
+  "last_reviewed": "2026-09-19",
   "_comment": "Machine-readable ledger of external evidence about WasmAgent artifacts. Distinct evidence_type values carry distinct claim ceilings; formal_certification is never inferred from organization affiliation and requires explicit certificate fields. Consumed by scripts/validate-external-evidence.py (EXT-01..07).",
   "records": [
     {
@@ -75,6 +75,33 @@
       "limitations": [
         "An open issue/PR in an OWASP project is a public contribution under discussion, not testing, certification, or endorsement.",
         "OWASP issue #44 is a reference-implementation proposal (VAL); WasmAgent artifacts are referenced as prior art, not adopted."
+      ]
+    },
+    {
+      "id": "EXT-CDX-0001",
+      "subject": "AEP / behavior evidence interoperability",
+      "venue": {
+        "org": "CycloneDX",
+        "repo": "specification",
+        "issue": 1015
+      },
+      "evidence_type": "upstream_contribution",
+      "state": "open",
+      "claim_ceiling": "CycloneDX specification issue #1015 is an open proposed core enhancement for behavior evidence. Steve Springett stated that the Blueprints working group has briefly discussed taking this work on for v2.1 and invited interested contributors to join the working group.",
+      "prohibited_claims": [
+        "cyclonedx_adopted_aep",
+        "cyclonedx_endorsed_aep",
+        "ecma_accepted_aep",
+        "v2_1_committed",
+        "aep_standardized_by_cyclonedx"
+      ],
+      "anchors": {
+        "issue_url": "https://github.com/CycloneDX/specification/issues/1015",
+        "publication_url": "https://github.com/CycloneDX/specification/issues/1015#issuecomment-5731543798"
+      },
+      "limitations": [
+        "The issue remains open and no CycloneDX 2.1 schema or interoperability design has been accepted.",
+        "The working-group invitation and possible v2.1 discussion do not constitute adoption, endorsement, certification, or standardization of AEP."
       ]
     }
   ]
