@@ -137,3 +137,5 @@ org-owner power; any reduction is an org-membership decision.
   longer produce a passing required check.
 - One App + one runner repo become the reusable governance root for other
   WasmAgent repositories.
+
+- 2026-09-19: P0d2 checkout pin verified end to end (judged tree == epoch basis, asserted in-workflow).
