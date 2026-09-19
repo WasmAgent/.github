@@ -177,6 +177,28 @@ jobs:
           }
           echo "OK: pinned validator carries G1 authority (status enum + PC-02a/02b)"
 
+          # PC-02b independent fixture — keep identical to public-claims-ci.
+          TMP3=$(mktemp -d)
+          cp -r . "$TMP3/repo"
+          rm -rf "$TMP3/repo/.git" "$TMP3/repo/.validator"
+          python3 - "$TMP3/repo" <<'PY'
+          import sys
+          repo = sys.argv[1]
+          p = f"{repo}/claims/public-claims.yml"
+          t = open(p, encoding="utf-8").read()
+          assert t.count("    status: supported\n") == 6
+          t = t.replace("    status: supported\n", "    status: deprecated\n", 1)
+          open(p, "w", encoding="utf-8").write(t)
+          PY
+          if python .validator/scripts/validate-public-claims.py --repo-root "$TMP3/repo" > /tmp/stale-pin-pc02b.out 2>&1; then
+            echo "FAIL: pinned validator ACCEPTED 'all \`supported\`' wording with a deprecated claim — PC-02b is MISSING from the pin"
+            exit 1
+          fi
+          grep -q "contains a non-supported claim" /tmp/stale-pin-pc02b.out || {
+            echo "FAIL: pinned validator failed for another reason — inspect /tmp/stale-pin-pc02b.out"; cat /tmp/stale-pin-pc02b.out; exit 1;
+          }
+          echo "OK: pinned validator independently enforces PC-02b"
+
   # Replay job: installs and RUNS record-named external packages. Chained
   # after the authority job; it never re-validates the ledgers afterwards —
   # the validator snapshots them before replay and fails closed on mutation.

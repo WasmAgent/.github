@@ -20,10 +20,10 @@ import (
 //     (e.g. wasmagent-train-replay's `evidence-consumer`). Deriving the
 //     research set from an authoritative maturity registry instead of this
 //     hardcoded list is deferred to the pinned-CI round.
-//   - In profile/README.md, every Projects-table row linking a research
-//     repo and every Maintainers-wanted bullet mentioning one must carry
-//     a "Research / Preview" qualifier — research repos are never
-//     presented as core, shipping components.
+//   - In profile/README.md, every Projects-table row linking an ENUMERATED
+//     research repo and every Maintainers-wanted bullet mentioning one must
+//     carry a "Research / Preview" qualifier — enumerated research repos
+//     are never presented as core, shipping components.
 func TestRepoCoreTierLabels(t *testing.T) {
 	projectIndex, err := docs.LoadProjectIndex()
 	if err != nil {
